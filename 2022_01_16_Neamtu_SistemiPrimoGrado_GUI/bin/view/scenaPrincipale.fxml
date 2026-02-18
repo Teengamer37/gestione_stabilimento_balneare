@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.RadialGradient?>
+<?import javafx.scene.paint.Stop?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane prefHeight="500.0" prefWidth="700.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.ScenaPrincipaleController">
+   <children>
+      <AnchorPane prefHeight="250.0" prefWidth="700.0" style="-fx-background-color: white;">
+         <children>
+            <Text layoutX="140.0" layoutY="41.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sistema di 2 equazioni di primo grado" underline="true">
+               <font>
+                  <Font size="25.0" />
+               </font>
+               <fill>
+                  <RadialGradient centerX="0.46685082872928174" centerY="0.6184834123222749" radius="0.5">
+                     <stops>
+                        <Stop>
+                           <color>
+                              <Color red="1.0" />
+                           </color>
+                        </Stop>
+                        <Stop offset="1.0">
+                           <color>
+                              <Color />
+                           </color>
+                        </Stop>
+                     </stops>
+                  </RadialGradient>
+               </fill>
+            </Text>
+            <Text layoutX="253.0" layoutY="164.0" strokeType="OUTSIDE" strokeWidth="0.0" text="{">
+               <font>
+                  <Font size="96.0" />
+               </font>
+            </Text>
+            <TextField fx:id="a" layoutX="281.0" layoutY="103.0" prefHeight="25.0" prefWidth="35.0" />
+            <TextField fx:id="b" layoutX="346.0" layoutY="103.0" prefHeight="25.0" prefWidth="35.0" />
+            <TextField fx:id="c" layoutX="416.0" layoutY="104.0" prefHeight="25.0" prefWidth="35.0" />
+            <TextField fx:id="d" layoutX="281.0" layoutY="146.0" prefHeight="25.0" prefWidth="35.0" />
+            <TextField fx:id="e" layoutX="346.0" layoutY="148.0" prefHeight="25.0" prefWidth="35.0" />
+            <TextField fx:id="f" layoutX="416.0" layoutY="148.0" prefHeight="25.0" prefWidth="35.0" />
+            <Text layoutX="316.0" layoutY="123.0" strokeType="OUTSIDE" strokeWidth="0.0" text="X + ">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </Text>
+            <Text layoutX="316.0" layoutY="166.0" strokeType="OUTSIDE" strokeWidth="0.0" text="X + ">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </Text>
+            <Text layoutX="382.0" layoutY="167.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Y = ">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </Text>
+            <Text layoutX="382.0" layoutY="123.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Y = ">
+               <font>
+                  <Font size="19.0" />
+               </font>
+            </Text>
+            <Button layoutX="312.0" layoutY="197.0" mnemonicParsing="false" onMouseClicked="#handleRisolvi" text="Risolvi!">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Button>
+            <Label fx:id="errore" alignment="CENTER" layoutX="471.0" layoutY="89.0" prefHeight="102.0" prefWidth="216.0" textFill="#ae0000" wrapText="true" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutY="250.0" prefHeight="250.0" prefWidth="700.0" style="-fx-background-color: white;">
+         <children>
+            <Text layoutX="14.0" layoutY="36.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Soluzione:" underline="true">
+               <font>
+                  <Font size="20.0" />
+               </font>
+            </Text>
+            <Label fx:id="risoluzione" alignment="TOP_LEFT" layoutX="14.0" layoutY="48.0" prefHeight="190.0" prefWidth="671.0" style="-fx-background-color: #D3D3D3;" text="Qui visualizzerai la soluzione del sistema tramite il metodo di Cramer appena premerai su &quot;Risolvi!&quot;" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
