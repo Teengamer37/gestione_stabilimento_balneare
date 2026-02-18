@@ -1,4 +1,4 @@
-package com.example.stabilimento_balneare;
+package com.example.s_balneare;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

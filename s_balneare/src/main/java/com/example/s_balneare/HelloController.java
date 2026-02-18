@@ -1,4 +1,4 @@
-package com.example.stabilimento_balneare;
+package com.example.s_balneare;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
