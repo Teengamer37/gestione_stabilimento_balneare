@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="12" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.s_balneare.ui.controller.BookController">
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12"/>
+    </padding>
+
+    <!-- PAGINA WORK IN PROGRESS!!! -->
+
+    <Label text="Prenotazione (Mock)" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+    <Label fx:id="beachLabel" text="Stabilimento: (da impostare)"/>
+
+    <HBox spacing="10">
+        <Label text="Data:"/>
+        <DatePicker fx:id="datePicker"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Persone:"/>
+        <Spinner fx:id="personeSpinner" editable="true"/>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label text="Ombrelloni:"/>
+        <Spinner fx:id="ombrelloniSpinner" editable="true"/>
+        <Label text="Tende:"/>
+        <Spinner fx:id="tendeSpinner" editable="true"/>
+    </HBox>
+
+    <Label fx:id="capacityLabel" text="Capienza: -"/>
+
+    <HBox spacing="10">
+        <Label text="Lettini:"/>
+        <Spinner fx:id="lettiniSpinner" editable="true"/>
+        <Label text="Sdraio:"/>
+        <Spinner fx:id="sdraioSpinner" editable="true"/>
+    </HBox>
+
+    <Button fx:id="confirmButton" text="Conferma (mock)" onAction="#onConfirm"/>
+    <Label fx:id="statusLabel"/>
+</VBox>

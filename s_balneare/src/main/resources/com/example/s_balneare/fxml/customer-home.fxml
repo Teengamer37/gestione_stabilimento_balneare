@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="10" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.s_balneare.ui.controller.CustomerHomeController">
+    <padding>
+        <Insets top="12" right="12" bottom="12" left="12"/>
+    </padding>
+
+    <Label text="Balneazioni disponibili" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+    <TextField fx:id="searchField" promptText="Cerca per città o nome..."/>
+
+    <ListView fx:id="beachList" prefHeight="400"/>
+
+    <HBox spacing="10">
+        <Button fx:id="bookButton" text="Prenota" onAction="#onBook" disable="true"/>
+        <Label fx:id="hintLabel" text="Seleziona uno stabilimento e premi Prenota."/>
+    </HBox>
+</VBox>

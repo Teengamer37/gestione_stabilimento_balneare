@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.s_balneare.ui.controller.RootController">
+
+    <top>
+        <HBox spacing="10" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets top="10" right="12" bottom="10" left="12"/>
+            </padding>
+
+            <Label text="Stabilimenti Balneari" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <HBox HBox.hgrow="ALWAYS"/>
+
+            <Button text="Home" onAction="#onHome"/>
+            <Button text="Login" onAction="#onLogin"/>
+
+            <Label fx:id="userLabel" text="Ospite"/>
+            <Button fx:id="reservedButton" text="Area riservata" onAction="#onReserved"/>
+        </HBox>
+    </top>
+
+    <center>
+        <BorderPane fx:id="contentHost"/>
+    </center>
+
+</BorderPane>
