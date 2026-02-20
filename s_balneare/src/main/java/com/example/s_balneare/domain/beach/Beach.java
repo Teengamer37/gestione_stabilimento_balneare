@@ -4,20 +4,24 @@ import com.example.s_balneare.domain.common.Address;
 
 import java.util.UUID;
 
+/// TBD: da aggiungere disponibilità bar/ristorante e info aggiuntive
+
 public class Beach {
     private final UUID id;
     private String beachName;
     private String beachDescription;
     private Address beachAddress;
     private String telephoneNumber;
+    private Parking parkingSpace;
     private boolean active;
 
-    public Beach(UUID id, String beachName, String beachDescription, Address beachAddress, String telephoneNumber, boolean active) {
+    public Beach(UUID id, String beachName, String beachDescription, Address beachAddress, String telephoneNumber, Parking parkingSpace, boolean active) {
         this.id = id;
         this.beachName = beachName;
         this.beachDescription = beachDescription;
         this.beachAddress = beachAddress;
         this.telephoneNumber = telephoneNumber;
+        this.parkingSpace = parkingSpace;
         this.active = active;
     }
 
