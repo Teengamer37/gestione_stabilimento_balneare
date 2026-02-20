@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  mysql_db:
+    image: mysql:latest
+    container_name: mysql_container
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: prova
+      MYSQL_DATABASE: test
+      MYSQL_USER: javauser
+      MYSQL_PASSWORD: sb
+    ports:
+    - '3307:3306'
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
