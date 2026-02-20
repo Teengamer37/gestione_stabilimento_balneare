@@ -1,20 +1,18 @@
-DROP database if exists stabilimenti;
-CREATE database stabilimenti;
-use stabilimenti;
+DROP DATABASE IF EXISTS stabilimenti;
+CREATE DATABASE stabilimenti;
+USE stabilimenti;
 
-create table user (
-    id int primary key auto_increment,
+CREATE TABLE users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
     nome varchar(64) NOT NULL
 );
 
-create table beach (
-    id int primary key auto_increment,
-    nome varchar(64) NOT NULL
+CREATE TABLE beaches (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(64) NOT NULL
 );
 
-create table admin (
-    id int primary key auto_increment,
-    nome varchar(64) NOT NULL
+CREATE TABLE admins (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nome VARCHAR(64) NOT NULL
 )
-
-
