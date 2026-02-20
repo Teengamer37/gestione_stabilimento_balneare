@@ -6,7 +6,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: prova
-      MYSQL_DATABASE: test
+      MYSQL_DATABASE: stabilimenti
       MYSQL_USER: javauser
       MYSQL_PASSWORD: sb
     ports:

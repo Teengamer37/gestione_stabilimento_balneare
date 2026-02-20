@@ -1,11 +1,20 @@
-DROP TABLE if exists prova;
+DROP database if exists stabilimenti;
+CREATE database stabilimenti;
+use stabilimenti;
 
-CREATE TABLE if not exists prova(
-                                    id INT PRIMARY KEY AUTO_INCREMENT,
-                                    nome VARCHAR(100) NOT NULL
-    );
+create table user (
+    id int primary key auto_increment,
+    nome varchar(64) NOT NULL
+);
 
-INSERT INTO prova (nome)
-VALUES
-    ('Mario'),
-    ('Luigi');
+create table beach (
+    id int primary key auto_increment,
+    nome varchar(64) NOT NULL
+);
+
+create table admin (
+    id int primary key auto_increment,
+    nome varchar(64) NOT NULL
+)
+
+
