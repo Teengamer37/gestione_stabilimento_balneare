@@ -1,27 +1,25 @@
 package com.example.s_balneare.domain.beach;
 
-import com.example.s_balneare.domain.common.Address;
-
 import java.util.UUID;
-
-/// TBD: da aggiungere disponibilità bar/ristorante e info aggiuntive
 
 public class Beach {
     private final UUID id;
-    private String beachName;
-    private String beachDescription;
-    private Address beachAddress;
-    private String telephoneNumber;
-    private Parking parkingSpace;
+    private final UUID ownerID;
+
+    private BeachGeneral beachGeneral;
+    private BeachInventory beachInventory;
+    private BeachServices beachServices;
+
+    private String extraInfo;
     private boolean active;
 
-    public Beach(UUID id, String beachName, String beachDescription, Address beachAddress, String telephoneNumber, Parking parkingSpace, boolean active) {
+    public Beach(UUID id, UUID ownerID, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, String extraInfo, boolean active) {
         this.id = id;
-        this.beachName = beachName;
-        this.beachDescription = beachDescription;
-        this.beachAddress = beachAddress;
-        this.telephoneNumber = telephoneNumber;
-        this.parkingSpace = parkingSpace;
+        this.ownerID = ownerID;
+        this.beachGeneral = beachGeneral;
+        this.beachInventory = beachInventory;
+        this.beachServices = beachServices;
+        this.extraInfo = extraInfo;
         this.active = active;
     }
 
@@ -29,36 +27,40 @@ public class Beach {
         return id;
     }
 
-    public String getBeachName() {
-        return beachName;
+    public UUID getOwnerID() {
+        return ownerID;
     }
 
-    public void setBeachName(String beachName) {
-        this.beachName = beachName;
+    public BeachGeneral getBeachGeneral() {
+        return beachGeneral;
     }
 
-    public String getBeachDescription() {
-        return beachDescription;
+    public void setBeachGeneral(BeachGeneral beachGeneral) {
+        this.beachGeneral = beachGeneral;
     }
 
-    public void setBeachDescription(String beachDescription) {
-        this.beachDescription = beachDescription;
+    public BeachInventory getBeachInventory() {
+        return beachInventory;
     }
 
-    public Address getBeachAddress() {
-        return beachAddress;
+    public void setBeachInventory(BeachInventory beachInventory) {
+        this.beachInventory = beachInventory;
     }
 
-    public void setBeachAddress(Address beachAddress) {
-        this.beachAddress = beachAddress;
+    public BeachServices getBeachServices() {
+        return beachServices;
     }
 
-    public String getTelephoneNumber() {
-        return telephoneNumber;
+    public void setBeachServices(BeachServices beachServices) {
+        this.beachServices = beachServices;
     }
 
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
+    public String getExtraInfo() {
+        return extraInfo;
+    }
+
+    public void setExtraInfo(String extraInfo) {
+        this.extraInfo = extraInfo;
     }
 
     public boolean isActive() {

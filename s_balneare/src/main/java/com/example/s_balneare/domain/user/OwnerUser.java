@@ -5,11 +5,11 @@ import com.example.s_balneare.domain.beach.Beach;
 import java.util.UUID;
 
 public final class OwnerUser extends AppUser {
-    private final Beach beach;
+    private UUID beachID;
 
-    public OwnerUser(UUID id, String email, String username, boolean active, Beach beach) {
+    public OwnerUser(UUID id, String email, String username, boolean active, UUID beachID) {
         super(id, email, username, active);
-        this.beach = beach;
+        this.beachID = beachID;
     }
 
     @Override
@@ -17,7 +17,11 @@ public final class OwnerUser extends AppUser {
         return Role.OWNER;
     }
 
-    public Beach getBeach() {
-        return beach;
+    public UUID getBeachID() {
+        return beachID;
+    }
+
+    public void setBeachID(UUID beachID) {
+        this.beachID = beachID;
     }
 }
