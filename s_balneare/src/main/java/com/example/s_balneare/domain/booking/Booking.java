@@ -1,28 +1,30 @@
 package com.example.s_balneare.domain.booking;
 
+import com.example.s_balneare.domain.beach.Beach;
+import com.example.s_balneare.domain.layout.Spot;
 import com.example.s_balneare.domain.layout.SpotType;
+import com.example.s_balneare.domain.user.CustomerUser;
 
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class Booking {
-    private final UUID id;
-    private final UUID beachID;
-    private final UUID customerID;
+    private final int id;
+    private final Beach beach;
+    private final CustomerUser customer;
     private final LocalDate date;
 
-    private final List<UUID> spotIDs;
+    private final List<Spot> spots;
     private int extraSdraio;
     private int extraLettini;
     private int extraSedie;
 
     private BookingStatus status;
 
-    public Booking(UUID id, UUID beachID, UUID customerID, LocalDate date, List<UUID> spotIDs, int extraSdraio, int extraLettini, int extraSedie) {
-        if (spotIDs.isEmpty()) {
+    public Booking(int id, Beach beach, CustomerUser customer, LocalDate date, List<Spot> spots, int extraSdraio, int extraLettini, int extraSedie) {
+        if (spots.isEmpty()) {
             throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + id);
         }
         if (extraSdraio < 0 || extraLettini < 0 || extraSedie < 0) {
@@ -30,33 +32,33 @@ public class Booking {
         }
 
         this.id = id;
-        this.beachID = beachID;
-        this.customerID = customerID;
+        this.beach = beach;
+        this.customer = customer;
         this.date = date;
-        this.spotIDs = spotIDs;
+        this.spots = spots;
         this.extraSdraio = extraSdraio;
         this.extraLettini = extraLettini;
         this.extraSedie = extraSedie;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public UUID getBeachID() {
-        return beachID;
+    public Beach getBeach() {
+        return beach;
     }
 
-    public UUID getCustomerID() {
-        return customerID;
+    public CustomerUser getCustomer() {
+        return customer;
     }
 
     public LocalDate getDate() {
         return date;
     }
 
-    public List<UUID> getSpotIDs() {
-        return spotIDs;
+    public List<Spot> getSpots() {
+        return spots;
     }
 
     public int getExtraSdraio() {

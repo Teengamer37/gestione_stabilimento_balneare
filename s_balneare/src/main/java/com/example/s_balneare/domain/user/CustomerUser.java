@@ -11,7 +11,7 @@ public final class CustomerUser extends AppUser {
     private Address address;
 
 
-    public CustomerUser(String name, String surname, String phoneNumber, Address address, UUID id, String email, String username, boolean active) {
+    public CustomerUser(String name, String surname, String phoneNumber, Address address, int id, String email, String username, boolean active) {
         super(id, email, username, active);
         this.name = name;
         this.surname = surname;

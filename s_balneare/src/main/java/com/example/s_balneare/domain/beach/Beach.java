@@ -1,34 +1,38 @@
 package com.example.s_balneare.domain.beach;
 
-import java.util.UUID;
+import com.example.s_balneare.domain.user.OwnerUser;
+
+import java.util.List;
 
 public class Beach {
-    private final UUID id;
-    private final UUID ownerID;
+    private final int id;
+    private final OwnerUser owner;
 
     private BeachGeneral beachGeneral;
     private BeachInventory beachInventory;
     private BeachServices beachServices;
 
     private String extraInfo;
+    private List<Season> seasons;
     private boolean active;
 
-    public Beach(UUID id, UUID ownerID, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, String extraInfo, boolean active) {
+    public Beach(int id, OwnerUser owner, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, String extraInfo, List<Season> seasons, boolean active) {
         this.id = id;
-        this.ownerID = ownerID;
+        this.owner = owner;
         this.beachGeneral = beachGeneral;
         this.beachInventory = beachInventory;
         this.beachServices = beachServices;
         this.extraInfo = extraInfo;
+        this.seasons = seasons;
         this.active = active;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public UUID getOwnerID() {
-        return ownerID;
+    public OwnerUser getOwner() {
+        return owner;
     }
 
     public BeachGeneral getBeachGeneral() {
@@ -61,6 +65,10 @@ public class Beach {
 
     public void setExtraInfo(String extraInfo) {
         this.extraInfo = extraInfo;
+    }
+
+    public List<Season> getSeasons() {
+        return seasons;
     }
 
     public boolean isActive() {

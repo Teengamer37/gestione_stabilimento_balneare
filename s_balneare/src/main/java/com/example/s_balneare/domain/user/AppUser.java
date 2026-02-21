@@ -1,14 +1,12 @@
 package com.example.s_balneare.domain.user;
 
-import java.util.UUID;
-
 public abstract class AppUser {
-    private final UUID id;
+    private final int id;
     private String email;
     private String username;
     private boolean active;
 
-    protected AppUser(UUID id, String email, String username, boolean active) {
+    protected AppUser(int id, String email, String username, boolean active) {
         this.id = id;
         this.email = email;
         this.username = username;
@@ -17,7 +15,7 @@ public abstract class AppUser {
 
     public abstract Role getRole();
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 

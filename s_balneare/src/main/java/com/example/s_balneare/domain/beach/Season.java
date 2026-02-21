@@ -1,31 +1,32 @@
 package com.example.s_balneare.domain.beach;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 public class Season {
-    private final UUID id;
-    private final UUID beachID;
+    private final int id;
+    private final Beach beach;
     private LocalDate startDate;
     private LocalDate endDate;
+    private Pricing pricing;
 
-    public Season(UUID id, UUID beachID, LocalDate startDate, LocalDate endDate) {
+    public Season(int id, Beach beach, LocalDate startDate, LocalDate endDate, Pricing pricing) {
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("ERROR: end date must be after start date");
         }
 
         this.id = id;
-        this.beachID = beachID;
+        this.beach = beach;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.pricing = pricing;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public UUID getBeachID() {
-        return beachID;
+    public Beach getBeach() {
+        return beach;
     }
 
     public LocalDate getStartDate() {
@@ -42,6 +43,10 @@ public class Season {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public Pricing getPricing() {
+        return pricing;
     }
 
     public boolean includes(LocalDate date) {

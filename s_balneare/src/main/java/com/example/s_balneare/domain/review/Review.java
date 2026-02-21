@@ -1,37 +1,39 @@
 package com.example.s_balneare.domain.review;
 
+import com.example.s_balneare.domain.beach.Beach;
+import com.example.s_balneare.domain.user.CustomerUser;
+
 import java.time.Instant;
-import java.util.UUID;
 
 public class Review {
-    private final UUID id;
-    private final UUID beachID;
-    private final UUID customerID;
+    private final int id;
+    private final Beach beach;
+    private final CustomerUser customer;
 
     private final int rating;               //da 1 a 5
     private final String comment;
     private final Instant createdAt;
 
-    public Review(UUID id, UUID beachID, UUID customerID, int rating, String comment) {
+    public Review(int id, Beach beach, CustomerUser customer, int rating, String comment) {
         if (rating < 1 || rating > 5) throw new IllegalArgumentException("ERROR: rating must be between 1 and 5");
         this.id = id;
-        this.beachID = beachID;
-        this.customerID = customerID;
+        this.beach = beach;
+        this.customer = customer;
         this.rating = rating;
         this.comment = comment == null ? "" : comment;
         this.createdAt = Instant.now();
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public UUID getBeachID() {
-        return beachID;
+    public Beach getBeach() {
+        return beach;
     }
 
-    public UUID getCustomerID() {
-        return customerID;
+    public CustomerUser getCustomer() {
+        return customer;
     }
 
     public int getRating() {

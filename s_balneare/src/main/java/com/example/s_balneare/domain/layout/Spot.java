@@ -1,29 +1,29 @@
 package com.example.s_balneare.domain.layout;
 
-import java.util.UUID;
+import com.example.s_balneare.domain.beach.Beach;
 
 public class Spot {
-    private final UUID id;
-    private final UUID beachID;
+    private final int id;
+    private final Beach beach;
     private final SpotType type;
 
     private final int row;
     private final int column;
 
-    public Spot(UUID id, UUID beachID, SpotType type, int row, int column) {
+    public Spot(int id, Beach beach, SpotType type, int row, int column) {
         this.id = id;
-        this.beachID = beachID;
+        this.beach = beach;
         this.type = type;
         this.row = row;
         this.column = column;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public UUID getBeachID() {
-        return beachID;
+    public Beach getBeach() {
+        return beach;
     }
 
     public SpotType getType() {

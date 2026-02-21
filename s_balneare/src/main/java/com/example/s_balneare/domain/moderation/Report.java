@@ -1,38 +1,50 @@
 package com.example.s_balneare.domain.moderation;
 
+import com.example.s_balneare.domain.user.AppUser;
+import com.example.s_balneare.domain.user.Role;
+
 import java.time.Instant;
-import java.util.UUID;
 
 public class Report {
-    private final UUID id;
-    private final UUID reporterID;
-    private final UUID reportedID;
+    private final int id;
+    private final AppUser reporter;
+    private final AppUser reported;
     private final ReportTargetType reportedType;
 
     private final String description;
     private final Instant createdAt;
     private ReportStatus status;
 
-    public Report(UUID id, UUID reporterID, UUID reportedID, ReportTargetType reportedType, String description) {
+    public Report(int id, AppUser reporter, AppUser reported, String description) {
+        if (reporter == null || reported == null) throw new IllegalArgumentException("ERROR: reporter and/or reported users cannot be null");
+        if (reporter.getId().equals(reported.getId())) throw new IllegalArgumentException("ERROR: reporter and reported cannot be the same user");
+        if (description.isBlank()) throw new IllegalArgumentException("ERROR: description cannot be empty");
+
         this.id = id;
-        this.reporterID = reporterID;
-        this.reportedID = reportedID;
-        this.reportedType = reportedType;
+        this.reporter = reporter;
+        this.reported = reported;
+
+        if(reported.getRole() == Role.CUSTOMER) {
+            reportedType = ReportTargetType.USER;
+        } else {
+            reportedType = ReportTargetType.BEACH;
+        }
+
         this.description = description;
         this.createdAt = Instant.now();
         this.status = ReportStatus.PENDING;
     }
 
-    public UUID getId() {
+    public int getId() {
         return id;
     }
 
-    public UUID getReporterID() {
-        return reporterID;
+    public AppUser getReporter() {
+        return reporter;
     }
 
-    public UUID getReportedID() {
-        return reportedID;
+    public AppUser getReported() {
+        return reported;
     }
 
     public ReportTargetType getReportedType() {
