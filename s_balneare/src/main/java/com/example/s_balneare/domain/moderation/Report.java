@@ -17,7 +17,7 @@ public class Report {
 
     public Report(int id, AppUser reporter, AppUser reported, String description) {
         if (reporter == null || reported == null) throw new IllegalArgumentException("ERROR: reporter and/or reported users cannot be null");
-        if (reporter.getId().equals(reported.getId())) throw new IllegalArgumentException("ERROR: reporter and reported cannot be the same user");
+        if (reporter.getId() == reported.getId()) throw new IllegalArgumentException("ERROR: reporter and reported cannot be the same user");
         if (description.isBlank()) throw new IllegalArgumentException("ERROR: description cannot be empty");
 
         this.id = id;
