@@ -8,8 +8,9 @@ public class Pricing {
     private double priceSdraio;
     private double priceSedie;
     private double priceParcheggio;
+    private double priceChangingRoom;
 
-    public Pricing(int id, double priceOmbrelloni, double priceTende, double priceLettini, double priceSdraio, double priceSedie, double priceParcheggio) {
+    public Pricing(int id, double priceOmbrelloni, double priceTende, double priceLettini, double priceSdraio, double priceSedie, double priceParcheggio,  double priceChangingRoom) {
         this.id = id;
         this.priceOmbrelloni = priceOmbrelloni;
         this.priceTende = priceTende;
@@ -17,6 +18,7 @@ public class Pricing {
         this.priceSdraio = priceSdraio;
         this.priceSedie = priceSedie;
         this.priceParcheggio = priceParcheggio;
+        this.priceChangingRoom = priceChangingRoom;
     }
 
     public int getId() {
@@ -70,4 +72,8 @@ public class Pricing {
     public void setPriceParcheggio(double priceParcheggio) {
         this.priceParcheggio = priceParcheggio;
     }
+
+    public double getPriceChangingRoom() {return priceChangingRoom;}
+
+    public void setPriceChangingRoom(double priceChangingRoom) {this.priceChangingRoom = priceChangingRoom;}
 }

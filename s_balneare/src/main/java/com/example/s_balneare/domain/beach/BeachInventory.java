@@ -6,13 +6,15 @@ public class BeachInventory {
     private int countExtraSdraio;
     private int countExtraLettini;
     private int countExtraSedie;
+    private int countChangingRoom;
 
-    public BeachInventory(int countOmbrelloni, int countTende, int countExtraSdraio, int countExtraLettini, int countExtraSedie) {
+    public BeachInventory(int countOmbrelloni, int countTende, int countExtraSdraio, int countExtraLettini, int countExtraSedie, int countChangingRoom) {
         this.countOmbrelloni = countOmbrelloni;
         this.countTende = countTende;
         this.countExtraSdraio = countExtraSdraio;
         this.countExtraLettini = countExtraLettini;
         this.countExtraSedie = countExtraSedie;
+        this.countChangingRoom = countChangingRoom;
     }
 
     public int getCountOmbrelloni() {
@@ -54,4 +56,8 @@ public class BeachInventory {
     public void setCountExtraSedie(int countExtraSedie) {
         this.countExtraSedie = countExtraSedie;
     }
+
+    public int getCountChangingRoom() {return countChangingRoom;}
+
+    public void setCountChangingRoom(int countChangingRoom) {this.countChangingRoom = countChangingRoom;}
 }

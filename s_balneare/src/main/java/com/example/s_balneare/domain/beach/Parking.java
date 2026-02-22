@@ -5,15 +5,15 @@ public class Parking {
     private int nAutoPark;
     private int nMotoPark;
     private int nBikePark;
-    private boolean electric;
+    private int nElectric;
     private boolean CCTV;
 
-    public Parking(int id, int nAutoPark, int nMotoPark, int nBikePark, boolean electric, boolean CCTV, double priceHour, double priceDay) {
+    public Parking(int id, int nAutoPark, int nMotoPark, int nBikePark, int nElectric, boolean CCTV, double priceHour, double priceDay) {
         this.id = id;
         this.nAutoPark = nAutoPark;
         this.nMotoPark = nMotoPark;
         this.nBikePark = nBikePark;
-        this.electric = electric;
+        this.nElectric = nElectric;
         this.CCTV = CCTV;
     }
 
@@ -45,12 +45,12 @@ public class Parking {
         this.nBikePark = nBikePark;
     }
 
-    public boolean isElectric() {
-        return electric;
+    public int getnElectric() {
+        return nElectric;
     }
 
-    public void setElectric(boolean electric) {
-        this.electric = electric;
+    public void setnElectric(int nElectric) {
+        this.nElectric = nElectric;
     }
 
     public boolean isCCTV() {
