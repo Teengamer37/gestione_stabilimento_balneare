@@ -2,6 +2,11 @@ package com.example.s_balneare.domain.beach;
 
 import java.time.LocalDate;
 
+/// TBD servono due classi per la gestione dei settori e dei prezzi: Zone e ZonePricing,
+///modificare l'attributo price ombrelloni e tende in Pricing ed aggiungere
+///una lista di oggetti della nuova classe, in modo che pricing sia una legenda modificabile dal gestore che servirà
+/// per calcolare i prezzi
+
 public class Season {
     private final int id;
     private final Beach beach;
