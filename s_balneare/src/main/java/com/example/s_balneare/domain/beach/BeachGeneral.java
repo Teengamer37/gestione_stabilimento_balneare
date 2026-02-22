@@ -37,10 +37,6 @@ public class BeachGeneral {
         return beachAddress;
     }
 
-    public void setBeachAddress(Address beachAddress) {
-        this.beachAddress = beachAddress;
-    }
-
     public String getTelephoneNumber() {
         return telephoneNumber;
     }
@@ -51,9 +47,5 @@ public class BeachGeneral {
 
     public Parking getParkingSpace() {
         return parkingSpace;
-    }
-
-    public void setParkingSpace(Parking parkingSpace) {
-        this.parkingSpace = parkingSpace;
     }
 }

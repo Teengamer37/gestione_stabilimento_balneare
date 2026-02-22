@@ -4,18 +4,16 @@ import java.time.LocalDate;
 
 public class Season {
     private final int id;
-    private final Beach beach;
     private LocalDate startDate;
     private LocalDate endDate;
     private Pricing pricing;
 
-    public Season(int id, Beach beach, LocalDate startDate, LocalDate endDate, Pricing pricing) {
+    public Season(int id, LocalDate startDate, LocalDate endDate, Pricing pricing) {
         if (endDate.isBefore(startDate)) {
             throw new IllegalArgumentException("ERROR: end date must be after start date");
         }
 
         this.id = id;
-        this.beach = beach;
         this.startDate = startDate;
         this.endDate = endDate;
         this.pricing = pricing;
@@ -23,10 +21,6 @@ public class Season {
 
     public int getId() {
         return id;
-    }
-
-    public Beach getBeach() {
-        return beach;
     }
 
     public LocalDate getStartDate() {
