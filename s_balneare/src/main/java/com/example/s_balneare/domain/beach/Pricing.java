@@ -2,18 +2,14 @@ package com.example.s_balneare.domain.beach;
 
 public class Pricing {
     private final int id;
-    private double priceOmbrellone;
-    private double priceTenda;
     private double priceLettino;
     private double priceSdraio;
     private double priceSedia;
     private double priceParking;
     private double priceChangingRoom;
 
-    public Pricing(int id, double priceOmbrellone, double priceTenda, double priceLettino, double priceSdraio, double priceSedia, double priceParking, double priceChangingRoom) {
+    public Pricing(int id, double priceLettino, double priceSdraio, double priceSedia, double priceParking, double priceChangingRoom) {
         this.id = id;
-        this.priceOmbrellone = priceOmbrellone;
-        this.priceTenda = priceTenda;
         this.priceLettino = priceLettino;
         this.priceSdraio = priceSdraio;
         this.priceSedia = priceSedia;
@@ -23,22 +19,6 @@ public class Pricing {
 
     public int getId() {
         return id;
-    }
-
-    public double getPriceOmbrellone() {
-        return priceOmbrellone;
-    }
-
-    public void setPriceOmbrellone(double priceOmbrellone) {
-        this.priceOmbrellone = priceOmbrellone;
-    }
-
-    public double getPriceTenda() {
-        return priceTenda;
-    }
-
-    public void setPriceTenda(double priceTenda) {
-        this.priceTenda = priceTenda;
     }
 
     public double getPriceLettino() {
