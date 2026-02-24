@@ -3,38 +3,38 @@ package com.example.s_balneare.domain.beach;
 import com.example.s_balneare.domain.common.Address;
 
 public class BeachGeneral {
-    private String beachName;
-    private String beachDescription;
-    private Address beachAddress;
+    private String name;
+    private String description;
+    private Address address;
     private String telephoneNumber;
     private Parking parkingSpace;
 
-    public BeachGeneral(String beachName, String beachDescription, Address beachAddress, String telephoneNumber, Parking parkingSpace) {
-        this.beachName = beachName;
-        this.beachDescription = beachDescription;
-        this.beachAddress = beachAddress;
+    public BeachGeneral(String name, String description, Address address, String telephoneNumber, Parking parkingSpace) {
+        this.name = name;
+        this.description = description;
+        this.address = address;
         this.telephoneNumber = telephoneNumber;
         this.parkingSpace = parkingSpace;
     }
 
-    public String getBeachName() {
-        return beachName;
+    public String getName() {
+        return name;
     }
 
-    public void setBeachName(String beachName) {
-        this.beachName = beachName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getBeachDescription() {
-        return beachDescription;
+    public String getDescription() {
+        return description;
     }
 
-    public void setBeachDescription(String beachDescription) {
-        this.beachDescription = beachDescription;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public Address getBeachAddress() {
-        return beachAddress;
+    public Address getAddress() {
+        return address;
     }
 
     public String getTelephoneNumber() {

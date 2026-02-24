@@ -1,7 +1,5 @@
 package com.example.s_balneare.domain.layout;
 
-import com.example.s_balneare.domain.beach.Beach;
-
 import java.util.List;
 
 public class Zone {
@@ -9,8 +7,8 @@ public class Zone {
     private String name;
     private List<Spot> spots;
 
-    public Zone(int id, Beach beach, String name, List<Spot> spots) {
-        if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: name cannot be empty");
+    public Zone(int id, String name, List<Spot> spots) {
+        if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: beachName cannot be empty");
 
         this.id = id;
         this.name = name;

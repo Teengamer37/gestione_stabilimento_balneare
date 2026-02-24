@@ -4,7 +4,7 @@ USE stabilimenti;
 
 -- INDIRIZZI UTENTI E SPIAGGIA
 
-CREATE TABLE address (
+CREATE TABLE addresses (
     id INT PRIMARY KEY AUTO_INCREMENT,
     street VARCHAR(255) NOT NULL,
     streetNumber VARCHAR(20) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE address (
 
 -- SPIAGGIA E SERVIZI
 
-CREATE TABLE parking(
+CREATE TABLE parkings (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nAutoPark INT NOT NULL,
     nMotoPark INT NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE parking(
     CCTV BOOLEAN NOT NULL
 );
 
-CREATE TABLE beach_services(
+CREATE TABLE beach_services (
     id INT PRIMARY KEY AUTO_INCREMENT,
     bathrooms BOOLEAN NOT NULL,
     showers BOOLEAN NOT NULL,
@@ -35,7 +35,7 @@ CREATE TABLE beach_services(
     volleyballField BOOLEAN NOT NULL
 );
 
-CREATE TABLE beach_inventory(
+CREATE TABLE beach_inventories (
     id INT PRIMARY KEY AUTO_INCREMENT,
     countOmbrelloni INT NOT NULL,
     countTende INT NOT NULL,
@@ -46,157 +46,164 @@ CREATE TABLE beach_inventory(
 );
 CREATE TABLE beaches (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    phone_number varchar(50) NOT NULL,
-    inventory_id INT NOT NULL,
-    service_id INT NOT NULL,
+    telephoneNumber varchar(50) NOT NULL,
+    beachInventory INT NOT NULL,
+    beachServices INT NOT NULL,
     address INT NOT NULL,
-    parking INT NOT NULL,
-    FOREIGN KEY (inventory_id) REFERENCES beach_inventory (id),
-    FOREIGN KEY (service_id) REFERENCES beach_services (id),
-    FOREIGN KEY (address) REFERENCES address (id),
-    FOREIGN KEY (parking) REFERENCES parking (id)
+    parkingSpace INT NOT NULL,
+    extraInfo VARCHAR(255),
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    FOREIGN KEY (beachInventory) REFERENCES beach_inventories(id),
+    FOREIGN KEY (beachServices) REFERENCES beach_services(id),
+    FOREIGN KEY (address) REFERENCES addresses(id),
+    FOREIGN KEY (parkingSpace) REFERENCES parkings(id)
 );
 
 -- PREZZI, STAGIONI E ZONE
 
-CREATE TABLE pricing(
+CREATE TABLE pricings (
     id INT PRIMARY KEY AUTO_INCREMENT,
     priceLettino INT NOT NULL,
     priceSdraio INT NOT NULL,
     priceSedia INT NOT NULL,
     priceParking INT NOT NULL,
-    priceChangingRoom INT NOT NULL
+    priceCamerino INT NOT NULL
 );
 
-CREATE TABLE season (
+CREATE TABLE seasons (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    beach_id  INT NOT NULL,
-    pricing_id INT NOT NULL,
-    FOREIGN KEY (beach_id) REFERENCES beaches (id),
-    FOREIGN KEY (pricing_id) REFERENCES pricing (id)
+    startDate DATE NOT NULL,
+    endDate DATE NOT NULL,
+    beachId  INT NOT NULL,
+    pricingsId INT NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id),
+    FOREIGN KEY (pricingsId) REFERENCES pricings(id)
 );
 
-CREATE TABLE zone(
+CREATE TABLE zones (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name varchar(50) NOT NULL,
-    beach_id INT NOT NULL,
-    FOREIGN KEY (beach_id) REFERENCES beaches(id)
-);
-CREATE TABLE zone_pricing (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    season_id INT NOT NULL,
-    zone_id INT NOT NULL,
-    price_o INT NOT NULL,
-    price_t INT NOT NULL,
-    FOREIGN KEY (season_id) REFERENCES season(id),
-    FOREIGN KEY (zone_id) REFERENCES zone(id)
+    beachId INT NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id)
 );
 
-CREATE TABLE spot (
+CREATE TABLE zone_pricings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    seasonId INT NOT NULL,
+    zone INT NOT NULL,
+    priceOmbrellone INT NOT NULL,
+    priceTenda INT NOT NULL,
+    FOREIGN KEY (seasonId) REFERENCES seasons(id),
+    FOREIGN KEY (zone) REFERENCES zones(id)
+);
+
+CREATE TABLE spots (
     id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('UMBRELLA', 'TENT') NOT NULL,
-    r INT NOT NULL,
-    c INT NOT NULL,
-    zone_id INT NOT NULL,
-    FOREIGN KEY (zone_id) REFERENCES zone(id)
+    `row` INT NOT NULL,
+    `column` INT NOT NULL,
+    zoneId INT NOT NULL,
+    FOREIGN KEY (zoneId) REFERENCES zones(id)
 );
 
 -- UTENTI
-CREATE TABLE app_user (
+
+CREATE TABLE app_users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    nome varchar(50) NOT NULL,
-    cognome varchar(50) NOT NULL,
+    name varchar(50) NOT NULL,
+    surname varchar(50) NOT NULL,
     username varchar(50) NOT NULL,
     email varchar(50) NOT NULL,
     active BOOLEAN NOT NULL
 );
 
-CREATE TABLE customer (
+CREATE TABLE customers (
     id INT PRIMARY KEY,
     phone_number varchar(50) NOT NULL,
     address INT NOT NULL,
-    FOREIGN KEY (address) REFERENCES address (id),
-    FOREIGN KEY (id) REFERENCES app_user(id)
+    FOREIGN KEY (address) REFERENCES addresses(id),
+    FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
-CREATE TABLE owner
-(
+CREATE TABLE owners (
     id INT PRIMARY KEY,
-    beach_id INT NOT NULL,
-    FOREIGN KEY (beach_id) REFERENCES beaches (id),
-    FOREIGN KEY (id) REFERENCES app_user(id)
+    beach INT NOT NULL,
+    FOREIGN KEY (beach) REFERENCES beaches(id),
+    FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
-CREATE TABLE admin (
+CREATE TABLE admins (
    id INT PRIMARY KEY AUTO_INCREMENT,
-   nome varchar(50) NOT NULL,
-   cognome varchar(50) NOT NULL,
-   username varchar(50) NOT NULL,
-   email varchar(50) NOT NULL,
-   active BOOLEAN NOT NULL
+   FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
 -- GESTIONE APP
 
-CREATE TABLE booking (
+CREATE TABLE bookings (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    beach_id INT NOT NULL,
-    customer_id INT NOT NULL,
+    beach INT NOT NULL,
+    customer INT NOT NULL,
     date DATE NOT NULL,
     extraSdraio INT NOT NULL,
     extraLettini INT NOT NULL,
     extraSedie INT NOT NULL,
-    changingRooms INT NOT NULL,
+    camerini INT NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL,
-    FOREIGN KEY (beach_id) REFERENCES beaches(id),
-    FOREIGN KEY (customer_id) REFERENCES customer(id)
+    FOREIGN KEY (beach) REFERENCES beaches(id),
+    FOREIGN KEY (customer) REFERENCES customers(id)
 );
 
-CREATE TABLE booking_spots(
-    booking_id INT NOT NULL,
-    spot_id INT NOT NULL,
-    PRIMARY KEY (booking_id, spot_id),
-    FOREIGN KEY (booking_id) REFERENCES booking (id),
-    FOREIGN KEY (spot_id) REFERENCES spot(id)
+CREATE TABLE booking_spots (
+    booking INT NOT NULL,
+    spot INT NOT NULL,
+    PRIMARY KEY (booking, spot),
+    FOREIGN KEY (booking) REFERENCES bookings(id),
+    FOREIGN KEY (spot) REFERENCES spots(id)
 );
 
-CREATE TABLE ban (
+CREATE TABLE bans (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    banned_user_id INT NOT NULL,
-    ban_type ENUM('BEACH', 'APPLICATION'),
-    banned_from_beach_id INT,
-    admin_id INT NOT NULL,
+    banned INT NOT NULL,
+    banType ENUM('BEACH', 'APPLICATION'),
+    bannedFromBeach INT,
+    admin INT NOT NULL,
     reason VARCHAR(255) NOT NULL,
     time DATETIME NOT NULL,
-    FOREIGN KEY (banned_user_id) REFERENCES customer(id),
-    FOREIGN KEY (banned_from_beach_id) REFERENCES beaches(id),
-    FOREIGN KEY (admin_id) REFERENCES admin(id)
+    FOREIGN KEY (banned) REFERENCES customers(id),
+    FOREIGN KEY (bannedFromBeach) REFERENCES beaches(id),
+    FOREIGN KEY (admin) REFERENCES admins(id)
 );
 
-CREATE TABLE review(
+CREATE TABLE reviews (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    beach_id INT NOT NULL,
-    customer_id INT NOT NULL,
+    beach INT NOT NULL,
+    customer INT NOT NULL,
     rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
     comment VARCHAR(500) NOT NULL,
-    created_at DATETIME NOT NULL,
-    FOREIGN KEY (beach_id) REFERENCES beaches(id),
-    FOREIGN KEY (customer_id) REFERENCES customer(id)
+    createdAt DATETIME NOT NULL,
+    FOREIGN KEY (beach) REFERENCES beaches(id),
+    FOREIGN KEY (customer) REFERENCES customers(id)
 );
-CREATE TABLE report(
+
+CREATE TABLE reports (
     id INT NOT NULL PRIMARY KEY,
-    reporter_id INT NOT NULL,
-    reported_id INT NOT NULL,
-    reported_type ENUM('USER', 'BEACH'),
+    reporter INT NOT NULL,
+    reported INT NOT NULL,
+    reportedType ENUM('USER', 'BEACH'),
     description VARCHAR(500) NOT NULL,
-    time DATETIME NOT NULL,
+    createdAt DATETIME NOT NULL,
     status ENUM('PENDING', 'RESOLVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
-    FOREIGN KEY (reported_id) REFERENCES app_user(id),
-    FOREIGN KEY (reporter_id) REFERENCES app_user(id)
-)
+    FOREIGN KEY (reported) REFERENCES app_users(id),
+    FOREIGN KEY (reporter) REFERENCES app_users(id)
+);
 
 
+-- Ti aggiungo un controllo necessario per la tabella bans, poi decidi tu se tenerla o modificarla
+ALTER TABLE bans
+ADD CONSTRAINT chk_bans_beach_id_matches_type CHECK (
+    (banType = 'BEACH' AND bannedFromBeach IS NOT NULL)
+        OR
+    (banType = 'APPLICATION' AND bannedFromBeach IS NULL)
+);

@@ -7,8 +7,8 @@ import java.util.UUID;
 public final class OwnerUser extends AppUser {
     private Beach beach;
 
-    public OwnerUser(int id, String email, String username,String name, String surname, boolean active, Beach beach) {
-        super(id, email, username,name, surname, active);
+    public OwnerUser(int id, String email, String username, String name, String surname, boolean active, Beach beach) {
+        super(id, email, username, name, surname, active);
         this.beach = beach;
     }
 

@@ -13,7 +13,7 @@
     CREATE TABLE IF NOT EXISTS customers (
       user_id uuid PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
       username varchar(100) NOT NULL,
-      name varchar(80) NOT NULL,
+      beachName varchar(80) NOT NULL,
       surname varchar(80) NOT NULL,
       phone varchar(30) NOT NULL
       -- address fields qui oppure in tabella address separata (preferibilmente separata)

@@ -6,15 +6,15 @@ public class Pricing {
     private double priceSdraio;
     private double priceSedia;
     private double priceParking;
-    private double priceChangingRoom;
+    private double priceCamerino;
 
-    public Pricing(int id, double priceLettino, double priceSdraio, double priceSedia, double priceParking, double priceChangingRoom) {
+    public Pricing(int id, double priceLettino, double priceSdraio, double priceSedia, double priceParking, double priceCamerino) {
         this.id = id;
         this.priceLettino = priceLettino;
         this.priceSdraio = priceSdraio;
         this.priceSedia = priceSedia;
         this.priceParking = priceParking;
-        this.priceChangingRoom = priceChangingRoom;
+        this.priceCamerino = priceCamerino;
     }
 
     public int getId() {
@@ -53,11 +53,11 @@ public class Pricing {
         this.priceParking = priceParking;
     }
 
-    public double getPriceChangingRoom() {
-        return priceChangingRoom;
+    public double getPriceCamerino() {
+        return priceCamerino;
     }
 
-    public void setPriceChangingRoom(double priceChangingRoom) {
-        this.priceChangingRoom = priceChangingRoom;
+    public void setPriceCamerino(double priceCamerino) {
+        this.priceCamerino = priceCamerino;
     }
 }

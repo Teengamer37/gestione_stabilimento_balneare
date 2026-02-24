@@ -9,8 +9,8 @@ public final class CustomerUser extends AppUser {
     private Address address;
 
 
-    public CustomerUser(String name, String surname, String phoneNumber, Address address, int id, String email, String username, boolean active) {
-        super(id, email, username,name, surname, active);
+    public CustomerUser(int id, String email, String username, String name, String surname, boolean active, String phoneNumber, Address address) {
+        super(id, email, username, name, surname, active);
         this.phoneNumber = phoneNumber;
         this.address = address;
     }
@@ -18,5 +18,21 @@ public final class CustomerUser extends AppUser {
     @Override
     public Role getRole() {
         return Role.CUSTOMER;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
     }
 }
