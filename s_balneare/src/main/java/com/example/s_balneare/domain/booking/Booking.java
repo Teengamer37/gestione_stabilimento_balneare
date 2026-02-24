@@ -20,15 +20,15 @@ public class Booking {
     private int extraSdraio;
     private int extraLettini;
     private int extraSedie;
-    private int changingRoom;
+    private int changingRooms;
 
     private BookingStatus status;
 
-    public Booking(int id, Beach beach, CustomerUser customer, LocalDate date, List<Spot> spots, int extraSdraio, int extraLettini, int extraSedie, int changingRoom) {
+    public Booking(int id, Beach beach, CustomerUser customer, LocalDate date, List<Spot> spots, int extraSdraio, int extraLettini, int extraSedie, int changingRooms) {
         if (spots.isEmpty()) {
             throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + id);
         }
-        if (extraSdraio < 0 || extraLettini < 0 || extraSedie < 0 || changingRoom < 0) {
+        if (extraSdraio < 0 || extraLettini < 0 || extraSedie < 0 || changingRooms < 0) {
             throw new IllegalArgumentException("ERROR: extra quantity must be >=0 for booking " + id);
         }
 
@@ -40,7 +40,7 @@ public class Booking {
         this.extraSdraio = extraSdraio;
         this.extraLettini = extraLettini;
         this.extraSedie = extraSedie;
-        this.changingRoom = changingRoom;
+        this.changingRooms = changingRooms;
     }
 
     public int getId() {
@@ -90,11 +90,12 @@ public class Booking {
         this.extraSedie = extraSedie;
     }
 
-    public int getChangingRoom() {return changingRoom;}
+    public int getChangingRooms() {return changingRooms;}
 
-    public void setChangingRoom(int changingRoom) {
-        if (changingRoom < 0) throw new IllegalArgumentException("ERROR: quantity must be >=0 for booking " + id);
-        this.changingRoom = changingRoom;}
+    public void setChangingRooms(int changingRooms) {
+        if (changingRooms < 0) throw new IllegalArgumentException("ERROR: quantity must be >=0 for booking " + id);
+        this.changingRooms = changingRooms;
+    }
 
     public BookingStatus getStatus() {
         return status;
