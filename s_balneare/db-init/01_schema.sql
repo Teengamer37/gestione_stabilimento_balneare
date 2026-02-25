@@ -48,11 +48,11 @@ CREATE TABLE beaches (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    telephoneNumber varchar(50) NOT NULL,
-    beachInventory INT NOT NULL,
-    beachServices INT NOT NULL,
-    address INT NOT NULL,
-    parkingSpace INT NOT NULL,
+    telephoneNumber varchar(50) NOT NULL UNIQUE ,
+    beachInventory INT NOT NULL UNIQUE,
+    beachServices INT NOT NULL UNIQUE,
+    address INT NOT NULL UNIQUE,
+    parkingSpace INT NOT NULL UNIQUE,
     extraInfo VARCHAR(255),
     active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (beachInventory) REFERENCES beach_inventories(id),
@@ -77,7 +77,7 @@ CREATE TABLE seasons (
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     beachId  INT NOT NULL,
-    pricingsId INT NOT NULL,
+    pricingsId INT NOT NULL UNIQUE,
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (pricingsId) REFERENCES pricings(id)
 );
@@ -114,14 +114,14 @@ CREATE TABLE app_users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     surname varchar(50) NOT NULL,
-    username varchar(50) NOT NULL,
-    email varchar(50) NOT NULL,
+    username varchar(50) NOT NULL UNIQUE,
+    email varchar(50) NOT NULL UNIQUE,
     active BOOLEAN NOT NULL
 );
 
 CREATE TABLE customers (
     id INT PRIMARY KEY,
-    telephoneNumber varchar(50) NOT NULL,
+    telephoneNumber varchar(50) NOT NULL UNIQUE,
     address INT NOT NULL,
     FOREIGN KEY (address) REFERENCES addresses(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
@@ -129,7 +129,7 @@ CREATE TABLE customers (
 
 CREATE TABLE owners (
     id INT PRIMARY KEY,
-    beach INT NOT NULL,
+    beach INT NOT NULL UNIQUE,
     FOREIGN KEY (beach) REFERENCES beaches(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
 );
@@ -199,6 +199,7 @@ CREATE TABLE reports (
     FOREIGN KEY (reporter) REFERENCES app_users(id)
 );
 
+-- Controlli
 
 -- Ti aggiungo un controllo necessario per la tabella bans, poi decidi tu se tenerla o modificarla
 ALTER TABLE bans
@@ -207,3 +208,27 @@ ADD CONSTRAINT chk_bans_beach_id_matches_type CHECK (
         OR
     (banType = 'APPLICATION' AND bannedFromBeach IS NULL)
 );
+
+ALTER TABLE bans -- Impedisce inserimento di ban identici
+    ADD CONSTRAINT uq_ban_single_active UNIQUE (banned, bannedFromBeach, banType);
+
+ALTER TABLE zones -- Per evitare ad una spiaggia di creare zone uguali
+    ADD CONSTRAINT uq_zone_name_per_beach UNIQUE (beachId, name);
+
+ALTER TABLE zone_pricings -- Per evitare la creazione di stesse zone nelle stesse stagioni con prezzi diversi
+    ADD CONSTRAINT uq_pricing_per_season_zone UNIQUE (seasonId, zone);
+
+ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad una spiaggia (come su google)
+    ADD CONSTRAINT uq_review_per_customer UNIQUE (beach, customer);
+
+ALTER TABLE spots -- Per permettere l'unicità dei posti nella zona
+    ADD CONSTRAINT uq_spot_position UNIQUE (zoneId, `row`, `column`);
+
+ALTER TABLE seasons -- Per impedire la creazione di stagioni duplicate
+    ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId, startDate, endDate);
+
+ALTER TABLE reports -- Uguale a reviews
+    ADD CONSTRAINT uq_report_unique UNIQUE (reporter, reported);
+
+ALTER TABLE addresses -- Riduce dimensione tabella, per utenti diversi con stesso indirizzo (es. più utenti del solito palazzo)
+    ADD CONSTRAINT uq_full_address UNIQUE (street, streetNumber, city, zipCode, country);
