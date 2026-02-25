@@ -6,13 +6,13 @@ import java.util.UUID;
 
 public final class CustomerUser extends AppUser {
     private String phoneNumber;
-    private Address address;
+    private int addressId;
 
 
-    public CustomerUser(int id, String email, String username, String name, String surname, boolean active, String phoneNumber, Address address) {
+    public CustomerUser(int id, String email, String username, String name, String surname, boolean active, String phoneNumber, int addressId) {
         super(id, email, username, name, surname, active);
         this.phoneNumber = phoneNumber;
-        this.address = address;
+        this.addressId = addressId;
     }
 
     @Override
@@ -28,11 +28,11 @@ public final class CustomerUser extends AppUser {
         this.phoneNumber = phoneNumber;
     }
 
-    public Address getAddress() {
-        return address;
+    public int getAddress() {
+        return addressId;
     }
 
-    public void setAddress(Address address) {
-        this.address = address;
+    public void setAddressId(int addressId) {
+        this.addressId = addressId;
     }
 }

@@ -4,16 +4,15 @@ import com.example.s_balneare.domain.layout.Zone;
 
 public class ZonePricing {
     private final int id;
-    private final Zone zone;
+    private final int zoneId;
     private double priceOmbrellone;
     private double priceTenda;
 
-    public ZonePricing(int id, Zone zone, double priceOmbrellone, double priceTenda) {
+    public ZonePricing(int id, int zoneId, double priceOmbrellone, double priceTenda) {
         if (priceOmbrellone <= 0 || priceTenda <= 0) throw new IllegalArgumentException("ERROR: price(s) must be > 0");
-        if (zone == null) throw new IllegalArgumentException("ERROR: zone cannot be null");
 
         this.id = id;
-        this.zone = zone;
+        this.zoneId = zoneId;
         this.priceOmbrellone = priceOmbrellone;
         this.priceTenda = priceTenda;
     }
@@ -22,8 +21,8 @@ public class ZonePricing {
         return id;
     }
 
-    public Zone getZone() {
-        return zone;
+    public int getZoneId() {
+        return zoneId;
     }
 
     public double getPriceOmbrellone() {

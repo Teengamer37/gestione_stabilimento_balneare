@@ -3,33 +3,32 @@ package com.example.s_balneare.domain.moderation;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;
-import com.example.s_balneare.domain.user.Role;
 
 import java.time.Instant;
 
 public class Ban {
     private final int id;
-    private final AppUser banned;
+    private final int bannedId;
     private final BanType banType;
-    private final Beach bannedFromBeach;
-    private final AdminUser admin;
+    private final int bannedFromBeachId;
+    private final int adminId;
 
     private final String reason;
     private final Instant createdAt;
 
-    public Ban(int id, AppUser banned, BanType banType, Beach bannedFromBeach, AdminUser admin, String reason) {
-        if (banned.getRole() == Role.ADMIN) {
-            throw new IllegalArgumentException("ERROR: admin cannot be banned");
-        }
+    public Ban(int id, int bannedId, BanType banType, int bannedFromBeachId, int adminId, String reason) {
+        if (bannedId <= 0) throw new IllegalArgumentException("ERROR: bannedId not valid");
+        if (banType == null) throw new IllegalArgumentException("ERROR: banType not valid");
+        if (adminId <= 0) throw new IllegalArgumentException("ERROR: adminId not valid");
 
-        if (banType == BanType.BEACH && bannedFromBeach == null) {
+        if (banType == BanType.BEACH && bannedFromBeachId <= 0) {
             throw new IllegalArgumentException("ERROR: bannedFromBeachID must be set for BEACH ban");
         }
 
-        if (banType == BanType.APPLICATION && bannedFromBeach != null) {
-            this.bannedFromBeach = null;
+        if (banType == BanType.APPLICATION) {
+            this.bannedFromBeachId = 0;
         } else {
-            this.bannedFromBeach = bannedFromBeach;
+            this.bannedFromBeachId = bannedFromBeachId;
         }
 
         if (reason == null) {
@@ -37,9 +36,9 @@ public class Ban {
         }
 
         this.id = id;
-        this.banned = banned;
+        this.bannedId = bannedId;
         this.banType = banType;
-        this.admin = admin;
+        this.adminId = adminId;
         this.reason = reason;
         this.createdAt = Instant.now();
     }
@@ -48,20 +47,20 @@ public class Ban {
         return id;
     }
 
-    public AppUser getBanned() {
-        return banned;
+    public int getBannedId() {
+        return bannedId;
     }
 
     public BanType getBanType() {
         return banType;
     }
 
-    public Beach getBannedFromBeach() {
-        return bannedFromBeach;
+    public int getBannedFromBeachId() {
+        return bannedFromBeachId;
     }
 
-    public AdminUser getAdmin() {
-        return admin;
+    public int getAdminId() {
+        return adminId;
     }
 
     public String getReason() {

@@ -1,3 +1,8 @@
+
+-- TBD: gestione delete e cascade methods
+
+
+
 DROP DATABASE IF EXISTS stabilimenti;
 CREATE DATABASE stabilimenti;
 USE stabilimenti;
@@ -48,17 +53,17 @@ CREATE TABLE beaches (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL,
     description VARCHAR(255) NOT NULL,
-    telephoneNumber varchar(50) NOT NULL UNIQUE ,
-    beachInventory INT NOT NULL UNIQUE,
-    beachServices INT NOT NULL UNIQUE,
-    address INT NOT NULL UNIQUE,
-    parkingSpace INT NOT NULL UNIQUE,
+    telephoneNumber varchar(50) UNIQUE NOT NULL,
+    beachInventoryId INT UNIQUE NOT NULL,
+    beachServicesId INT UNIQUE NOT NULL,
+    addressId INT UNIQUE NOT NULL,
+    parkingSpaceId INT UNIQUE NOT NULL,
     extraInfo VARCHAR(255),
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY (beachInventory) REFERENCES beach_inventories(id),
-    FOREIGN KEY (beachServices) REFERENCES beach_services(id),
-    FOREIGN KEY (address) REFERENCES addresses(id),
-    FOREIGN KEY (parkingSpace) REFERENCES parkings(id)
+    FOREIGN KEY (beachInventoryId) REFERENCES beach_inventories(id),
+    FOREIGN KEY (beachServicesId) REFERENCES beach_services(id),
+    FOREIGN KEY (addressId) REFERENCES addresses(id),
+    FOREIGN KEY (parkingSpaceId) REFERENCES parkings(id)
 );
 
 -- PREZZI, STAGIONI E ZONE
@@ -72,12 +77,12 @@ CREATE TABLE pricings (
     priceCamerino INT NOT NULL
 );
 
-CREATE TABLE seasons (
+CREATE TABLE seasonIds (
     id INT PRIMARY KEY AUTO_INCREMENT,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     beachId  INT NOT NULL,
-    pricingsId INT NOT NULL UNIQUE,
+    pricingsId INT UNIQUE NOT NULL,
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (pricingsId) REFERENCES pricings(id)
 );
@@ -92,11 +97,11 @@ CREATE TABLE zones (
 CREATE TABLE zone_pricings (
     id INT PRIMARY KEY AUTO_INCREMENT,
     seasonId INT NOT NULL,
-    zone INT NOT NULL,
+    zoneId INT NOT NULL,
     priceOmbrellone INT NOT NULL,
     priceTenda INT NOT NULL,
-    FOREIGN KEY (seasonId) REFERENCES seasons(id),
-    FOREIGN KEY (zone) REFERENCES zones(id)
+    FOREIGN KEY (seasonId) REFERENCES seasonIds(id),
+    FOREIGN KEY (zoneId) REFERENCES zones(id)
 );
 
 CREATE TABLE spots (
@@ -114,23 +119,24 @@ CREATE TABLE app_users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     surname varchar(50) NOT NULL,
-    username varchar(50) NOT NULL UNIQUE,
-    email varchar(50) NOT NULL UNIQUE,
+    username varchar(50) UNIQUE NOT NULL,
+    email varchar(50) UNIQUE NOT NULL,
+    hashPassword varchar(255) NOT NULL,
     active BOOLEAN NOT NULL
 );
 
 CREATE TABLE customers (
     id INT PRIMARY KEY,
-    telephoneNumber varchar(50) NOT NULL UNIQUE,
-    address INT NOT NULL,
-    FOREIGN KEY (address) REFERENCES addresses(id),
+    telephoneNumber varchar(50) UNIQUE NOT NULL,
+    addressId INT NOT NULL,
+    FOREIGN KEY (addressId) REFERENCES addresses(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
 CREATE TABLE owners (
     id INT PRIMARY KEY,
-    beach INT NOT NULL UNIQUE,
-    FOREIGN KEY (beach) REFERENCES beaches(id),
+    beachId INT UNIQUE NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
@@ -143,16 +149,16 @@ CREATE TABLE admins (
 
 CREATE TABLE bookings (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    beach INT NOT NULL,
-    customer INT NOT NULL,
+    beachId INT NOT NULL,
+    customerId INT NOT NULL,
     date DATE NOT NULL,
     extraSdraio INT NOT NULL,
     extraLettini INT NOT NULL,
     extraSedie INT NOT NULL,
     camerini INT NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
-    FOREIGN KEY (beach) REFERENCES beaches(id),
-    FOREIGN KEY (customer) REFERENCES customers(id)
+    FOREIGN KEY (beachId) REFERENCES beaches(id),
+    FOREIGN KEY (customerId) REFERENCES customers(id)
 );
 
 CREATE TABLE booking_spots (
@@ -165,38 +171,38 @@ CREATE TABLE booking_spots (
 
 CREATE TABLE bans (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    banned INT NOT NULL,
+    bannedId INT NOT NULL,
     banType ENUM('BEACH', 'APPLICATION'),
-    bannedFromBeach INT,
-    admin INT NOT NULL,
+    bannedFromBeachId INT,
+    adminId INT NOT NULL,
     reason VARCHAR(255) NOT NULL,
     time DATETIME NOT NULL,
-    FOREIGN KEY (banned) REFERENCES customers(id),
-    FOREIGN KEY (bannedFromBeach) REFERENCES beaches(id),
-    FOREIGN KEY (admin) REFERENCES admins(id)
+    FOREIGN KEY (bannedId) REFERENCES customers(id),
+    FOREIGN KEY (bannedFromBeachId) REFERENCES beaches(id),
+    FOREIGN KEY (adminId) REFERENCES admins(id)
 );
 
 CREATE TABLE reviews (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    beach INT NOT NULL,
-    customer INT NOT NULL,
+    beachId INT NOT NULL,
+    customerId INT NOT NULL,
     rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
     comment VARCHAR(500) NOT NULL,
     createdAt DATETIME NOT NULL,
-    FOREIGN KEY (beach) REFERENCES beaches(id),
-    FOREIGN KEY (customer) REFERENCES customers(id)
+    FOREIGN KEY (beachId) REFERENCES beaches(id),
+    FOREIGN KEY (customerId) REFERENCES customers(id)
 );
 
 CREATE TABLE reports (
     id INT NOT NULL PRIMARY KEY,
-    reporter INT NOT NULL,
-    reported INT NOT NULL,
+    reporterId INT NOT NULL,
+    reportedId INT NOT NULL,
     reportedType ENUM('USER', 'BEACH'),
     description VARCHAR(500) NOT NULL,
     createdAt DATETIME NOT NULL,
     status ENUM('PENDING', 'RESOLVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
-    FOREIGN KEY (reported) REFERENCES app_users(id),
-    FOREIGN KEY (reporter) REFERENCES app_users(id)
+    FOREIGN KEY (reportedId) REFERENCES app_users(id),
+    FOREIGN KEY (reporterId) REFERENCES app_users(id)
 );
 
 -- Controlli
@@ -204,31 +210,31 @@ CREATE TABLE reports (
 -- Ti aggiungo un controllo necessario per la tabella bans, poi decidi tu se tenerla o modificarla
 ALTER TABLE bans
 ADD CONSTRAINT chk_bans_beach_id_matches_type CHECK (
-    (banType = 'BEACH' AND bannedFromBeach IS NOT NULL)
+    (banType = 'BEACH' AND bannedFromBeachId IS NOT NULL)
         OR
-    (banType = 'APPLICATION' AND bannedFromBeach IS NULL)
+    (banType = 'APPLICATION' AND bannedFromBeachId IS NULL)
 );
 
 ALTER TABLE bans -- Impedisce inserimento di ban identici
-    ADD CONSTRAINT uq_ban_single_active UNIQUE (banned, bannedFromBeach, banType);
+    ADD CONSTRAINT uq_ban_single_active UNIQUE (bannedId, bannedFromBeachId, banType);
 
-ALTER TABLE zones -- Per evitare ad una spiaggia di creare zone uguali
+ALTER TABLE zones -- Per evitare ad una spiaggia di creare zoneId uguali
     ADD CONSTRAINT uq_zone_name_per_beach UNIQUE (beachId, name);
 
-ALTER TABLE zone_pricings -- Per evitare la creazione di stesse zone nelle stesse stagioni con prezzi diversi
-    ADD CONSTRAINT uq_pricing_per_season_zone UNIQUE (seasonId, zone);
+ALTER TABLE zone_pricings -- Per evitare la creazione di stesse zoneId nelle stesse stagioni con prezzi diversi
+    ADD CONSTRAINT uq_pricing_per_season_zone UNIQUE (seasonId, zoneId);
 
-ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad una spiaggia (come su google)
-    ADD CONSTRAINT uq_review_per_customer UNIQUE (beach, customer);
+ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad una spiaggia (come su Google)
+    ADD CONSTRAINT uq_review_per_customer UNIQUE (beachId, customerId);
 
 ALTER TABLE spots -- Per permettere l'unicità dei posti nella zona
     ADD CONSTRAINT uq_spot_position UNIQUE (zoneId, `row`, `column`);
 
-ALTER TABLE seasons -- Per impedire la creazione di stagioni duplicate
+ALTER TABLE seasonIds -- Per impedire la creazione di stagioni duplicate
     ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId, startDate, endDate);
 
 ALTER TABLE reports -- Uguale a reviews
-    ADD CONSTRAINT uq_report_unique UNIQUE (reporter, reported);
+    ADD CONSTRAINT uq_report_unique UNIQUE (reporterId, reportedId);
 
 ALTER TABLE addresses -- Riduce dimensione tabella, per utenti diversi con stesso indirizzo (es. più utenti del solito palazzo)
     ADD CONSTRAINT uq_full_address UNIQUE (street, streetNumber, city, zipCode, country);
@@ -268,8 +274,8 @@ ALTER TABLE bookings
 ALTER TABLE spots
     ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);
 
-ALTER TABLE seasons -- Integrità date stagioni
+ALTER TABLE seasonIds -- Integrità date stagioni
     ADD CONSTRAINT chk_season_dates_valid CHECK (startDate < endDate);
 
 ALTER TABLE reports -- Impedisce di fare report su se stessi
-    ADD CONSTRAINT chk_reporter_not_reported CHECK (reporter <> reported);
+    ADD CONSTRAINT chk_reporter_not_reported CHECK (reporterId <> reportedId);

@@ -16,7 +16,7 @@
       beachName varchar(80) NOT NULL,
       surname varchar(80) NOT NULL,
       phone varchar(30) NOT NULL
-      -- address fields qui oppure in tabella address separata (preferibilmente separata)
+      -- addressId fields qui oppure in tabella addressId separata (preferibilmente separata)
     );
 
     create table if not exists owners (

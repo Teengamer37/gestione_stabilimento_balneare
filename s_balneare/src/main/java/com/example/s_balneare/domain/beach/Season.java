@@ -7,18 +7,19 @@ public class Season {
     private final int id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private Pricing pricing;
-    private final List<ZonePricing> zonePricings;
+    private int pricingId;
+    private final List<Integer> zonePricingIds;
 
-    public Season(int id, LocalDate startDate, LocalDate endDate, Pricing pricing, List<ZonePricing> zonePricings) {
+    public Season(int id, LocalDate startDate, LocalDate endDate, int pricingId, List<Integer> zonePricingIds) {
+        if (pricingId <= 0) throw new IllegalArgumentException("ERROR: pricingId not valid");
         if (endDate.isBefore(startDate)) throw new IllegalArgumentException("ERROR: end date must be after start date");
-        if (zonePricings.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set for season");
+        if (zonePricingIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set for season");
 
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
-        this.pricing = pricing;
-        this.zonePricings = zonePricings;
+        this.pricingId = pricingId;
+        this.zonePricingIds = zonePricingIds;
     }
 
     public int getId() {
@@ -41,12 +42,12 @@ public class Season {
         this.endDate = endDate;
     }
 
-    public Pricing getPricing() {
-        return pricing;
+    public int getPricingId() {
+        return pricingId;
     }
 
-    public List<ZonePricing> getZonePricings() {
-        return zonePricings;
+    public List<Integer> getZonePricingIds() {
+        return zonePricingIds;
     }
 
     public boolean includes(LocalDate date) {

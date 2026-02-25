@@ -6,22 +6,28 @@ public class Beach {
     private final int id;
     private final int ownerId;
 
-    private int beachGeneral;
-    private int beachInventory;
-    private int beachServices;
+    private int beachGeneralId;
+    private int beachInventoryId;
+    private int beachServicesId;
 
     private String extraInfo;
-    private List<Integer> seasons;
+    private List<Integer> seasonIds;
     private boolean active;
 
-    public Beach(int id, int ownerId, int beachGeneral, int beachInventory, int beachServices, String extraInfo, List<Integer> seasons, boolean active) {
+    public Beach(int id, int ownerId, int beachGeneralId, int beachInventoryId, int beachServicesId, String extraInfo, List<Integer> seasonIds, boolean active) {
+        if (ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
+        if (beachGeneralId <= 0) throw new IllegalArgumentException("ERROR: beachGeneralId not valid");
+        if (beachInventoryId <= 0) throw new IllegalArgumentException("ERROR: beachInventoryId not valid");
+        if (beachServicesId <= 0) throw new IllegalArgumentException("ERROR: beachServicesId not valid");
+        if (seasonIds == null || seasonIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one season must be set for beach");
+
         this.id = id;
         this.ownerId = ownerId;
-        this.beachGeneral = beachGeneral;
-        this.beachInventory = beachInventory;
-        this.beachServices = beachServices;
+        this.beachGeneralId = beachGeneralId;
+        this.beachInventoryId = beachInventoryId;
+        this.beachServicesId = beachServicesId;
         this.extraInfo = extraInfo;
-        this.seasons = seasons;
+        this.seasonIds = seasonIds;
         this.active = active;
     }
 
@@ -33,28 +39,16 @@ public class Beach {
         return ownerId;
     }
 
-    public int getBeachGeneral() {
-        return beachGeneral;
+    public int getBeachGeneralId() {
+        return beachGeneralId;
     }
 
-    public void setBeachGeneral(int beachGeneral) {
-        this.beachGeneral = beachGeneral;
+    public int getBeachInventoryId() {
+        return beachInventoryId;
     }
 
-    public int getBeachInventory() {
-        return beachInventory;
-    }
-
-    public void setBeachInventory(int beachInventory) {
-        this.beachInventory = beachInventory;
-    }
-
-    public int getBeachServices() {
-        return beachServices;
-    }
-
-    public void setBeachServices(int beachServices) {
-        this.beachServices = beachServices;
+    public int getBeachServicesId() {
+        return beachServicesId;
     }
 
     public String getExtraInfo() {
@@ -65,8 +59,8 @@ public class Beach {
         this.extraInfo = extraInfo;
     }
 
-    public List<Integer> getSeasons() {
-        return seasons;
+    public List<Integer> getSeasonIds() {
+        return seasonIds;
     }
 
     public boolean isActive() {

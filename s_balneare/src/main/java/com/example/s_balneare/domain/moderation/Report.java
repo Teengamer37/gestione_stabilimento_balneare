@@ -7,24 +7,24 @@ import java.time.Instant;
 
 public class Report {
     private final int id;
-    private final AppUser reporter;
-    private final AppUser reported;
+    private final int reporterId;
+    private final int reportedId;
     private final ReportTargetType reportedType;
 
     private final String description;
     private final Instant createdAt;
     private ReportStatus status;
 
-    public Report(int id, AppUser reporter, AppUser reported, String description) {
-        if (reporter == null || reported == null) throw new IllegalArgumentException("ERROR: reporter and/or reported users cannot be null");
-        if (reporter.getId() == reported.getId()) throw new IllegalArgumentException("ERROR: reporter and reported cannot be the same user");
+    public Report(int id, int reporterId, int reportedId, Role reportedRole, String description) {
+        if (reporterId <= 0 || reportedId <= 0) throw new IllegalArgumentException("ERROR: reporter and/or reported users are not initialized correctly");
+        if (reporterId == reportedId) throw new IllegalArgumentException("ERROR: reporter and reported cannot be the same user");
         if (description.isBlank()) throw new IllegalArgumentException("ERROR: description cannot be empty");
 
         this.id = id;
-        this.reporter = reporter;
-        this.reported = reported;
+        this.reporterId = reporterId;
+        this.reportedId = reportedId;
 
-        if(reported.getRole() == Role.CUSTOMER) {
+        if(reportedRole == Role.CUSTOMER) {
             reportedType = ReportTargetType.USER;
         } else {
             reportedType = ReportTargetType.BEACH;
@@ -39,12 +39,12 @@ public class Report {
         return id;
     }
 
-    public AppUser getReporter() {
-        return reporter;
+    public int getReporterId() {
+        return reporterId;
     }
 
-    public AppUser getReported() {
-        return reported;
+    public int getReportedId() {
+        return reportedId;
     }
 
     public ReportTargetType getReportedType() {

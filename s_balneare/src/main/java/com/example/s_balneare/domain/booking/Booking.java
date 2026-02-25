@@ -1,24 +1,17 @@
 package com.example.s_balneare.domain.booking;
 
-import com.example.s_balneare.domain.beach.Beach;
-import com.example.s_balneare.domain.layout.Spot;
-import com.example.s_balneare.domain.layout.SpotType;
-import com.example.s_balneare.domain.user.CustomerUser;
-
 import java.time.LocalDate;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 public class Booking {
     //dati booking
     private final int id;
-    private final Beach beach;
-    private final CustomerUser customer;
+    private final int beachId;
+    private final int customerId;
     private final LocalDate date;
 
     //oggetti booking
-    private final List<Spot> spots;
+    private final List<Integer> spotIds;
     private int extraSdraio;
     private int extraLettini;
     private int extraSedie;
@@ -30,10 +23,10 @@ public class Booking {
     //costruttore fatto con Builder Pattern
     private Booking(BookingBuilder builder) {
         //check dati final
-        if (builder.beach == null) throw new IllegalArgumentException("ERROR: beach cannot be null for booking " + builder.id);
-        if (builder.customer == null) throw new IllegalArgumentException("ERROR: customer cannot be null for booking " + builder.id);
+        if (builder.beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid for booking " + builder.id);
+        if (builder.customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + builder.id);
         if (builder.date == null) throw new IllegalArgumentException("ERROR: date cannot be null for booking " + builder.id);
-        if (builder.spots == null || builder.spots.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + builder.id);
+        if (builder.spotIds == null || builder.spotIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + builder.id);
 
         //check integrità interi
         if (builder.extraSdraio < 0 || builder.extraLettini < 0 || builder.extraSedie < 0 || builder.camerini < 0) {
@@ -41,10 +34,10 @@ public class Booking {
         }
 
         this.id = builder.id;
-        this.beach = builder.beach;
-        this.customer = builder.customer;
+        this.beachId = builder.beachId;
+        this.customerId = builder.customerId;
         this.date = builder.date;
-        this.spots = builder.spots;
+        this.spotIds = builder.spotIds;
         this.extraSdraio = builder.extraSdraio;
         this.extraLettini = builder.extraLettini;
         this.extraSedie = builder.extraSedie;
@@ -55,22 +48,24 @@ public class Booking {
     //builder pattern
     public static class BookingBuilder {
         private final int id;
-        private final Beach beach;
-        private final CustomerUser customer;
+        private final int beachId;
+        private final int customerId;
         private final LocalDate date;
 
-        private final List<Spot> spots;
-        private int extraSdraio;
-        private int extraLettini;
-        private int extraSedie;
-        private int camerini;
+        private final List<Integer> spotIds;
+        private int extraSdraio = 0;
+        private int extraLettini = 0;
+        private int extraSedie = 0;
+        private int camerini = 0;
 
-        public BookingBuilder(int id, Beach beach, CustomerUser customer, LocalDate date, List<Spot> spots) {
+        private BookingStatus status = BookingStatus.PENDING;
+
+        public BookingBuilder(int id, int beachId, int customerId, LocalDate date, List<Integer> spotIds) {
             this.id = id;
-            this.beach = beach;
-            this.customer = customer;
+            this.beachId = beachId;
+            this.customerId = customerId;
             this.date = date;
-            this.spots = spots;
+            this.spotIds = spotIds;
         }
 
         //adders per attributi opzionali
@@ -91,6 +86,11 @@ public class Booking {
             return this;
         }
 
+        public BookingBuilder status(BookingStatus status) {
+            this.status = status;
+            return this;
+        }
+
         //build
         public Booking build() {
             return new Booking(this);
@@ -101,17 +101,17 @@ public class Booking {
     public int getId() {
         return id;
     }
-    public Beach getBeach() {
-        return beach;
+    public int getBeachId() {
+        return beachId;
     }
-    public CustomerUser getCustomer() {
-        return customer;
+    public int getCustomerId() {
+        return customerId;
     }
     public LocalDate getDate() {
         return date;
     }
-    public List<Spot> getSpots() {
-        return spots;
+    public List<Integer> getSpotIds() {
+        return spotIds;
     }
     public int getExtraSdraio() {
         return extraSdraio;

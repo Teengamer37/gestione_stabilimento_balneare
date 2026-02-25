@@ -2,14 +2,13 @@ package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.BookingRepository;
 import com.example.s_balneare.domain.booking.Booking;
+import com.example.s_balneare.domain.booking.BookingStatus;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-
-/// TBD: aggiornare TUTTE LE CLASSI in domain package
-/// prima di proseguire con le repository in JDBC!!!
-/// (ovvero togliere tutte le references e mettere ID al posto loro)
-/// (esempio: Beach beach -> int beachId)
 
 public class JdbcBookingRepository implements BookingRepository {
     private final Connection connection;
@@ -18,15 +17,22 @@ public class JdbcBookingRepository implements BookingRepository {
         this.connection = connection;
     }
 
+    //salva nuovo booking nel DB
     @Override
     public int save(Booking booking) {
+        //check se questo nuovo booking esiste già nel DB
+        if (findById(booking.getId()).isPresent()) {
+            throw new IllegalArgumentException("ERROR: booking already exists");
+        }
+
+        //query
         String sql = "INSERT INTO bookings(beach, customer, date, extraSdraio, extraLettini, extraSedie, camerini) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
+        //settaggio valori nella query + esecuzione query
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            /// TBD: aggiornare questi valori dopo le modifiche!!!
-            statement.setInt(1, booking.getBeach().getId());
-            statement.setInt(2, booking.getCustomer().getId());
+            statement.setInt(1, booking.getBeachId());
+            statement.setInt(2, booking.getCustomerId());
             statement.setDate(3, java.sql.Date.valueOf(booking.getDate()));
             statement.setInt(4, booking.getExtraSdraio());
             statement.setInt(5, booking.getExtraLettini());
@@ -34,6 +40,7 @@ public class JdbcBookingRepository implements BookingRepository {
             statement.setInt(7, booking.getCamerini());
             statement.executeUpdate();
 
+            //prendo nuovo id generato dal DB
             try (ResultSet rs = statement.getGeneratedKeys()) {
                 rs.next();
                 return rs.getInt(1);
@@ -45,8 +52,10 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
+    //cancella booking dal DB
     @Override
     public void delete(int id) {
+        //query
         String sql = "DELETE FROM bookings WHERE id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -57,10 +66,13 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
+    //aggiornamento booking nel DB
     @Override
     public void update(Booking booking) {
+        //query
         String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, status = ? WHERE id = ?";
 
+        //settaggio valori nella query + esecuzione query
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, booking.getExtraSdraio());
             statement.setInt(2, booking.getExtraLettini());
@@ -74,33 +86,59 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
-    ///TBD: rivisitare tutta la query e continuare coi metodi
+    //trova booking dal DB da ID
     @Override
     public Optional<Booking> findById(int id) {
-        String sql = "SELECT b.*," +
-                "au.name AS customerName, au.surname AS customerSurname, au.username AS customerUsername, au.email AS customerEmail, au.active AS customerActive," +
-                "c.telephoneNumber as customerTelephoneNumber" +
-                "ad.street AS customerStreet, ad.streetNumber AS customerStreetNumber, ad.city AS customerCity, ad.zipCode AS customerZipCode, ad.country AS customerCountry" +
-                "" +
-                "FROM bookings b WHERE id = ?" +
-                "JOIN customers c ON b.customer = c.id" +
-                "JOIN beaches be ON b.beach = be.id" +
-                "JOIN app_users au ON au.id = b.customer" +
-                "JOIN addresses ad ON ad.id = au.address";
+        //query
+        String sql = "SELECT b.*, bs.spot FROM bookings b " +
+                     "LEFT JOIN bookings_spots bs ON b.id = bs.booking " +
+                     "WHERE b.id = ?";
 
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        //inserisco ID ed eseguo
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             statement.executeQuery();
 
             try (ResultSet rs = statement.getResultSet()) {
-                rs.next();
+                //controllo se ho trovato qualcosa
+                if (!rs.next()) {
+                    return Optional.empty();
+                }
 
-                // TBD: da modificare IL PRIMA POSSIBILE
-                return Optional.empty();
-                //return new Booking.BookingBuilder(rs.getInt(1))
+                //ricavo la prima riga ritornata dal SELECT
+                int beachId = rs.getInt("beachId");
+                int customerId = rs.getInt("customerId");
+                LocalDate date = rs.getDate("date").toLocalDate();
+                int extraSdraio = rs.getInt("extraSdraio");
+                int extraLettini = rs.getInt("extraLettini");
+                int extraSedie = rs.getInt("extraSedie");
+                int camerini = rs.getInt("camerini");
+                BookingStatus status = BookingStatus.valueOf(rs.getString("status"));
+
+                //inserisco tutti gli spot associati al booking
+                List<Integer> spotIds = new ArrayList<>();
+                int spotId;
+                do {
+                    spotId = rs.getInt("spot");
+                    if (!rs.wasNull()) {
+                        spotIds.add(spotId);
+                    }
+                } while (rs.next());
+
+                //costruisco il Booking
+                Booking booking = new Booking.BookingBuilder(id, beachId, customerId, date, spotIds)
+                        .extraSdraio(extraSdraio)
+                        .extraLettini(extraLettini)
+                        .extraSedie(extraSedie)
+                        .camerini(camerini)
+                        .status(status)
+                        .build();
+
+                return Optional.of(booking);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find booking", e);
+            System.out.println("ERROR: SQL query not executed correctly");
+            return Optional.empty();
         }
     }
 }

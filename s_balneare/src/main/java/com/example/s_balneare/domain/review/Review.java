@@ -7,18 +7,20 @@ import java.time.Instant;
 
 public class Review {
     private final int id;
-    private final Beach beach;
-    private final CustomerUser customer;
+    private final int beachId;
+    private final int customerId;
 
     private final int rating;               //da 1 a 5
     private final String comment;
     private final Instant createdAt;
 
-    public Review(int id, Beach beach, CustomerUser customer, int rating, String comment) {
+    public Review(int id, int beachId, int customerId, int rating, String comment) {
         if (rating < 1 || rating > 5) throw new IllegalArgumentException("ERROR: rating must be between 1 and 5");
+        if (beachId <= 0 || customerId <= 0) throw new IllegalArgumentException("ERROR: beachId and customerId are not valid");
+
         this.id = id;
-        this.beach = beach;
-        this.customer = customer;
+        this.beachId = beachId;
+        this.customerId = customerId;
         this.rating = rating;
         this.comment = comment == null ? "" : comment;
         this.createdAt = Instant.now();
@@ -28,12 +30,12 @@ public class Review {
         return id;
     }
 
-    public Beach getBeach() {
-        return beach;
+    public int getBeachId() {
+        return beachId;
     }
 
-    public CustomerUser getCustomer() {
-        return customer;
+    public int getCustomerId() {
+        return customerId;
     }
 
     public int getRating() {

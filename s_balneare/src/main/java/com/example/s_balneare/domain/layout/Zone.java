@@ -5,14 +5,14 @@ import java.util.List;
 public class Zone {
     private final int id;
     private String name;
-    private List<Spot> spots;
+    private List<Integer> spotIds;
 
-    public Zone(int id, String name, List<Spot> spots) {
+    public Zone(int id, String name, List<Integer> spotIds) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: beachName cannot be empty");
 
         this.id = id;
         this.name = name;
-        this.spots = spots;
+        this.spotIds = spotIds;
     }
 
     public int getId() {
@@ -27,11 +27,7 @@ public class Zone {
         this.name = name;
     }
 
-    public List<Spot> getSpots() {
-        return spots;
-    }
-
-    public void setSpots(List<Spot> spots) {
-        this.spots = spots;
+    public List<Integer> getSpotIds() {
+        return spotIds;
     }
 }
