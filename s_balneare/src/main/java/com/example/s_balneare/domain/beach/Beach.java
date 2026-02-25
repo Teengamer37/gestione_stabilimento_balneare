@@ -1,24 +1,22 @@
 package com.example.s_balneare.domain.beach;
 
-import com.example.s_balneare.domain.user.OwnerUser;
-
 import java.util.List;
 
 public class Beach {
     private final int id;
-    private final OwnerUser owner;
+    private final int ownerId;
 
-    private BeachGeneral beachGeneral;
-    private BeachInventory beachInventory;
-    private BeachServices beachServices;
+    private int beachGeneral;
+    private int beachInventory;
+    private int beachServices;
 
     private String extraInfo;
-    private List<Season> seasons;
+    private List<Integer> seasons;
     private boolean active;
 
-    public Beach(int id, OwnerUser owner, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, String extraInfo, List<Season> seasons, boolean active) {
+    public Beach(int id, int ownerId, int beachGeneral, int beachInventory, int beachServices, String extraInfo, List<Integer> seasons, boolean active) {
         this.id = id;
-        this.owner = owner;
+        this.ownerId = ownerId;
         this.beachGeneral = beachGeneral;
         this.beachInventory = beachInventory;
         this.beachServices = beachServices;
@@ -31,31 +29,31 @@ public class Beach {
         return id;
     }
 
-    public OwnerUser getOwner() {
-        return owner;
+    public int getOwnerId() {
+        return ownerId;
     }
 
-    public BeachGeneral getBeachGeneral() {
+    public int getBeachGeneral() {
         return beachGeneral;
     }
 
-    public void setBeachGeneral(BeachGeneral beachGeneral) {
+    public void setBeachGeneral(int beachGeneral) {
         this.beachGeneral = beachGeneral;
     }
 
-    public BeachInventory getBeachInventory() {
+    public int getBeachInventory() {
         return beachInventory;
     }
 
-    public void setBeachInventory(BeachInventory beachInventory) {
+    public void setBeachInventory(int beachInventory) {
         this.beachInventory = beachInventory;
     }
 
-    public BeachServices getBeachServices() {
+    public int getBeachServices() {
         return beachServices;
     }
 
-    public void setBeachServices(BeachServices beachServices) {
+    public void setBeachServices(int beachServices) {
         this.beachServices = beachServices;
     }
 
@@ -67,7 +65,7 @@ public class Beach {
         this.extraInfo = extraInfo;
     }
 
-    public List<Season> getSeasons() {
+    public List<Integer> getSeasons() {
         return seasons;
     }
 
