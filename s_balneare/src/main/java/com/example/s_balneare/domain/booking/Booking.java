@@ -42,12 +42,12 @@ public class Booking {
         this.extraLettini = builder.extraLettini;
         this.extraSedie = builder.extraSedie;
         this.camerini = builder.camerini;
-        this.status = BookingStatus.PENDING;
+        this.status = builder.status;
     }
 
     //builder pattern
     public static class BookingBuilder {
-        private final int id;
+        private int id;
         private final int beachId;
         private final int customerId;
         private final LocalDate date;
@@ -60,8 +60,18 @@ public class Booking {
 
         private BookingStatus status = BookingStatus.PENDING;
 
+        //costruttore per booking salvati nel DB (con ID)
         public BookingBuilder(int id, int beachId, int customerId, LocalDate date, List<Integer> spotIds) {
             this.id = id;
+            this.beachId = beachId;
+            this.customerId = customerId;
+            this.date = date;
+            this.spotIds = spotIds;
+        }
+
+        //costruttore per salvataggio nuovo booking (senza ID)
+        public BookingBuilder(int beachId, int customerId, LocalDate date, List<Integer> spotIds) {
+            this.id = 0;
             this.beachId = beachId;
             this.customerId = customerId;
             this.date = date;
@@ -148,6 +158,8 @@ public class Booking {
         if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
             throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to be cancelled");
         }
+
+        status = BookingStatus.CANCELLED;
     }
 
     //aggiungi extra sdraio con controlli

@@ -20,35 +20,61 @@ public class JdbcBookingRepository implements BookingRepository {
     //salva nuovo booking nel DB
     @Override
     public int save(Booking booking) {
-        //check se questo nuovo booking esiste già nel DB
-        if (findById(booking.getId()).isPresent()) {
-            throw new IllegalArgumentException("ERROR: booking already exists");
-        }
-
         //query
-        String sql = "INSERT INTO bookings(beach, customer, date, extraSdraio, extraLettini, extraSedie, camerini) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO bookings(beachId, customerId, date, extraSdraio, extraLettini, extraSedie, camerini, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        //settaggio valori nella query + esecuzione query
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setInt(1, booking.getBeachId());
-            statement.setInt(2, booking.getCustomerId());
-            statement.setDate(3, java.sql.Date.valueOf(booking.getDate()));
-            statement.setInt(4, booking.getExtraSdraio());
-            statement.setInt(5, booking.getExtraLettini());
-            statement.setInt(6, booking.getExtraSedie());
-            statement.setInt(7, booking.getCamerini());
-            statement.executeUpdate();
+        try {
+            //inizio "transaction"
+            connection.setAutoCommit(false);
+            int newId;
 
-            //prendo nuovo id generato dal DB
-            try (ResultSet rs = statement.getGeneratedKeys()) {
-                rs.next();
-                return rs.getInt(1);
-            } catch (SQLException e) {
-                throw new RuntimeException("ERROR: SQL insert not executed correctly", e);
+            //settaggio valori nella query + esecuzione query
+            try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setInt(1, booking.getBeachId());
+                statement.setInt(2, booking.getCustomerId());
+                statement.setDate(3, java.sql.Date.valueOf(booking.getDate()));
+                statement.setInt(4, booking.getExtraSdraio());
+                statement.setInt(5, booking.getExtraLettini());
+                statement.setInt(6, booking.getExtraSedie());
+                statement.setInt(7, booking.getCamerini());
+                statement.setString(8, booking.getStatus().toString());
+                statement.executeUpdate();
+
+                //prendo nuovo id generato dal DB
+                try (ResultSet rs = statement.getGeneratedKeys()) {
+                    if (rs.next()) newId = rs.getInt(1);
+                    else throw new SQLException("ERROR: SQL FAILED, no ID generated");
+                }
             }
+
+            List<Integer> spotIds = booking.getSpotIds();
+            sql = "INSERT INTO bookings_spots(booking, spot) VALUES (?, ?)";
+            try (PreparedStatement statement2 = connection.prepareStatement(sql)) {
+                for (int spotId : spotIds) {
+                    statement2.setInt(1, newId);
+                    statement2.setInt(2, spotId);
+                    statement2.addBatch();
+                }
+                statement2.executeBatch();
+            }
+
+            connection.commit();
+            return newId;
         } catch (SQLException e) {
+            try {
+                if (connection != null) connection.rollback();
+            } catch (SQLException e2) {
+                e.addSuppressed(e2);
+            }
+
             throw new RuntimeException("ERROR: unable to save booking", e);
+        } finally {
+            try {
+                if (connection != null) connection.setAutoCommit(true);
+            } catch (SQLException e) {
+                System.out.println("WARNING: unable to set autocommit to true on save booking");
+            }
         }
     }
 
