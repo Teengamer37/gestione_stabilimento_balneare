@@ -232,3 +232,38 @@ ALTER TABLE reports -- Uguale a reviews
 
 ALTER TABLE addresses -- Riduce dimensione tabella, per utenti diversi con stesso indirizzo (es. più utenti del solito palazzo)
     ADD CONSTRAINT uq_full_address UNIQUE (street, streetNumber, city, zipCode, country);
+
+-- CHECK >= 0
+ALTER TABLE parkings
+    ADD CONSTRAINT chk_nAutoPark_nonneg CHECK (nAutoPark >= 0),
+    ADD CONSTRAINT chk_nMotoPark_nonneg CHECK (nMotoPark >= 0),
+    ADD CONSTRAINT chk_nBikePark_nonneg CHECK (nBikePark >= 0),
+    ADD CONSTRAINT chk_nElectricPark_nonneg CHECK (nElectricPark >= 0);
+
+ALTER TABLE beach_inventories
+    ADD CONSTRAINT chk_ombrelloni_nonneg CHECK (countOmbrelloni >= 0),
+    ADD CONSTRAINT chk_tende_nonneg CHECK (countTende >= 0),
+    ADD CONSTRAINT chk_extra_sdraio_nonneg CHECK (countExtraSdraio >= 0),
+    ADD CONSTRAINT chk_extra_lettini_nonneg CHECK (countExtraLettini >= 0),
+    ADD CONSTRAINT chk_extra_sedie_nonneg CHECK (countExtraSedie >= 0),
+    ADD CONSTRAINT chk_camerini_nonneg CHECK (countCamerini >= 0);
+
+ALTER TABLE pricings
+    ADD CONSTRAINT chk_price_lettino_nonneg CHECK (priceLettino >= 0),
+    ADD CONSTRAINT chk_price_sdraio_nonneg CHECK (priceSdraio >= 0),
+    ADD CONSTRAINT chk_price_sedia_nonneg CHECK (priceSedia >= 0),
+    ADD CONSTRAINT chk_price_parking_nonneg CHECK (priceParking >= 0),
+    ADD CONSTRAINT chk_price_camerino_nonneg CHECK (priceCamerino >= 0);
+
+ALTER TABLE zone_pricings
+    ADD CONSTRAINT chk_price_ombrellone_nonneg CHECK (priceOmbrellone >= 0),
+    ADD CONSTRAINT chk_price_tenda_nonneg CHECK (priceTenda >= 0);
+
+ALTER TABLE bookings
+    ADD CONSTRAINT chk_extra_sdraio_booking_nonneg CHECK (extraSdraio >= 0),
+    ADD CONSTRAINT chk_extra_lettini_booking_nonneg CHECK (extraLettini >= 0),
+    ADD CONSTRAINT chk_extra_sedie_booking_nonneg CHECK (extraSedie >= 0),
+    ADD CONSTRAINT chk_camerini_booking_nonneg CHECK (camerini >= 0);
+
+ALTER TABLE spots
+    ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);
