@@ -9,7 +9,7 @@ CREATE TABLE addresses (
     street VARCHAR(255) NOT NULL,
     streetNumber VARCHAR(20) NOT NULL,
     city VARCHAR(100) NOT NULL,
-    zipCode INT NOT NULL,
+    zipCode VARCHAR(20) NOT NULL,
     country VARCHAR(100) NOT NULL
 );
 
@@ -267,3 +267,9 @@ ALTER TABLE bookings
 
 ALTER TABLE spots
     ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);
+
+ALTER TABLE seasons -- Integrità date stagioni
+    ADD CONSTRAINT chk_season_dates_valid CHECK (startDate < endDate);
+
+ALTER TABLE reports -- Impedisce di fare report su se stessi
+    ADD CONSTRAINT chk_reporter_not_reported CHECK (reporter <> reported);
