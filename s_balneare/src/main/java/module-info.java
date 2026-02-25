@@ -1,5 +1,7 @@
 module com.example.s_balneare {
     requires java.sql;
+    requires java.desktop;
+    requires org.postgresql.jdbc;
 
     exports com.example.s_balneare;
     exports com.example.s_balneare.domain.user;

@@ -121,7 +121,7 @@ CREATE TABLE app_users (
 
 CREATE TABLE customers (
     id INT PRIMARY KEY,
-    phone_number varchar(50) NOT NULL,
+    telephoneNumber varchar(50) NOT NULL,
     address INT NOT NULL,
     FOREIGN KEY (address) REFERENCES addresses(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
@@ -150,7 +150,7 @@ CREATE TABLE bookings (
     extraLettini INT NOT NULL,
     extraSedie INT NOT NULL,
     camerini INT NOT NULL,
-    status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL,
+    status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (beach) REFERENCES beaches(id),
     FOREIGN KEY (customer) REFERENCES customers(id)
 );
