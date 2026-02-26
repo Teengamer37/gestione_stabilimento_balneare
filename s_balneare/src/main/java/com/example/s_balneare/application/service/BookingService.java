@@ -3,6 +3,8 @@ package com.example.s_balneare.application.service;
 import com.example.s_balneare.application.port.out.BookingRepository;
 import com.example.s_balneare.domain.booking.Booking;
 
+import java.util.List;
+
 //contiene metodi per gestire la collezione di bookings salvati nel database
 public class BookingService {
     private final BookingRepository bookingRepository;
@@ -13,6 +15,15 @@ public class BookingService {
 
     //aggiunta booking nel DB
     public int addBooking(Booking booking) {
+        //check spot occupati
+        List<Integer> occupiedSpots = bookingRepository.findOccupiedSpots(booking.getBeachId(), booking.getDate());
+
+        for (int spotId : booking.getSpotIds()) {
+            if (occupiedSpots.contains(spotId)) {
+                throw new IllegalArgumentException("ERROR: Spot " + spotId + " is already occupied on " + booking.getDate());
+            }
+        }
+
         return bookingRepository.save(booking);
     }
 

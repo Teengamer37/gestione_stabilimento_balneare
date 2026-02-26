@@ -48,6 +48,7 @@ public class JdbcBookingRepository implements BookingRepository {
                 }
             }
 
+            //aggiungo spot del nuovo booking nel DB
             List<Integer> spotIds = booking.getSpotIds();
             sql = "INSERT INTO bookings_spots(booking, spot) VALUES (?, ?)";
             try (PreparedStatement statement2 = connection.prepareStatement(sql)) {
@@ -59,17 +60,20 @@ public class JdbcBookingRepository implements BookingRepository {
                 statement2.executeBatch();
             }
 
+            //fine transazione: posso salvare
             connection.commit();
             return newId;
         } catch (SQLException e) {
+            //se succede un errore, provo a fare un rollback senza salvare nulla nel DB
             try {
-                if (connection != null) connection.rollback();
+                connection.rollback();
             } catch (SQLException e2) {
                 e.addSuppressed(e2);
             }
 
             throw new RuntimeException("ERROR: unable to save booking", e);
         } finally {
+            //in qualsiasi caso, rimetto i valori di default dell'autocommit
             try {
                 if (connection != null) connection.setAutoCommit(true);
             } catch (SQLException e) {
@@ -166,5 +170,32 @@ public class JdbcBookingRepository implements BookingRepository {
             System.out.println("ERROR: SQL query not executed correctly");
             return Optional.empty();
         }
+    }
+
+    //trova spot occupati per una data specifica
+    @Override
+    public List<Integer> findOccupiedSpots(int beachId, LocalDate date) {
+        //query
+        String sql = "SELECT bs.spot FROM bookings b " +
+                     "JOIN bookings_spots bs ON b.id = bs.booking " +
+                     "WHERE b.beachId = ? AND b.date = ? " +
+                     "AND b.status != 'CANCELLED' AND b.status != 'REJECTED'";
+        List<Integer> occupiedSpots = new ArrayList<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, beachId);
+            statement.setDate(2, java.sql.Date.valueOf(date));
+            statement.executeQuery();
+
+            //aggiungo spot trovati occupati per la data x
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    occupiedSpots.add(rs.getInt("spot"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find occupied spots", e);
+        }
+        return occupiedSpots;
     }
 }
