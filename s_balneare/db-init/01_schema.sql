@@ -76,19 +76,18 @@ CREATE TABLE pricings (
 );
 
 CREATE TABLE seasons (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
     name VARCHAR(50) NOT NULL,
     beachId  INT NOT NULL,
     pricingsId INT UNIQUE NOT NULL,
-    PRIMARY KEY (beachId,id),
+    PRIMARY KEY (beachId,name),
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (pricingsId) REFERENCES pricings(id)
 );
 
 CREATE TABLE zones (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     beachId INT NOT NULL,
     PRIMARY KEY (id, beachId),
@@ -96,21 +95,22 @@ CREATE TABLE zones (
 );
 
 CREATE TABLE zone_tariffs (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     seasonId INT NOT NULL,
     zoneId INT NOT NULL,
     priceOmbrellone INT NOT NULL,
     priceTenda INT NOT NULL,
+    PRIMARY KEY (seasonId,zoneId),
     FOREIGN KEY (seasonId) REFERENCES seasons(id),
     FOREIGN KEY (zoneId) REFERENCES zones(id)
 );
 
 CREATE TABLE spots (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id INT AUTO_INCREMENT,
     type ENUM('UMBRELLA', 'TENT') NOT NULL,
     `row` INT NOT NULL,
     `column` INT NOT NULL,
     zoneId INT NOT NULL,
+    PRIMARY KEY (id,zoneId),
     FOREIGN KEY (zoneId) REFERENCES zones(id)
 );
 
@@ -166,10 +166,11 @@ CREATE TABLE booking_spots (
     beachId INT NOT NULL,
     customerId INT NOT NULL,
     date DATE NOT NULL,
-    spot INT NOT NULL,
-    PRIMARY KEY (beachId,customerId,date,spot),
+    spotId INT NOT NULL,
+    zoneId INT NOT NULL,
+    PRIMARY KEY (beachId,customerId,date,spotId,zoneId),
     FOREIGN KEY (beachId,customerId,date) REFERENCES bookings(beachId,customerId,date),
-    FOREIGN KEY (spot) REFERENCES spots(id)
+    FOREIGN KEY (spotId,zoneId) REFERENCES spots(id,zoneId)
 );
 
 CREATE TABLE bans (
