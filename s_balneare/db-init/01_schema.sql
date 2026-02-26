@@ -20,50 +20,48 @@ CREATE TABLE addresses (
 
 -- SPIAGGIA E SERVIZI
 
-CREATE TABLE parkings (
+CREATE TABLE beaches (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    telephoneNumber varchar(50) UNIQUE NOT NULL,
+    addressId INT UNIQUE NOT NULL,
+    extraInfo VARCHAR(255),
+    active BOOLEAN NOT NULL DEFAULT FALSE,
+    FOREIGN KEY (addressId) REFERENCES addresses(id)
+);
+
+CREATE TABLE parkings (
+    beachId INT PRIMARY KEY,
     nAutoPark INT NOT NULL,
     nMotoPark INT NOT NULL,
     nBikePark INT NOT NULL,
     nElectricPark INT NOT NULL,
-    CCTV BOOLEAN NOT NULL
+    CCTV BOOLEAN NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id)
 );
 
 CREATE TABLE beach_services (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    beachId INT PRIMARY KEY,
     bathrooms BOOLEAN NOT NULL,
     showers BOOLEAN NOT NULL,
     pool BOOLEAN NOT NULL,
     bar BOOLEAN NOT NULL,
     restaurant BOOLEAN NOT NULL,
     wifi BOOLEAN NOT NULL,
-    volleyballField BOOLEAN NOT NULL
+    volleyballField BOOLEAN NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id)
 );
 
 CREATE TABLE beach_inventories (
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    beachId INT PRIMARY KEY,
     countOmbrelloni INT NOT NULL,
     countTende INT NOT NULL,
     countExtraSdraio INT NOT NULL,
     countExtraLettini INT NOT NULL,
     countExtraSedie INT NOT NULL,
-    countCamerini INT NOT NULL
-);
-CREATE TABLE beaches (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    description VARCHAR(255) NOT NULL,
-    telephoneNumber varchar(50) UNIQUE NOT NULL,
-    beachInventoryId INT UNIQUE NOT NULL,
-    beachServicesId INT UNIQUE NOT NULL,
-    addressId INT UNIQUE NOT NULL,
-    parkingSpaceId INT UNIQUE NOT NULL,
-    extraInfo VARCHAR(255),
-    active BOOLEAN NOT NULL DEFAULT TRUE,
-    FOREIGN KEY (beachInventoryId) REFERENCES beach_inventories(id),
-    FOREIGN KEY (beachServicesId) REFERENCES beach_services(id),
-    FOREIGN KEY (addressId) REFERENCES addresses(id),
-    FOREIGN KEY (parkingSpaceId) REFERENCES parkings(id)
+    countCamerini INT NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id)
 );
 
 -- PREZZI, STAGIONI E ZONE
@@ -81,8 +79,10 @@ CREATE TABLE seasons (
     id INT PRIMARY KEY AUTO_INCREMENT,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
+    name VARCHAR(50) NOT NULL,
     beachId  INT NOT NULL,
     pricingsId INT UNIQUE NOT NULL,
+    PRIMARY KEY (beachId,id),
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (pricingsId) REFERENCES pricings(id)
 );
@@ -91,6 +91,7 @@ CREATE TABLE zones (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     beachId INT NOT NULL,
+    PRIMARY KEY (id, beachId),
     FOREIGN KEY (beachId) REFERENCES beaches(id)
 );
 
@@ -148,7 +149,6 @@ CREATE TABLE admins (
 -- GESTIONE APP
 
 CREATE TABLE bookings (
-    id INT PRIMARY KEY AUTO_INCREMENT,
     beachId INT NOT NULL,
     customerId INT NOT NULL,
     date DATE NOT NULL,
@@ -158,14 +158,17 @@ CREATE TABLE bookings (
     camerini INT NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (beachId) REFERENCES beaches(id),
-    FOREIGN KEY (customerId) REFERENCES customers(id)
+    FOREIGN KEY (customerId) REFERENCES customers(id),
+    PRIMARY KEY (beachId,customerId,date)
 );
 
 CREATE TABLE booking_spots (
-    booking INT NOT NULL,
+    beachId INT NOT NULL,
+    customerId INT NOT NULL,
+    date DATE NOT NULL,
     spot INT NOT NULL,
-    PRIMARY KEY (booking, spot),
-    FOREIGN KEY (booking) REFERENCES bookings(id),
+    PRIMARY KEY (beachId,customerId,date,spot),
+    FOREIGN KEY (beachId,customerId,date) REFERENCES bookings(beachId,customerId,date),
     FOREIGN KEY (spot) REFERENCES spots(id)
 );
 
