@@ -77,7 +77,7 @@ CREATE TABLE pricings (
     priceCamerino INT NOT NULL
 );
 
-CREATE TABLE seasonIds (
+CREATE TABLE seasons (
     id INT PRIMARY KEY AUTO_INCREMENT,
     startDate DATE NOT NULL,
     endDate DATE NOT NULL,
@@ -94,13 +94,13 @@ CREATE TABLE zones (
     FOREIGN KEY (beachId) REFERENCES beaches(id)
 );
 
-CREATE TABLE zone_pricings (
+CREATE TABLE zone_tariffs (
     id INT PRIMARY KEY AUTO_INCREMENT,
     seasonId INT NOT NULL,
     zoneId INT NOT NULL,
     priceOmbrellone INT NOT NULL,
     priceTenda INT NOT NULL,
-    FOREIGN KEY (seasonId) REFERENCES seasonIds(id),
+    FOREIGN KEY (seasonId) REFERENCES seasons(id),
     FOREIGN KEY (zoneId) REFERENCES zones(id)
 );
 
@@ -221,7 +221,7 @@ ALTER TABLE bans -- Impedisce inserimento di ban identici
 ALTER TABLE zones -- Per evitare ad una spiaggia di creare zoneId uguali
     ADD CONSTRAINT uq_zone_name_per_beach UNIQUE (beachId, name);
 
-ALTER TABLE zone_pricings -- Per evitare la creazione di stesse zoneId nelle stesse stagioni con prezzi diversi
+ALTER TABLE zone_tariffs -- Per evitare la creazione di stesse zoneId nelle stesse stagioni con prezzi diversi
     ADD CONSTRAINT uq_pricing_per_season_zone UNIQUE (seasonId, zoneId);
 
 ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad una spiaggia (come su Google)
@@ -230,7 +230,7 @@ ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad u
 ALTER TABLE spots -- Per permettere l'unicità dei posti nella zona
     ADD CONSTRAINT uq_spot_position UNIQUE (zoneId, `row`, `column`);
 
-ALTER TABLE seasonIds -- Per impedire la creazione di stagioni duplicate
+ALTER TABLE seasons -- Per impedire la creazione di stagioni duplicate
     ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId, startDate, endDate);
 
 ALTER TABLE reports -- Uguale a reviews
@@ -261,7 +261,7 @@ ALTER TABLE pricings
     ADD CONSTRAINT chk_price_parking_nonneg CHECK (priceParking >= 0),
     ADD CONSTRAINT chk_price_camerino_nonneg CHECK (priceCamerino >= 0);
 
-ALTER TABLE zone_pricings
+ALTER TABLE zone_tariffs
     ADD CONSTRAINT chk_price_ombrellone_nonneg CHECK (priceOmbrellone >= 0),
     ADD CONSTRAINT chk_price_tenda_nonneg CHECK (priceTenda >= 0);
 
@@ -274,7 +274,7 @@ ALTER TABLE bookings
 ALTER TABLE spots
     ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);
 
-ALTER TABLE seasonIds -- Integrità date stagioni
+ALTER TABLE seasons -- Integrità date stagioni
     ADD CONSTRAINT chk_season_dates_valid CHECK (startDate < endDate);
 
 ALTER TABLE reports -- Impedisce di fare report su se stessi
