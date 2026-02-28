@@ -1,0 +1,2 @@
+File generato da Googlia AI studio seguendo le slides di basi di dati, quando scriveremo la relazione sarà da aggiustare perfezionare o lasciare così. Presenta tabelle che  esplicitano attributo di entità e relazioni, le partecipazioni alle relazioni da parte degli attributi, informazioni sui vincoli (eliminabili a parer mio) e attributi derivati ( derivabile). Il file è stato generato utilizzando le informazioni racchiuse nel diagramma e nel codice del DB.
+Ciao Narcis <3

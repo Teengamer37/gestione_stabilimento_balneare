@@ -1,0 +1,153 @@
+\documentclass[a4paper, 11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\usepackage{parskip}
+
+% Usiamo longtable per permettere alle tabelle di spezzarsi su più pagine 
+% eliminando alla radice gli errori "Runaway argument" e "Overfull vbox"
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{array}
+
+\begin{document}
+
+\section*{1. Dizionario dei Dati - Entità}
+La seguente tabella descrive le entità presenti nello schema, i loro attributi concettuali e i relativi identificatori (chiavi primarie).
+
+\vspace{0.5cm}
+\begin{longtable}{@{} >{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}p{5.5cm} >{\raggedright\arraybackslash}p{5cm} >{\raggedright\arraybackslash}p{2.5cm} @{}}
+\toprule
+\textbf{Entità} & \textbf{Descrizione} & \textbf{Attributi} & \textbf{ID} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{Entità} & \textbf{Descrizione} & \textbf{Attributi} & \textbf{ID} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{App\_users} & Utente generico registrato sull'applicazione (Entità Padre). & Name, Surname, Username, Email, HashPassword, Active & Id \\ \addlinespace
+\textbf{Customers} & Utente di tipo cliente (figlio di App\_users). & TelephoneNumber & Id \\ \addlinespace
+\textbf{Owners} & Utente di tipo proprietario di stabilimento (figlio di App\_users). & - & Id \\ \addlinespace
+\textbf{Admins} & Utente di tipo amministratore di sistema (figlio di App\_users). & - & Id \\ \addlinespace
+\textbf{Addresses} & Indirizzo fisico di uno stabilimento o cliente. & Street, StreetNumber, City, ZipCode, Country & Id \\ \addlinespace
+\textbf{Beaches} & Stabilimento balneare. & Name, Description, TelephoneNumber, ExtraInfo, Active & Id \\ \addlinespace
+\textbf{Parkings} & Dettagli sui posti auto/moto dello stabilimento. & NAutoPark, NMotoPark, NBikePark, NElectricPark, CCTV & BeachId \\ \addlinespace
+\textbf{Beach\_services} & Servizi aggiuntivi offerti dallo stabilimento. & Bathrooms, Showers, Pool, Bar, Restaurant, Wifi, VolleyballField & BeachId \\ \addlinespace
+\textbf{Beach\_inventories} & Inventario delle disponibilità base dello stabilimento. & CountOmbrelloni, CountTende, CountExtraSdraio, CountExtraLettini, CountExtraSedie, CountCamerini & BeachId \\ \addlinespace
+\textbf{Pricings} & Listino prezzi per extra e parcheggio. & PriceLettino, PriceSdraio, PriceSedia, PriceParking, PriceCamerino & Id \\ \addlinespace
+\textbf{Seasons} & Stagione tariffaria (es. Alta/Bassa stagione). & Name, StartDate, EndDate & Name, BeachId \\ \addlinespace
+\textbf{Zones} & Zona fisica all'interno di uno stabilimento (es. VIP, Standard). & Name & Name, BeachId \\ \addlinespace
+\textbf{Spots} & Singolo posto occupabile (ombrellone o tenda) in una zona. & Type, Row, Column & Id \\ \addlinespace
+\textbf{Bookings} & Prenotazione generale effettuata da un cliente. & Date, ExtraSdraio, ExtraLettini, ExtraSedie, Camerini, Status & Id \\ \addlinespace
+\textbf{Reviews} & Recensione lasciata da un cliente. & Rating, Comment, CreatedAt & Id \\ \addlinespace
+\textbf{Reports} & Segnalazione di un utente verso un altro utente o stabilimento. & ReportedType, Description, CreatedAt, Status & Id \\ \addlinespace
+\textbf{Bans} & Blocco temporaneo o permanente di un utente. & BanType, Reason, Time & Id \\
+\end{longtable}
+
+\vspace{0.2cm}
+\textit{Nota sulle Generalizzazioni:} L'entità \textbf{App\_users} è una generalizzazione \textit{Totale} ed \textit{Esclusiva} di \textbf{Customers}, \textbf{Owners} e \textbf{Admins}.
+
+\newpage
+
+\section*{2. Dizionario dei Dati - Relazioni}
+La seguente tabella descrive i legami logici tra le entità, specificando le cardinalità e gli eventuali attributi della relazione.
+
+\vspace{0.5cm}
+\begin{longtable}{@{} >{\raggedright\arraybackslash}p{3cm} >{\raggedright\arraybackslash}p{6.5cm} >{\raggedright\arraybackslash}p{4cm} >{\raggedright\arraybackslash}p{2.5cm} @{}}
+\toprule
+\textbf{Relazione} & \textbf{Descrizione} & \textbf{Entità coinvolte} & \textbf{Attributi} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{Relazione} & \textbf{Descrizione} & \textbf{Entità coinvolte} & \textbf{Attributi} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{Located at} & Associa una spiaggia al suo indirizzo fisico. & Beaches (1,1) \newline Addresses (0,1) & - \\ \addlinespace
+\textbf{Lives in} & Associa un cliente al suo indirizzo di residenza. & Customers (1,1) \newline Addresses (0,N) & - \\ \addlinespace
+\textbf{Features} & Associa la spiaggia ai suoi dati di parcheggio. & Beaches (1,1) \newline Parkings (1,1) & - \\ \addlinespace
+\textbf{Offers} & Associa la spiaggia ai servizi offerti. & Beaches (1,1) \newline Beach\_services (1,1) & - \\ \addlinespace
+\textbf{Holds} & Associa la spiaggia al suo inventario. & Beaches (1,1) \newline Beach\_inventories (1,1) & - \\ \addlinespace
+\textbf{Owns} & Assegna la proprietà di uno stabilimento a un proprietario. & Owners (1,1) \newline Beaches (0,1) & - \\ \addlinespace
+\textbf{Periodicity} & Divide la spiaggia in diverse stagioni tariffarie. & Beaches (1,N) \newline Seasons (1,1) & - \\ \addlinespace
+\textbf{Applies} & Associa una stagione a un listino prezzi degli extra. & Seasons (1,1) \newline Pricings (1,1) & - \\ \addlinespace
+\textbf{Divided into} & Suddivide la spiaggia in diverse zone. & Beaches (1,N) \newline Zones (1,1) & - \\ \addlinespace
+\textbf{Composed of} & Assegna i singoli spot (posti) ad una determinata zona. & Zones (1,N) \newline Spots (1,1) & - \\ \addlinespace
+\textbf{Zone\_tariffs} & Stabilisce il prezzo base di ombrelloni/tende. & Seasons (0,N) \newline Zones (0,N) & PriceOmbrellone, PriceTenda \\ \addlinespace
+\textbf{Books} & Associa una prenotazione a chi l'ha effettuata. & Customers (0,N) \newline Bookings (1,1) & - \\ \addlinespace
+\textbf{Booked} & Specifica in quale stabilimento è fatta la prenotazione. & Bookings (1,1) \newline Beaches (0,N) & - \\ \addlinespace
+\textbf{Booking\_spots} & Associa una prenotazione ai posti fisici (Spots). & Bookings (0,N) \newline Spots (0,N) & Date \\ \addlinespace
+\textbf{Reviews} & Recensione di un cliente a uno stabilimento. & Customers (0,N) \newline Beaches (0,N) & Rating, Comment, CreatedAt \\ \addlinespace
+\textbf{Bans} & Azione punitiva di un Admin verso un Customer. & Admins (0,N) \newline Customers (0,N) \newline Beaches (0,N) & BanType, Reason, Time \\ \addlinespace
+\textbf{Report} & Relazione ricorsiva tra utenti per le segnalazioni. & Reporter (0,N) \newline Reported (0,N) & Type, Description, Status, Date \\
+\end{longtable}
+
+\vspace{0.8cm}
+
+\section*{3. Regole Aziendali (Business Rules)}
+
+\subsection*{Regole di Vincolo (RV)}
+
+\vspace{0.3cm}
+\begin{longtable}{@{} >{\raggedright\arraybackslash}p{1.5cm} >{\raggedright\arraybackslash}p{14.5cm} @{}}
+\toprule
+\textbf{ID} & \textbf{Descrizione del Vincolo} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{ID} & \textbf{Descrizione del Vincolo} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{(RV1)} & Le quantità associate agli inventari (ombrelloni, ecc.) e le capienze dei parcheggi \textbf{devono} essere $\ge$ 0. \\ \addlinespace
+\textbf{(RV2)} & I prezzi definiti nel listino generale (\texttt{Pricings}) e nelle tariffe di zona (\texttt{Zone\_tariffs}) \textbf{devono} essere $\ge$ 0. \\ \addlinespace
+\textbf{(RV3)} & La data di inizio di una stagione \textbf{deve} essere cronologicamente precedente alla data di fine. \\ \addlinespace
+\textbf{(RV4)} & Per uno stesso stabilimento, le date di inizio e fine stagione \textbf{non devono} formare duplicati esatti. \\ \addlinespace
+\textbf{(RV5)} & Un cliente \textbf{non deve} lasciare più di una singola recensione per il medesimo stabilimento balneare. \\ \addlinespace
+\textbf{(RV6)} & Durante una segnalazione (Report), l'ID del segnalatore \textbf{deve} essere diverso dall'ID del segnalato. \\ \addlinespace
+\textbf{(RV7)} & Un utente \textbf{non deve} effettuare la stessa segnalazione verso la stessa persona/spiaggia più di una volta nello stesso istante. \\ \addlinespace
+\textbf{(RV8)} & Se un Ban è 'BEACH', \textbf{deve} indicare da quale stabilimento il cliente è stato bannato. Se è 'APPLICATION', \textbf{non deve} indicare nessuno stabilimento. \\ \addlinespace
+\textbf{(RV9)} & Un cliente \textbf{non deve} subire più di un Ban attivo dello stesso tipo per la stessa spiaggia. \\ \addlinespace
+\textbf{(RV10)} & Per uno stesso stabilimento, \textbf{non devono} esistere due \texttt{Spots} con le stesse coordinate (Row, Column) nella stessa Zona. \\ \addlinespace
+\textbf{(RV11)} & Uno stesso \texttt{Spot} \textbf{non deve} comparire in più di una prenotazione per la medesima data. \\
+\end{longtable}
+
+\vspace{0.8cm}
+
+\subsection*{Regole di Derivazione (RD)}
+
+\vspace{0.3cm}
+\begin{longtable}{@{} >{\raggedright\arraybackslash}p{1.5cm} >{\raggedright\arraybackslash}p{14.5cm} @{}}
+\toprule
+\textbf{ID} & \textbf{Descrizione della Derivazione} \\
+\midrule
+\endfirsthead
+
+\toprule
+\textbf{ID} & \textbf{Descrizione della Derivazione} \\
+\midrule
+\endhead
+
+\bottomrule
+\endlastfoot
+
+\textbf{(RD1)} & Il \textbf{Costo Totale di una Prenotazione} \textit{si ottiene} sommando il costo del posto base stabilito dalla tariffa della zona per quella data stagione, al costo cumulativo degli extra richiesti moltiplicato per i valori definiti nel listino associato a quella stagione. \\ \addlinespace
+\textbf{(RD2)} & Lo \textbf{Stato di Occupazione di un Posto (Spot)} in un determinato giorno \textit{si ottiene} valutando l'esistenza o meno di un record per quello \texttt{SpotId} e \texttt{Date} all'interno della tabella \texttt{booking\_spots} legato a una prenotazione in stato 'CONFIRMED'. \\
+\end{longtable}
+
+\end{document}
