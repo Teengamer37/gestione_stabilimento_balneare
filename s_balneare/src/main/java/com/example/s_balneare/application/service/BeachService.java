@@ -6,8 +6,6 @@ import com.example.s_balneare.domain.beach.BeachGeneral;
 import com.example.s_balneare.domain.beach.BeachInventory;
 import com.example.s_balneare.domain.beach.BeachServices;
 
-import java.util.List;
-
 public class BeachService {
     private final BeachRepository beachRepository;
 

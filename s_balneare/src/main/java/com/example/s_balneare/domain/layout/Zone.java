@@ -2,6 +2,8 @@ package com.example.s_balneare.domain.layout;
 
 import java.util.List;
 
+//TBD: da implementarla nel pattern DDD-lite
+
 public class Zone {
     private final int id;
     private String name;

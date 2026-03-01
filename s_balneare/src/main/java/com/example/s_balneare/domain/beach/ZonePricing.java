@@ -1,6 +1,6 @@
 package com.example.s_balneare.domain.beach;
 
-import com.example.s_balneare.domain.layout.Zone;
+//TBD: da implementarla nel pattern DDD-lite
 
 public class ZonePricing {
     private final int id;

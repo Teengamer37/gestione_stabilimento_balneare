@@ -12,7 +12,7 @@ USE stabilimenti;
 CREATE TABLE addresses (
     id INT PRIMARY KEY AUTO_INCREMENT,
     street VARCHAR(255) NOT NULL,
-    streetNumber VARCHAR(20) NOT NULL,
+    streetNumber VARCHAR(10) NOT NULL,
     city VARCHAR(100) NOT NULL,
     zipCode VARCHAR(20) NOT NULL,
     country VARCHAR(100) NOT NULL
@@ -87,7 +87,7 @@ CREATE TABLE seasons (
 );
 
 CREATE TABLE zones (
-    name varchar(50) NOT NULL,
+    name VARCHAR(50) NOT NULL,
     beachId INT NOT NULL,
     PRIMARY KEY (name, beachId),
     FOREIGN KEY (beachId) REFERENCES beaches(id)
@@ -96,20 +96,20 @@ CREATE TABLE zones (
 CREATE TABLE zone_tariffs (
     seasonName VARCHAR(50) NOT NULL,
     beachId INT NOT NULL,
-    zoneName varchar(50) NOT NULL,
+    zoneName VARCHAR(50) NOT NULL,
     priceOmbrellone INT NOT NULL,
     priceTenda INT NOT NULL,
     PRIMARY KEY (seasonName,beachId,zoneName),
-    FOREIGN KEY (beachId,seasonName) REFERENCES seasons(beachId,name) ,
+    FOREIGN KEY (beachId,seasonName) REFERENCES seasons(beachId,name),
     FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId)
 );
 
 CREATE TABLE spots (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT PRIMARY KEY AUTO_INCREMENT,
     type ENUM('UMBRELLA', 'TENT') NOT NULL,
     `row` INT NOT NULL,
     `column` INT NOT NULL,
-    zoneName varchar(50) NOT NULL,
+    zoneName VARCHAR(50) NOT NULL,
     beachId INT NOT NULL,
     UNIQUE (`row`,`column`,zoneName, beachId),
     FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId)
@@ -119,17 +119,17 @@ CREATE TABLE spots (
 
 CREATE TABLE app_users (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name varchar(50) NOT NULL,
-    surname varchar(50) NOT NULL,
-    username varchar(50) UNIQUE NOT NULL,
-    email varchar(50) UNIQUE NOT NULL,
-    hashPassword varchar(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    surname VARCHAR(50) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(80) UNIQUE NOT NULL,
+    hashPassword VARCHAR(255) NOT NULL,
     active BOOLEAN NOT NULL
 );
 
 CREATE TABLE customers (
     id INT PRIMARY KEY,
-    telephoneNumber varchar(50) UNIQUE NOT NULL,
+    telephoneNumber VARCHAR(50) UNIQUE NOT NULL,
     addressId INT NOT NULL,
     FOREIGN KEY (addressId) REFERENCES addresses(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
@@ -162,17 +162,17 @@ CREATE TABLE bookings (
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (customerId) REFERENCES customers(id),
     UNIQUE (beachId,customerId,date),
-    UNIQUE (id, date)
+    UNIQUE (id,date)
 );
 
 CREATE TABLE booking_spots (
     bookingId INT NOT NULL,
     date DATE NOT NULL,
     spotId INT NOT NULL,
-    PRIMARY KEY (bookingId, spotId),
-    FOREIGN KEY (bookingId, date) REFERENCES bookings(id, date),
+    PRIMARY KEY (bookingId,spotId),
+    FOREIGN KEY (bookingId,date) REFERENCES bookings(id,date),
     FOREIGN KEY (spotId) REFERENCES spots(id),
-    UNIQUE (spotId, date)
+    UNIQUE (spotId,date)
 );
 
 CREATE TABLE bans (
@@ -181,7 +181,7 @@ CREATE TABLE bans (
     banType ENUM('BEACH', 'APPLICATION'),
     bannedFromBeachId INT,
     adminId INT NOT NULL,
-    reason VARCHAR(255) NOT NULL,
+    reason VARCHAR(512) NOT NULL,
     time DATETIME NOT NULL,
     FOREIGN KEY (bannedId) REFERENCES customers(id),
     FOREIGN KEY (bannedFromBeachId) REFERENCES beaches(id),
@@ -193,7 +193,7 @@ CREATE TABLE reviews (
     beachId INT NOT NULL,
     customerId INT NOT NULL,
     rating TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
-    comment VARCHAR(500) NOT NULL,
+    comment VARCHAR(1024) NOT NULL,
     createdAt DATETIME NOT NULL,
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (customerId) REFERENCES customers(id)
@@ -204,7 +204,7 @@ CREATE TABLE reports (
     reporterId INT NOT NULL,
     reportedId INT NOT NULL,
     reportedType ENUM('USER', 'BEACH'),
-    description VARCHAR(500) NOT NULL,
+    description VARCHAR(512) NOT NULL,
     createdAt DATETIME NOT NULL,
     status ENUM('PENDING', 'RESOLVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (reportedId) REFERENCES app_users(id),
@@ -222,19 +222,19 @@ ADD CONSTRAINT chk_bans_beach_id_matches_type CHECK (
 );
 
 ALTER TABLE bans -- Impedisce inserimento di ban identici
-    ADD CONSTRAINT uq_ban_single_active UNIQUE (bannedId, bannedFromBeachId, banType);
+    ADD CONSTRAINT uq_ban_single_active UNIQUE (bannedId,bannedFromBeachId,banType);
 
 ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad una spiaggia (come su Google)
-    ADD CONSTRAINT uq_review_per_customer UNIQUE (beachId, customerId);
+    ADD CONSTRAINT uq_review_per_customer UNIQUE (beachId,customerId);
 
 ALTER TABLE seasons -- Per impedire la creazione di stagioni duplicate
-    ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId, startDate, endDate);
+    ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId,startDate,endDate);
 
 ALTER TABLE reports -- Minimizza report giornalieri
-    ADD CONSTRAINT uq_report_unique UNIQUE (reporterId, reportedId, createdAt);
+    ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt);
 
 ALTER TABLE addresses -- Riduce dimensione tabella, per utenti diversi con stesso indirizzo (es. più utenti del solito palazzo)
-    ADD CONSTRAINT uq_full_address UNIQUE (street, streetNumber, city, zipCode, country);
+    ADD CONSTRAINT uq_full_address UNIQUE (street,streetNumber,city,zipCode,country);
 
 -- CHECK >= 0
 ALTER TABLE parkings

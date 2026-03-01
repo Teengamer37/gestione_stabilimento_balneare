@@ -11,7 +11,11 @@ public interface BeachRepository {
     int save(Beach beach);
     void update(Beach beach);
     void delete(int id);
-    List<Beach> findAll();
     Optional<Beach> findById(int id);
+
+    //trova gli ID delle stagioni di una spiaggia
     List<Integer> findBeachSeasonIds(int beachId);
+
+    //trova tutte le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse)
+    List<Beach> findAll();
 }

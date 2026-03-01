@@ -1,5 +1,7 @@
 package com.example.s_balneare.domain.common;
 
+//TBD: da implementarla nel pattern DDD-lite
+
 public class Address {
     private String street;
     private String streetNumber;

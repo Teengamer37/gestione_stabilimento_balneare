@@ -1,9 +1,10 @@
 package com.example.s_balneare.domain.moderation;
 
-import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.Role;
 
 import java.time.Instant;
+
+//TBD: da implementarla nel pattern DDD-lite
 
 public class Report {
     private final int id;

@@ -1,10 +1,8 @@
 package com.example.s_balneare.domain.moderation;
 
-import com.example.s_balneare.domain.beach.Beach;
-import com.example.s_balneare.domain.user.AdminUser;
-import com.example.s_balneare.domain.user.AppUser;
-
 import java.time.Instant;
+
+//TBD: da implementarla nel pattern DDD-lite
 
 public class Ban {
     private final int id;

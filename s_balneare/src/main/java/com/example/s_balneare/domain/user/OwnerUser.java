@@ -1,8 +1,6 @@
 package com.example.s_balneare.domain.user;
 
-import com.example.s_balneare.domain.beach.Beach;
-
-import java.util.UUID;
+//TBD: da implementarla nel pattern DDD-lite
 
 public final class OwnerUser extends AppUser {
     private int beachId;

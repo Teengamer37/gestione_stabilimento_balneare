@@ -1,5 +1,7 @@
 package com.example.s_balneare.domain.user;
 
+/// TBD: SPOSTARLA IMMEDIATAMENTE DA DOMAIN!!!!!!!!!!!!!
+
 public class RegistrationRequest {
     //dati comuni a tutti gli utenti
     private Role type;
