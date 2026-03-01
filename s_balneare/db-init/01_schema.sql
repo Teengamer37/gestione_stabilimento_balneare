@@ -22,11 +22,11 @@ CREATE TABLE addresses (
 
 CREATE TABLE beaches (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(50) NOT NULL,
-    description VARCHAR(255) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(512) NOT NULL,
     telephoneNumber varchar(50) UNIQUE NOT NULL,
     addressId INT UNIQUE NOT NULL,
-    extraInfo VARCHAR(255),
+    extraInfo VARCHAR(512),
     active BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (addressId) REFERENCES addresses(id)
 );

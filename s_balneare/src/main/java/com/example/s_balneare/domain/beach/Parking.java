@@ -1,63 +1,66 @@
 package com.example.s_balneare.domain.beach;
 
-public class Parking {
-    private final int id;
-    private int nAutoPark;
-    private int nMotoPark;
-    private int nBikePark;
-    private int nElectricPark;
-    private boolean CCTV;
-
-    public Parking(int id, int nAutoPark, int nMotoPark, int nBikePark, int nElectricPark, boolean CCTV) {
-        this.id = id;
-        this.nAutoPark = nAutoPark;
-        this.nMotoPark = nMotoPark;
-        this.nBikePark = nBikePark;
-        this.nElectricPark = nElectricPark;
-        this.CCTV = CCTV;
+public record Parking(
+    int nAutoPark,
+    int nMotoPark,
+    int nBikePark,
+    int nElectricPark,
+    boolean CCTV
+) {
+    //costruttore
+    public Parking {
+        if (nAutoPark < 0 || nMotoPark < 0 || nBikePark < 0 || nElectricPark < 0) {
+            throw new IllegalArgumentException("ERROR: parking counts cannot be negative");
+        }
     }
 
-    public int getId() {
-        return id;
+    //metodo per inizializzare l'oggetto con valori di default
+    public static Parking empty() {
+        return new Parking(0, 0, 0, 0, false);
     }
 
-    public int getnAutoPark() {
-        return nAutoPark;
+    //metodi wither
+    public Parking withNAutoPark(int nAutoPark) {
+        return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
 
-    public void setnAutoPark(int nAutoPark) {
-        this.nAutoPark = nAutoPark;
+    public Parking withNMotoPark(int nMotoPark) {
+        return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
 
-    public int getnMotoPark() {
-        return nMotoPark;
+    public Parking withNBikePark(int nBikePark) {
+        return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
 
-    public void setnMotoPark(int nMotoPark) {
-        this.nMotoPark = nMotoPark;
+    public Parking withNElectricPark(int nElectricPark) {
+        return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
 
-    public int getnBikePark() {
-        return nBikePark;
+    public Parking withCCTV(boolean CCTV) {
+        return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
 
-    public void setnBikePark(int nBikePark) {
-        this.nBikePark = nBikePark;
+    //metodo per usare il pattern Builder per creare/manipolare Parking
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public int getnElectricPark() {
-        return nElectricPark;
-    }
+    //pattern Builder
+    public static class Builder {
+        private int nAutoPark = 0;
+        private int nMotoPark = 0;
+        private int nBikePark = 0;
+        private int nElectricPark = 0;
+        private boolean CCTV = false;
 
-    public void setnElectricPark(int nElectricPark) {
-        this.nElectricPark = nElectricPark;
-    }
+        public Builder nAutoPark(int val) { nAutoPark = val; return this; }
+        public Builder nMotoPark(int val) { nMotoPark = val; return this; }
+        public Builder nBikePark(int val) { nBikePark = val; return this; }
+        public Builder nElectricPark(int val) { nElectricPark = val; return this; }
+        public Builder CCTV(boolean val) { CCTV = val; return this; }
 
-    public boolean isCCTV() {
-        return CCTV;
-    }
-
-    public void setCCTV(boolean CCTV) {
-        this.CCTV = CCTV;
+        public Parking build() {
+            return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
+        }
     }
 }
