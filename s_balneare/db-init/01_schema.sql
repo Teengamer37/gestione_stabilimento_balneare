@@ -28,6 +28,8 @@ CREATE TABLE beaches (
     addressId INT UNIQUE NOT NULL,
     extraInfo VARCHAR(512),
     active BOOLEAN NOT NULL DEFAULT FALSE,
+    ownerId INT NOT NULL,
+    FOREIGN KEY (ownerId) REFERENCES owners(id),
     FOREIGN KEY (addressId) REFERENCES addresses(id)
 );
 
@@ -123,22 +125,20 @@ CREATE TABLE app_users (
     surname VARCHAR(50) NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(80) UNIQUE NOT NULL,
-    hashPassword VARCHAR(255) NOT NULL,
-    active BOOLEAN NOT NULL
+    hashPassword VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE customers (
     id INT PRIMARY KEY,
     telephoneNumber VARCHAR(50) UNIQUE NOT NULL,
     addressId INT NOT NULL,
+    active BOOLEAN NOT NULL,
     FOREIGN KEY (addressId) REFERENCES addresses(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
 CREATE TABLE owners (
     id INT PRIMARY KEY,
-    beachId INT UNIQUE NOT NULL,
-    FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
