@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.service;
+package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.in.CreateBeachCommand;
 import com.example.s_balneare.application.port.in.CreateBeachUseCase;

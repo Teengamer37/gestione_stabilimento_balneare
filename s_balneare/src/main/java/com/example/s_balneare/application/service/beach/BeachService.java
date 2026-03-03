@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.service;
+package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.out.BeachRepository;
 import com.example.s_balneare.domain.beach.Beach;
