@@ -5,12 +5,14 @@ package com.example.s_balneare.domain.user;
 public final class CustomerUser extends AppUser {
     private String phoneNumber;
     private int addressId;
+    private boolean active;
 
 
     public CustomerUser(int id, String email, String username, String name, String surname, boolean active, String phoneNumber, int addressId) {
-        super(id, email, username, name, surname, active);
+        super(id, email, username, name, surname);
         this.phoneNumber = phoneNumber;
         this.addressId = addressId;
+        this.active = active;
     }
 
     @Override
@@ -33,4 +35,10 @@ public final class CustomerUser extends AppUser {
     public void setAddressId(int addressId) {
         this.addressId = addressId;
     }
+
+    public int getAddressId() {return addressId;}
+
+    public boolean isActive() {return active;}
+
+    public void setActive(boolean active) {this.active = active;}
 }

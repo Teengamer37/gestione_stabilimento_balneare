@@ -8,15 +8,17 @@ public abstract class AppUser {
     private String username;
     private String name;
     private String surname;
-    private boolean active;
 
-    protected AppUser(int id, String email, String username, String name, String surname, boolean active) {
+    protected AppUser(int id, String email, String username, String name, String surname) {
         this.id = id;
         this.email = email;
         this.username = username;
         this.name = name;
         this.surname = surname;
-        this.active = active;
+    }
+
+    protected AppUser(int id){
+        this.id = id;
     }
 
     public abstract Role getRole();
@@ -57,11 +59,4 @@ public abstract class AppUser {
         this.surname = surname;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }

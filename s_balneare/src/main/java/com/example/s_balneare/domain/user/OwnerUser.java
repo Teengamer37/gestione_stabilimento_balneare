@@ -6,7 +6,7 @@ public final class OwnerUser extends AppUser {
     private int beachId;
 
     public OwnerUser(int id, String email, String username, String name, String surname, boolean active, int beachId) {
-        super(id, email, username, name, surname, active);
+        super(id, email, username, name, surname);
         this.beachId = beachId;
     }
 
