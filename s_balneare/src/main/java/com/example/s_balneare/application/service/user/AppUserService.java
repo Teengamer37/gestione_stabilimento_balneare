@@ -5,7 +5,7 @@ import com.example.s_balneare.domain.user.AppUser;
 //Aggiungere metodi modifica una volta modificate le classi per il pattern DDD light
 
 public abstract class AppUserService {
-    private final AppUserRepository appUserRepository;
+    protected final AppUserRepository appUserRepository;
 
     public AppUserService(AppUserRepository appUserRepository) {this.appUserRepository = appUserRepository;}
 

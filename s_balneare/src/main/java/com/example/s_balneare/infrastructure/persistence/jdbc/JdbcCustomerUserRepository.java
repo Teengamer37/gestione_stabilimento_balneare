@@ -12,18 +12,33 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
     public JdbcCustomerUserRepository(Connection connection) {this.connection=connection; }
 
     @Override
-    public int save(AppUser user, String password){
-        String sqlBase = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
+    public int save(CustomerUser user, String password){
+        String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
                 "VALUES(?, ?, ?, ?, ?)";
-        String sqlCustomer= "INSERT INTO customers(id, telephoneNumber, addressId, active)" +
-                "VALUES(?, ?, ?, ?)";
-        String sqlAdmin_Owner= "INSERT INTO customers(id)" +
-                "VALUES(?)";
+        String sqlCustomer = "INSERT INTO customers(id,telephoneNumber, addressId, active)" + "VALUES(?,?,?)";
         try {
             connection.setAutoCommit(false);
+            int newId;
 
-            try (PreparedStatement statement = connection.prepareStatement(sqlBase, Statement.RETURN_GENERATED_KEYS)) {
-                //statement.setString(5, user.getPassword);
+            try (PreparedStatement statement = connection.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, user.getName());
+                statement.setString(2, user.getSurname());
+                statement.setString(3, user.getUsername());
+                statement.setString(4, user.getEmail());
+                statement.setString(5, password);
+                statement.executeUpdate();
+                try (ResultSet rs = statement.getGeneratedKeys()) {
+                    if (rs.next()) newId = rs.getInt(1);
+                    else throw new SQLException("ERROR: SQL FAILED, no ID generated for beach");
+                }
+            }
+
+            try(PreparedStatement statement = connection.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setInt(1, newId);
+                statement.setString(2, user.getPhoneNumber());
+                statement.setInt(3,user.getAddressId());
+                statement.setBoolean(4, user.isActive());
+                statement.executeUpdate();
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
