@@ -7,6 +7,7 @@ public class Beach {
     private final int id;
     private int ownerId;
 
+    private final int addressId;
     private BeachGeneral beachGeneral;
     private BeachInventory beachInventory;
     private BeachServices beachServices;
@@ -17,10 +18,10 @@ public class Beach {
     private boolean active;
 
     //costruttore
-    public Beach(int id, int ownerId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
-
+    public Beach(int id, int ownerId, int addressId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
         this.id = id;
         setOwnerId(ownerId);
+        this.addressId = addressId;
         this.beachGeneral = beachGeneral;
         this.beachInventory = beachInventory;
         this.beachServices = beachServices;
@@ -37,6 +38,9 @@ public class Beach {
     }
     public int getOwnerId() {
         return ownerId;
+    }
+    public int getAddressId() {
+        return addressId;
     }
     public BeachGeneral getBeachGeneral() {
         return beachGeneral;

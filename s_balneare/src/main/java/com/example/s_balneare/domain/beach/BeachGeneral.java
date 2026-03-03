@@ -3,18 +3,16 @@ package com.example.s_balneare.domain.beach;
 public class BeachGeneral {
     private final String name;
     private final String description;
-    private final int addressId;
     private final String telephoneNumber;
 
     //costruttore
-    public BeachGeneral(String name, String description, int addressId, String telephoneNumber) {
+    public BeachGeneral(String name, String description, String telephoneNumber) {
         validateName(name);
         validateDescription(description);
         validateTelephoneNumber(telephoneNumber);
 
         this.name = name;
         this.description = description;
-        this.addressId = addressId;
         this.telephoneNumber = telephoneNumber;
     }
 
@@ -25,9 +23,6 @@ public class BeachGeneral {
     public String getDescription() {
         return description;
     }
-    public int getAddressId() {
-        return addressId;
-    }
     public String getTelephoneNumber() {
         return telephoneNumber;
     }
@@ -35,15 +30,15 @@ public class BeachGeneral {
     //metodi wither
     public BeachGeneral withName(String name) {
         validateName(name);
-        return new BeachGeneral(name, description, addressId, telephoneNumber);
+        return new BeachGeneral(name, description, telephoneNumber);
     }
     public BeachGeneral withDescription(String description) {
         validateDescription(description);
-        return new BeachGeneral(name, description, addressId, telephoneNumber);
+        return new BeachGeneral(name, description, telephoneNumber);
     }
     public BeachGeneral withTelephoneNumber(String telephoneNumber) {
         validateTelephoneNumber(telephoneNumber);
-        return new BeachGeneral(name, description, addressId, telephoneNumber);
+        return new BeachGeneral(name, description, telephoneNumber);
     }
 
     //metodi di validazione privati

@@ -2,12 +2,14 @@ package com.example.s_balneare.application.port.out;
 
 import com.example.s_balneare.domain.beach.Beach;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo Beach
 public interface BeachRepository {
     int save(Beach beach);
+    int save(Beach beach, Connection conn);
     void update(Beach beach);
     void delete(int id);
     Optional<Beach> findById(int id);

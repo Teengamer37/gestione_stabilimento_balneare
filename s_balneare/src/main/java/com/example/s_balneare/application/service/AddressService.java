@@ -35,8 +35,7 @@ public class AddressService {
 
     //ricerca indirizzo nel DB
     public Address getAddress(int id) {
-        return addressRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Address not found with id: " + id));
+        return getAddressOrThrow(id);
     }
 
     //ricerca indirizzi nel DB data la città
