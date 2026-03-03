@@ -16,4 +16,5 @@ module com.example.s_balneare {
     exports com.example.s_balneare.application.booking;
     exports com.example.s_balneare.application.review;
     exports com.example.s_balneare.application.moderation;
+    exports com.example.s_balneare.application.service.user;
 }

@@ -233,9 +233,6 @@ ALTER TABLE seasons -- Per impedire la creazione di stagioni duplicate
 ALTER TABLE reports -- Minimizza report giornalieri
     ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt);
 
-ALTER TABLE addresses -- Riduce dimensione tabella, per utenti diversi con stesso indirizzo (es. più utenti del solito palazzo)
-    ADD CONSTRAINT uq_full_address UNIQUE (street,streetNumber,city,zipCode,country);
-
 -- CHECK >= 0
 ALTER TABLE parkings
     ADD CONSTRAINT chk_nAutoPark_nonneg CHECK (nAutoPark >= 0),
