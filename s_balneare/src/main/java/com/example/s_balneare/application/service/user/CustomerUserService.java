@@ -4,7 +4,9 @@ import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.user.CustomerUser;
 import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcCustomerUserRepository;
 
-public class CustomerUserService extends  AppUserService{
+//TODO: da fare
+
+public class CustomerUserService extends AppUserService {
     public CustomerUserService(JdbcCustomerUserRepository jdbcCustomerUserRepository) {super(jdbcCustomerUserRepository);}
 
     public void updateTelephoneNumber(CustomerUser user, String phoneNumber){

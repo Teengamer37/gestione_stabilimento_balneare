@@ -3,7 +3,7 @@ package com.example.s_balneare.domain.beach;
 import java.time.LocalDate;
 import java.util.List;
 
-//TBD: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite
 
 public class Season {
     private final int id;

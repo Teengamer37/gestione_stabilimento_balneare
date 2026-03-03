@@ -19,14 +19,18 @@ public class JdbcBeachRepository implements BeachRepository {
         this.connection = connection;
     }
 
+    //TODO: implementare save separata per il prossimo CreateBeachUseCase
+
+    //inserimento spiaggia nel DB
     @Override
     public int save(Beach beach) {
-        String sqlBeach = "INSERT INTO beaches (name, description, telephoneNumber, addressId, extraInfo, active) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlBeach = "INSERT INTO beaches (name, description, telephoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlInventory = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlServices = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlParking = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
+            //disattivo autocommit per avviare una transaction
             connection.setAutoCommit(false);
             int newId;
 
@@ -41,6 +45,7 @@ public class JdbcBeachRepository implements BeachRepository {
                 statement.setInt(4, general.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());
+                statement.setInt(7, beach.getOwnerId());
                 statement.executeUpdate();
 
                 try (ResultSet rs = statement.getGeneratedKeys()) {
@@ -94,36 +99,12 @@ public class JdbcBeachRepository implements BeachRepository {
                 }
             }
 
-            //passo 5: inserisco il nuovo gestore della spiaggia (se esiste)
-            if (beach.getOwnerId() > 0) {
-                //verifico che owner con ID esiste e che NON abbia una spiaggia associata
-                String checkOwner = "SELECT beachId FROM owners WHERE id = ? LIMIT 1";
-                try (PreparedStatement statement = connection.prepareStatement(checkOwner)) {
-                    statement.setInt(1, beach.getOwnerId());
-
-                    try (ResultSet rs = statement.executeQuery()) {
-                        if (rs.next()) {
-                            if (rs.getInt("beachId") != 0) {
-                                throw new IllegalStateException("ERROR: owner already has a beach associated");
-                            }
-                        } else {
-                            throw new IllegalArgumentException("ERROR: owner with ID " + beach.getOwnerId() + " does not exist");
-                        }
-                    }
-                }
-
-                String sqlOwner = "UPDATE owners SET beachId = ? WHERE id = ?";
-                try (PreparedStatement statement = connection.prepareStatement(sqlOwner)) {
-                    statement.setInt(1, newId);
-                    statement.setInt(2, beach.getOwnerId());
-                    statement.executeUpdate();
-                }
-            }
-
+            //commit della transaction
             connection.commit();
             return newId;
         } catch (SQLException e) {
             try {
+                //andata male -> ripristino allo stato iniziale
                 connection.rollback();
             } catch (SQLException e2) {
                 e.addSuppressed(e2);
@@ -131,6 +112,7 @@ public class JdbcBeachRepository implements BeachRepository {
             throw new RuntimeException("ERROR: unable to save beach", e);
         } finally {
             try {
+                //appena finito, rimetto autocommit a true
                 if (connection != null) connection.setAutoCommit(true);
             } catch (SQLException e) {
                 System.out.println("WARNING: unable to set autocommit to true");
@@ -138,9 +120,10 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
+    //aggiorno spiaggia presente nel DB
     @Override
     public void update(Beach beach) {
-        String sqlBeach = "UPDATE beaches SET name = ?, description = ?, telephoneNumber = ?, addressId = ?, extraInfo = ?, active = ? WHERE id = ?";
+        String sqlBeach = "UPDATE beaches SET name = ?, description = ?, telephoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, ownerId = ? WHERE id = ?";
         
         try {
             connection.setAutoCommit(false);
@@ -156,7 +139,8 @@ public class JdbcBeachRepository implements BeachRepository {
                 statement.setInt(4, general.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());
-                statement.setInt(7, beach.getId());
+                statement.setInt(7, beach.getOwnerId());
+                statement.setInt(8, beach.getId());
                 statement.executeUpdate();
             }
 
@@ -182,32 +166,6 @@ public class JdbcBeachRepository implements BeachRepository {
                 upsertParking(beach);
             } else {
                 deleteComponent(beach.getId(), "parkings");
-            }
-
-            //passo 5: aggiorno l'owner della spiaggia (se esiste)
-            if (beach.getOwnerId() > 0) {
-                //verifico che owner con ID esiste e che NON abbia una spiaggia associata
-                String checkOwner = "SELECT beachId FROM owners WHERE id = ? LIMIT 1";
-                try (PreparedStatement statement = connection.prepareStatement(checkOwner)) {
-                    statement.setInt(1, beach.getOwnerId());
-
-                    try (ResultSet rs = statement.executeQuery()) {
-                        if (rs.next()) {
-                            if (rs.getInt("beachId") != 0) {
-                                throw new IllegalStateException("ERROR: owner already has a beach associated");
-                            }
-                        } else {
-                            throw new IllegalArgumentException("ERROR: owner with ID " + beach.getOwnerId() + " does not exist");
-                        }
-                    }
-                }
-
-                String sqlOwner = "UPDATE owners SET beachId = ? WHERE id = ?";
-                try (PreparedStatement statement = connection.prepareStatement(sqlOwner)) {
-                    statement.setInt(1, beach.getId());
-                    statement.setInt(2, beach.getOwnerId());
-                    statement.executeUpdate();
-                }
             }
 
             connection.commit();
@@ -358,13 +316,6 @@ public class JdbcBeachRepository implements BeachRepository {
                 st.setInt(1, id);
                 st.executeUpdate();
             }
-            
-            //"libero" il proprietario dalla spiaggia
-            String sqlUnlinkOwner = "UPDATE owners SET beachId = NULL WHERE beachId = ?";
-            try (PreparedStatement st = connection.prepareStatement(sqlUnlinkOwner)) {
-                st.setInt(1, id);
-                st.executeUpdate();
-            }
             //elimino la spiaggia
             try (PreparedStatement st = connection.prepareStatement(sqlBeach)) {
                 st.setInt(1, id);
@@ -392,12 +343,10 @@ public class JdbcBeachRepository implements BeachRepository {
     public List<Beach> findAll() {
         String sql = "SELECT b.*, " +
                 "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
-                "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV, " +
-                "o.id as ownerId " +
+                "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
                 "FROM beaches b " +
                 "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
                 "LEFT JOIN parkings p ON b.id = p.beachId " +
-                "LEFT JOIN owners o ON b.id = o.beachId " +
                 "WHERE b.active = TRUE";
         List<Beach> beaches = new ArrayList<>();
 
@@ -463,13 +412,11 @@ public class JdbcBeachRepository implements BeachRepository {
         String sql = "SELECT b.*, " +
                      "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
                      "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
-                     "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV, " +
-                     "o.id as ownerId " +
+                     "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
                      "FROM beaches b " +
                      "LEFT JOIN beach_inventories bi ON b.id = bi.beachId " +
                      "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
                      "LEFT JOIN parkings p ON b.id = p.beachId " +
-                     "LEFT JOIN owners o ON b.id = o.beachId " +
                      "WHERE b.id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -545,6 +492,7 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
+    //TODO: spostare funzione in JdbcSeasonRepository
     //cerca le stagioni di una spiaggia
     @Override
     public List<Integer> findBeachSeasonIds(int beachId) {

@@ -23,19 +23,15 @@ public record Parking(
     public Parking withNAutoPark(int nAutoPark) {
         return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
-
     public Parking withNMotoPark(int nMotoPark) {
         return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
-
     public Parking withNBikePark(int nBikePark) {
         return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
-
     public Parking withNElectricPark(int nElectricPark) {
         return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }
-
     public Parking withCCTV(boolean CCTV) {
         return new Parking(nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV);
     }

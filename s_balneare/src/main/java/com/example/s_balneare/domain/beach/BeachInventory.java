@@ -16,7 +16,7 @@ public record BeachInventory(
         }
     }
 
-    // metodo Factory statico per inizializzare l'oggetto beachInventory
+    //metodo Factory statico per inizializzare l'oggetto beachInventory
     public static BeachInventory empty() {
         return new BeachInventory(0, 0, 0, 0, 0, 0);
     }
@@ -25,23 +25,18 @@ public record BeachInventory(
     public BeachInventory withCountOmbrelloni(int countOmbrelloni) {
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
-
     public BeachInventory withCountTende(int countTende) {
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
-
     public BeachInventory withCountExtraSdraio(int countExtraSdraio) {
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
-
     public BeachInventory withCountExtraLettini(int countExtraLettini) {
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
-
     public BeachInventory withCountExtraSedie(int countExtraSedie) {
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
-
     public BeachInventory withCountCamerini(int countCamerini) {
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }

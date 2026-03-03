@@ -70,7 +70,6 @@ public class JdbcBookingRepository implements BookingRepository {
             } catch (SQLException e2) {
                 e.addSuppressed(e2);
             }
-
             throw new RuntimeException("ERROR: unable to save booking", e);
         } finally {
             //in qualsiasi caso, rimetto i valori di default dell'autocommit

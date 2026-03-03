@@ -1,6 +1,6 @@
 package com.example.s_balneare.domain.user;
 
-//TBD: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite
 
 public final class CustomerUser extends AppUser {
     private String phoneNumber;

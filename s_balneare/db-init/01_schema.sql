@@ -1,5 +1,5 @@
 
--- TBD: gestione delete e cascade methods
+-- TODO: gestione delete e cascade methods
 
 
 
@@ -58,7 +58,7 @@ CREATE TABLE beaches (
     addressId INT UNIQUE NOT NULL,
     extraInfo VARCHAR(512),
     active BOOLEAN NOT NULL DEFAULT FALSE,
-    ownerId INT NOT NULL,
+    ownerId INT UNIQUE NOT NULL,
     FOREIGN KEY (ownerId) REFERENCES owners(id),
     FOREIGN KEY (addressId) REFERENCES addresses(id)
 );

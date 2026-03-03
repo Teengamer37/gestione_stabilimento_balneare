@@ -6,8 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-//porta (interfaccia) uscente dall'applicazione per i bookings
-//(serve per poi implementare queste funzioni nella classe che userà JDBC e MySQL)
+//interfacce per manipolazione oggetti di tipo Booking
 public interface BookingRepository {
     int save(Booking booking);
     void delete(int id);

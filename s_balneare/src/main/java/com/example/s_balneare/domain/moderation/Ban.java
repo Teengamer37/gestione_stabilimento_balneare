@@ -2,7 +2,7 @@ package com.example.s_balneare.domain.moderation;
 
 import java.time.Instant;
 
-//TBD: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite
 
 public class Ban {
     private final int id;

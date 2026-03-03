@@ -5,6 +5,8 @@ import com.example.s_balneare.domain.user.AppUser;
 
 import java.util.Optional;
 
+//FIXME: un macello qui pt2
+
 public class JdbcOwnerUserRepository implements AppUserRepository {
 
     @Override

@@ -51,11 +51,9 @@ public class BeachGeneral {
         if (name.isBlank()) throw new IllegalArgumentException("ERROR: name cannot be blank");
         if (name.length() > 100) throw new IllegalArgumentException("ERROR: name cannot exceed 100 characters");
     }
-
     private void validateDescription(String description) {
         if (description.length() > 512) throw new IllegalArgumentException("ERROR: description cannot exceed 512 characters");
     }
-
     private void validateTelephoneNumber(String telephoneNumber) {
         if (telephoneNumber == null) throw new IllegalArgumentException("ERROR: telephoneNumber cannot be null");
         String cleaned = telephoneNumber.replaceAll("\\s", "");

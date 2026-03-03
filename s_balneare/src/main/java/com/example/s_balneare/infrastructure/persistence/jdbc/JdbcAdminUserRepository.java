@@ -5,6 +5,8 @@ import com.example.s_balneare.domain.user.AppUser;
 
 import java.util.Optional;
 
+//TODO: continuare l'implementazione
+
 public class JdbcAdminUserRepository implements AppUserRepository {
 
     @Override

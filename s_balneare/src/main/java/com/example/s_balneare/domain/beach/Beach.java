@@ -125,7 +125,7 @@ public class Beach {
         this.active = active;
     }
 
-    // Update methods for components
+    //metodi update per vari attributi
     public void updateGeneralInfo(BeachGeneral newGeneral) {
         if (newGeneral == null) throw new IllegalArgumentException("ERROR: General info cannot be null");
         this.beachGeneral = newGeneral;

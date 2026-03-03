@@ -1,6 +1,6 @@
 package com.example.s_balneare.domain.beach;
 
-//TBD: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite
 
 public class Pricing {
     private final int id;

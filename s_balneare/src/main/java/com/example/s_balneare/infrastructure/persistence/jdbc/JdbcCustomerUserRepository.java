@@ -6,6 +6,8 @@ import com.example.s_balneare.domain.user.*;
 import java.sql.*;
 import java.util.Optional;
 
+//FIXME: un macello qui
+
 public class JdbcCustomerUserRepository implements AppUserRepository {
     private final Connection connection;
 

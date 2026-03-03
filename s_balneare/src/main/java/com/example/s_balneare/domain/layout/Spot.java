@@ -1,6 +1,6 @@
 package com.example.s_balneare.domain.layout;
 
-//TBD: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite
 
 public class Spot {
     private final int id;
