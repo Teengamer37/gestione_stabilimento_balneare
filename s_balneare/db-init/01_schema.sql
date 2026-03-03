@@ -18,6 +18,36 @@ CREATE TABLE addresses (
     country VARCHAR(100) NOT NULL
 );
 
+-- UTENTI
+
+CREATE TABLE app_users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    surname VARCHAR(50) NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(80) UNIQUE NOT NULL,
+    hashPassword VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    telephoneNumber VARCHAR(50) UNIQUE NOT NULL,
+    addressId INT NOT NULL,
+    active BOOLEAN NOT NULL,
+    FOREIGN KEY (addressId) REFERENCES addresses(id),
+    FOREIGN KEY (id) REFERENCES app_users(id)
+);
+
+CREATE TABLE owners (
+    id INT PRIMARY KEY,
+    FOREIGN KEY (id) REFERENCES app_users(id)
+);
+
+CREATE TABLE admins (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    FOREIGN KEY (id) REFERENCES app_users(id)
+);
+
 -- SPIAGGIA E SERVIZI
 
 CREATE TABLE beaches (
@@ -115,36 +145,6 @@ CREATE TABLE spots (
     beachId INT NOT NULL,
     UNIQUE (`row`,`column`,zoneName, beachId),
     FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId)
-);
-
--- UTENTI
-
-CREATE TABLE app_users (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    surname VARCHAR(50) NOT NULL,
-    username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(80) UNIQUE NOT NULL,
-    hashPassword VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE customers (
-    id INT PRIMARY KEY,
-    telephoneNumber VARCHAR(50) UNIQUE NOT NULL,
-    addressId INT NOT NULL,
-    active BOOLEAN NOT NULL,
-    FOREIGN KEY (addressId) REFERENCES addresses(id),
-    FOREIGN KEY (id) REFERENCES app_users(id)
-);
-
-CREATE TABLE owners (
-    id INT PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES app_users(id)
-);
-
-CREATE TABLE admins (
-   id INT PRIMARY KEY AUTO_INCREMENT,
-   FOREIGN KEY (id) REFERENCES app_users(id)
 );
 
 -- GESTIONE APP
