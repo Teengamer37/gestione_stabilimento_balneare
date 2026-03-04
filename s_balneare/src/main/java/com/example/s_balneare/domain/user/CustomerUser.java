@@ -5,7 +5,7 @@ public final class CustomerUser extends AppUser {
     private int addressId;
     private boolean active;
 
-    // Costruttore atomico: riceve tutto e valida tutto
+    //costruttore
     public CustomerUser(Integer id, String email, String username, String name, String surname,
                         String phoneNumber, int addressId, boolean active) {
         super(id, email, username, name, surname);

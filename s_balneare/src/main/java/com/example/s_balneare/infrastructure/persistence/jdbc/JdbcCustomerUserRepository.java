@@ -16,7 +16,7 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
     @Override
     public int save(AppUser inputUser, String password){
         if (!(inputUser instanceof CustomerUser user)){
-            throw new RuntimeException("Invalid type!");
+            throw new RuntimeException("ERROR: user is not a CustomerUser");
         }
         String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
                 "VALUES(?, ?, ?, ?, ?)";

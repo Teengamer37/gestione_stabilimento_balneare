@@ -3,7 +3,7 @@ package com.example.s_balneare.application.port.in;
 import com.example.s_balneare.domain.user.Role;
 
 public class RegistrationRequest {
-    // 1. Attributi comuni a tutti gli utenti
+    //attributi comuni a tutti gli utenti
     private final int id;
     private final Role type;
     private final String email;
@@ -11,12 +11,12 @@ public class RegistrationRequest {
     private final String name;
     private final String surname;
 
-    // 2. Attributi esclusivi del customer
+    //attributi esclusivi del customer
     private final String phoneNumber;
     private final int addressId;
     private final boolean active;
 
-    // Costruttore privato: l'oggetto può essere creato solo tramite il Builder
+    //costruttore privato: l'oggetto può essere creato solo tramite il Builder
     private RegistrationRequest(Builder builder) {
         this.type = builder.type;
         this.email = builder.email;
@@ -29,7 +29,7 @@ public class RegistrationRequest {
         this.id = builder.id;
     }
 
-    // Getter (Sola lettura per garantire l'immutabilità)
+    //getters (sola lettura per garantire l'immutabilità)
     public Role getType() { return type; }
     public String getEmail() { return email; }
     public String getUsername() { return username; }
@@ -42,7 +42,7 @@ public class RegistrationRequest {
 
     // --- INNER CLASS BUILDER ---
     public static class Builder {
-        // Campi del builder (stessi della classe esterna)
+        //campi del Builder (stessi della classe esterna)
         private Integer id;
         private Role type;
         private String email;
@@ -53,25 +53,26 @@ public class RegistrationRequest {
         private Integer addressId ;
         private boolean active;// Default a 0
 
-        // Il costruttore del Builder richiede i parametri minimi obbligatori per OGNI utente
+        //il costruttore del Builder richiede i parametri minimi obbligatori per OGNI utente
         public Builder(Role type, String email, String username) {
             this.type = type;
             this.email = email;
             this.username = username;
         }
 
-        //Utilizzato quando si preleva dati dal db per settare l'id, se altrimenti la richiesta è nuova l'id è nullo
-        public Builder DataBaseRequest(int id){
+        //utilizzato quando si preleva dati dal DB per settare l'ID, se altrimenti la richiesta è nuova l'ID è nullo
+        public Builder DatabaseRequest(int id){
             this.id = id;
             return this;
         }
 
+        //metodi wither
         public Builder withName(String name, String surname) {
             this.name = name;
             this.surname = surname;
             return this;
         }
-        // Utilizzato solo per i customer
+        //utilizzato solo per i customer
         public Builder withCustomerData(String phoneNumber, int addressId, boolean active) {
             this.phoneNumber = phoneNumber;
             this.addressId = addressId;
@@ -79,23 +80,23 @@ public class RegistrationRequest {
             return this;
         }
 
-        // Metodo build: Valida e restituisce la Request
+        //valida e restituisce la Request
         public RegistrationRequest build() {
-            RegistrationRequestLegal();
-            CustomerRegistrationRequestLegal();
+            registrationRequestLegal();
+            customerRegistrationRequestLegal();
             return new RegistrationRequest(this);
         }
 
-        public void CustomerRegistrationRequestLegal(){
+        public void customerRegistrationRequestLegal(){
             if (type == Role.CUSTOMER) {
                 if (phoneNumber == null || addressId == null)
-                    throw new IllegalArgumentException("ERROR: Required fields are mandatory");
+                    throw new IllegalArgumentException("ERROR: required fields are mandatory");
             }
         }
 
-        public void RegistrationRequestLegal(){
+        public void registrationRequestLegal(){
             if (type == null || name == null || surname == null || username == null || email == null) {
-                throw new IllegalArgumentException("ERROR: Required fields are mandatory");
+                throw new IllegalArgumentException("ERROR: required fields are mandatory");
             }
         }
     }
