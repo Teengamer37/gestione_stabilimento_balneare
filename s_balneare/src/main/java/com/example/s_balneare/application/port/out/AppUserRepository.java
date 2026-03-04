@@ -6,10 +6,10 @@ import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo AppUser
 public interface AppUserRepository {
-    int save(AppUser user, String password);
-    void delete(int id);
+    Integer save(AppUser user, String password);
+    void delete(Integer id);
     void update(AppUser user, String password);
-    Optional<AppUser> findById(int id);
+    Optional<AppUser> findById(Integer id);
     Optional<AppUser> findByUsername(String username);
     Optional<AppUser> findByEmail(String email);
     Optional<AppUser> findByPhoneNumber(String phoneNumber);

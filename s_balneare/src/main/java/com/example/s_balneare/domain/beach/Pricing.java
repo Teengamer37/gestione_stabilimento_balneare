@@ -3,14 +3,14 @@ package com.example.s_balneare.domain.beach;
 //TODO: da implementarla nel pattern DDD-lite
 
 public class Pricing {
-    private final int id;
+    private final Integer id;
     private double priceLettino;
     private double priceSdraio;
     private double priceSedia;
     private double priceParking;
     private double priceCamerino;
 
-    public Pricing(int id, double priceLettino, double priceSdraio, double priceSedia, double priceParking, double priceCamerino) {
+    public Pricing(Integer id, double priceLettino, double priceSdraio, double priceSedia, double priceParking, double priceCamerino) {
         this.id = id;
         this.priceLettino = priceLettino;
         this.priceSdraio = priceSdraio;
@@ -19,7 +19,7 @@ public class Pricing {
         this.priceCamerino = priceCamerino;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

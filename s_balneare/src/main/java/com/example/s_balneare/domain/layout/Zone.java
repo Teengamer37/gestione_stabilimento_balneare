@@ -5,11 +5,11 @@ import java.util.List;
 //TODO: da implementarla nel pattern DDD-lite
 
 public class Zone {
-    private final int id;
+    private final Integer id;
     private String name;
     private List<Integer> spotIds;
 
-    public Zone(int id, String name, List<Integer> spotIds) {
+    public Zone(Integer id, String name, List<Integer> spotIds) {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: beachName cannot be empty");
 
         this.id = id;
@@ -17,7 +17,7 @@ public class Zone {
         this.spotIds = spotIds;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

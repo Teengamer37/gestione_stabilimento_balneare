@@ -1,7 +1,7 @@
 package com.example.s_balneare.domain.common;
 
 public record Address(
-    int id,
+    Integer id,
     String street,
     String streetNumber,
     String city,
@@ -19,11 +19,11 @@ public record Address(
         if (country == null || country.isBlank()) throw new IllegalArgumentException("ERROR: country cannot be blank");
 
         //check lunghezze stringhe per farle entrare nel DB
-        if (street.length() > 255) throw new IllegalArgumentException("Street cannot exceed 255 characters");
-        if (streetNumber.length() > 10) throw new IllegalArgumentException("Street number cannot exceed 10 characters");
-        if (city.length() > 100) throw new IllegalArgumentException("City cannot exceed 100 characters");
-        if (zipCode.length() > 20) throw new IllegalArgumentException("Zip code cannot exceed 20 characters");
-        if (country.length() > 100) throw new IllegalArgumentException("Country cannot exceed 100 characters");
+        if (street.length() > 255) throw new IllegalArgumentException("ERROR: street cannot exceed 255 characters");
+        if (streetNumber.length() > 10) throw new IllegalArgumentException("ERROR: streetNumber cannot exceed 10 characters");
+        if (city.length() > 100) throw new IllegalArgumentException("ERROR: city cannot exceed 100 characters");
+        if (zipCode.length() > 20) throw new IllegalArgumentException("ERROR: zip code cannot exceed 20 characters");
+        if (country.length() > 100) throw new IllegalArgumentException("ERROR: country cannot exceed 100 characters");
     }
 
     //Static Factory per indirizzi nuovi da inserire nel database
@@ -32,7 +32,7 @@ public record Address(
     }
 
     //metodi wither
-    public Address withId(int id) {
+    public Address withId(Integer id) {
         return new Address(id, street, streetNumber, city, zipCode, country);
     }
     public Address withStreet(String street) {
@@ -57,7 +57,7 @@ public record Address(
     }
 
     public static class Builder {
-        private int id = 0;
+        private Integer id = 0;
         private String street;
         private String streetNumber;
         private String city;
@@ -76,7 +76,7 @@ public record Address(
             this.country = original.country;
         }
 
-        public Builder id(int val) { id = val; return this; }
+        public Builder id(Integer val) { id = val; return this; }
         public Builder street(String val) { street = val; return this; }
         public Builder streetNumber(String val) { streetNumber = val; return this; }
         public Builder city(String val) { city = val; return this; }

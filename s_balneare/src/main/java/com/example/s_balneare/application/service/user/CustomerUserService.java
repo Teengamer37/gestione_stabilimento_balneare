@@ -7,13 +7,15 @@ import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcCustomerUserRe
 //TODO: da fare
 
 public class CustomerUserService extends AppUserService {
-    public CustomerUserService(JdbcCustomerUserRepository jdbcCustomerUserRepository) {super(jdbcCustomerUserRepository);}
+    public CustomerUserService(JdbcCustomerUserRepository jdbcCustomerUserRepository) {
+        super(jdbcCustomerUserRepository);
+    }
 
-    public void updateTelephoneNumber(CustomerUser user, String phoneNumber){
+    public void updateTelephoneNumber(CustomerUser user, String phoneNumber) {
         //
         appUserRepository.update(user, null);
     }
-    public void updateAddress(CustomerUser user, Address address){
+    public void updateAddress(CustomerUser user, Address address) {
         //chiamo update su address
     }
 }

@@ -1,5 +1,16 @@
 package com.example.s_balneare.domain.user;
 
+/*
+    FIXME: aggiungere controlli dimensione dati stringhe:
+
+    esempio estratto da Address:
+    if (street.length() > 255) throw new IllegalArgumentException("ERROR: street cannot exceed 255 characters");
+    if (streetNumber.length() > 10) throw new IllegalArgumentException("ERROR: streetNumber cannot exceed 10 characters");
+    if (city.length() > 100) throw new IllegalArgumentException("ERROR: city cannot exceed 100 characters");
+    if (zipCode.length() > 20) throw new IllegalArgumentException("ERROR: zip code cannot exceed 20 characters");
+    if (country.length() > 100) throw new IllegalArgumentException("ERROR: country cannot exceed 100 characters");
+ */
+
 public abstract class AppUser {
     private final Integer id;
     private String email;

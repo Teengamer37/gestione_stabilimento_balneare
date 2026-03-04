@@ -6,14 +6,14 @@ import java.util.List;
 //TODO: da implementarla nel pattern DDD-lite
 
 public class Season {
-    private final int id;
+    private final Integer id;
     private LocalDate startDate;
     private LocalDate endDate;
-    private int pricingId;
+    private Integer pricingId;
     private final List<Integer> zonePricingIds;
 
-    public Season(int id, LocalDate startDate, LocalDate endDate, int pricingId, List<Integer> zonePricingIds) {
-        if (pricingId <= 0) throw new IllegalArgumentException("ERROR: pricingId not valid");
+    public Season(Integer id, LocalDate startDate, LocalDate endDate, Integer pricingId, List<Integer> zonePricingIds) {
+        if (pricingId == null || pricingId <= 0) throw new IllegalArgumentException("ERROR: pricingId not valid");
         if (endDate.isBefore(startDate)) throw new IllegalArgumentException("ERROR: end date must be after start date");
         if (zonePricingIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set for season");
 
@@ -24,7 +24,7 @@ public class Season {
         this.zonePricingIds = zonePricingIds;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -44,7 +44,7 @@ public class Season {
         this.endDate = endDate;
     }
 
-    public int getPricingId() {
+    public Integer getPricingId() {
         return pricingId;
     }
 

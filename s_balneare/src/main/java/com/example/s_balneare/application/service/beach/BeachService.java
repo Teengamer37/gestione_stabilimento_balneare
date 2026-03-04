@@ -24,63 +24,63 @@ public class BeachService {
 
     //aggiornamento info generali spiaggia
     //prendo spiaggia da DB -> modifico parametro -> update nel DB
-    public void updateGeneralInfo(int id, BeachGeneral newGeneral) {
+    public void updateGeneralInfo(Integer id, BeachGeneral newGeneral) {
         Beach beach = getBeachOrThrow(id);
         beach.updateGeneralInfo(newGeneral);
         beachRepository.update(beach);
     }
 
     //aggiornamento inventario spiaggia
-    public void updateInventory(int id, BeachInventory newInventory) {
+    public void updateInventory(Integer id, BeachInventory newInventory) {
         Beach beach = getBeachOrThrow(id);
         beach.updateInventory(newInventory);
         beachRepository.update(beach);
     }
 
     //aggiornamento servizi spiaggia
-    public void updateServices(int id, BeachServices newServices) {
+    public void updateServices(Integer id, BeachServices newServices) {
         Beach beach = getBeachOrThrow(id);
         beach.updateServices(newServices);
         beachRepository.update(beach);
     }
 
     //aggiornamento parcheggio spiaggia
-    public void updateParking(int id, Parking newParking) {
+    public void updateParking(Integer id, Parking newParking) {
         Beach beach = getBeachOrThrow(id);
         beach.updateParking(newParking);
         beachRepository.update(beach);
     }
 
     //aggiornamento info extra spiaggia
-    public void updateExtraInfo(int id, String extraInfo) {
+    public void updateExtraInfo(Integer id, String extraInfo) {
         Beach beach = getBeachOrThrow(id);
         beach.editExtraInfo(extraInfo);
         beachRepository.update(beach);
     }
 
     //manipolazione stato attività spiaggia
-    public void setBeachActive(int id, boolean active) {
+    public void setBeachActive(Integer id, boolean active) {
         Beach beach = getBeachOrThrow(id);
         beach.setActive(active);
         beachRepository.update(beach);
     }
 
     //aggiunta stagione in una determinata spiaggia
-    public void addSeason(int id, int seasonId) {
+    public void addSeason(Integer id, Integer seasonId) {
         Beach beach = getBeachOrThrow(id);
         beach.addSeason(seasonId);
         beachRepository.update(beach);
     }
 
     //aggiunta lista di stagioni in una determinata spiaggia
-    public void addSeasons(int id, List<Integer> seasonIds) {
+    public void addSeasons(Integer id, List<Integer> seasonIds) {
         Beach beach = getBeachOrThrow(id);
         beach.addSeasons(seasonIds);
         beachRepository.update(beach);
     }
 
     //eliminazione stagione da una determinata spiaggia
-    public void removeSeason(int id, int seasonId) {
+    public void removeSeason(Integer id, Integer seasonId) {
         Beach beach = getBeachOrThrow(id);
         beach.removeSeason(seasonId);
         beachRepository.update(beach);
@@ -88,25 +88,25 @@ public class BeachService {
 
     //eliminazione lista di stagioni da una determinata spiaggia
     //-> se SOLO UNA delle stagioni non esiste, l'azione viene revocata
-    public void removeSeasons(int id, List<Integer> seasonIds) {
+    public void removeSeasons(Integer id, List<Integer> seasonIds) {
         Beach beach = getBeachOrThrow(id);
         beach.removeSeasons(seasonIds);
         beachRepository.update(beach);
     }
 
     //ricerca spiaggia
-    public Beach getBeach(int id) {
+    public Beach getBeach(Integer id) {
         return getBeachOrThrow(id);
     }
 
     //rimozione spiaggia
-    public void deleteBeach(int id) {
+    public void deleteBeach(Integer id) {
         beachRepository.delete(id);
     }
 
     //metodo privato che serve nelle operazioni sensibili (in questo caso negli update)
     //cerca in DB -> se restituisce NULL, allora interrompo tutto
-    private Beach getBeachOrThrow(int id) {
+    private Beach getBeachOrThrow(Integer id) {
         return beachRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Beach not found with id: " + id));
     }

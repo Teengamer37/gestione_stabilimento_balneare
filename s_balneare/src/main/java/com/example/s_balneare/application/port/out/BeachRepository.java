@@ -8,15 +8,15 @@ import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo Beach
 public interface BeachRepository {
-    int save(Beach beach);
-    int save(Beach beach, Connection conn);
+    Integer save(Beach beach);
+    Integer save(Beach beach, Connection conn);
     void update(Beach beach);
-    void delete(int id);
-    Optional<Beach> findById(int id);
+    void delete(Integer id);
+    Optional<Beach> findById(Integer id);
 
     //trova gli ID delle stagioni di una spiaggia
     //TODO: da spostare su SeasonRepository
-    List<Integer> findBeachSeasonIds(int beachId);
+    List<Integer> findBeachSeasonIds(Integer beachId);
 
     //trova tutte le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse)
     List<Beach> findAll();

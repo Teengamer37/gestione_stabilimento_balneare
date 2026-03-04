@@ -19,7 +19,7 @@ public class JdbcAddressRepository implements AddressRepository {
     //salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User
     //DA USARE SOLO SE SI HA INTENZIONE IN UN FUTURO VICINO DI ESEGUIRE MANUALMENTE UN SALVATAGGIO DI BEACH O USER
     @Override
-    public int save(Address address) {
+    public Integer save(Address address) {
         try (Connection connection = dataSource.getConnection()) {
             return save(address, connection);
         } catch (SQLException e) {
@@ -30,7 +30,7 @@ public class JdbcAddressRepository implements AddressRepository {
     //salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User
     //usato direttamente dagli use cases di Beach e User, nessun rischio di avere address non associati
     @Override
-    public int save(Address address, Connection connection) {
+    public Integer save(Address address, Connection connection) {
         String sql = "INSERT INTO addresses (street, streetNumber, city, zipCode, country) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -56,6 +56,9 @@ public class JdbcAddressRepository implements AddressRepository {
     //aggiorna indirizzo nel DB
     @Override
     public void update(Address address) {
+        //check validità ID
+        if (address.id() == null) throw new IllegalArgumentException("ERROR: address must have a valid ID");
+
         String sql = "UPDATE addresses SET street = ?, streetNumber = ?, city = ?, zipCode = ?, country = ? WHERE id = ?";
 
         //apro connessione
@@ -78,7 +81,10 @@ public class JdbcAddressRepository implements AddressRepository {
 
     //cerca indirizzo nel DB per ID
     @Override
-    public Optional<Address> findById(int id) {
+    public Optional<Address> findById(Integer id) {
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         String sql = "SELECT id, street, streetNumber, city, zipCode, country FROM addresses WHERE id = ?";
 
         //apro connessione
@@ -109,6 +115,9 @@ public class JdbcAddressRepository implements AddressRepository {
     //cerca indirizzi nel DB per città
     @Override
     public List<Address> findByCity(String city) {
+        //check validità stringa
+        if (city == null || city.isBlank()) throw new IllegalArgumentException("ERROR: the parameter is either blank or null");
+
         String sql = "SELECT id, street, streetNumber, city, zipCode, country FROM addresses WHERE city = ?";
         List<Address> addresses = new ArrayList<>();
 
@@ -136,6 +145,9 @@ public class JdbcAddressRepository implements AddressRepository {
     //cerca indirizzi nel DB per paese
     @Override
     public List<Address> findByCountry(String country) {
+        //check validità stringa
+        if (country == null || country.isBlank()) throw new IllegalArgumentException("ERROR: the parameter is either blank or null");
+
         String sql = "SELECT id, street, streetNumber, city, zipCode, country FROM addresses WHERE country = ?";
         List<Address> addresses = new ArrayList<>();
 
@@ -186,7 +198,10 @@ public class JdbcAddressRepository implements AddressRepository {
 
     //elimina un indirizzo dal DB
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         String sql = "DELETE FROM addresses WHERE id = ?";
 
         //apro connessione

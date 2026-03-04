@@ -20,7 +20,7 @@ public class JdbcBookingRepository implements BookingRepository {
 
     //salva nuovo booking nel DB
     @Override
-    public int save(Booking booking) {
+    public Integer save(Booking booking) {
         //query
         String sql = "INSERT INTO bookings(beachId, customerId, date, extraSdraio, extraLettini, extraSedie, camerini, status) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -89,7 +89,10 @@ public class JdbcBookingRepository implements BookingRepository {
 
     //cancella booking dal DB
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         //query
         String sql = "DELETE FROM bookings WHERE id = ?";
 
@@ -109,6 +112,9 @@ public class JdbcBookingRepository implements BookingRepository {
     //aggiornamento booking nel DB
     @Override
     public void update(Booking booking) {
+        //check validità ID
+        if (booking.getId() == null || booking.getId() <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         //query
         String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, status = ? WHERE id = ?";
 
@@ -133,7 +139,10 @@ public class JdbcBookingRepository implements BookingRepository {
 
     //trova booking dal DB da ID
     @Override
-    public Optional<Booking> findById(int id) {
+    public Optional<Booking> findById(Integer id) {
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         //query
         String sql = "SELECT b.*, bs.spot FROM bookings b " +
                      "LEFT JOIN bookings_spots bs ON b.id = bs.booking " +
@@ -194,7 +203,10 @@ public class JdbcBookingRepository implements BookingRepository {
 
     //trova spot occupati per una data specifica
     @Override
-    public List<Integer> findOccupiedSpots(int beachId, LocalDate date) {
+    public List<Integer> findOccupiedSpots(Integer beachId, LocalDate date) {
+        //check validità parametri
+        if (beachId == null || beachId <= 0 || date == null) throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
+
         //query
         String sql = "SELECT bs.spot FROM bookings b " +
                      "JOIN bookings_spots bs ON b.id = bs.booking " +
@@ -203,7 +215,7 @@ public class JdbcBookingRepository implements BookingRepository {
         List<Integer> occupiedSpots = new ArrayList<>();
 
         //apro connessione
-        try(Connection connection = dataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
                 statement.setInt(1, beachId);
                 statement.setDate(2, java.sql.Date.valueOf(date));

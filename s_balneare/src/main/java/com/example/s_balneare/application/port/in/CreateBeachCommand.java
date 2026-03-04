@@ -9,7 +9,7 @@ import java.util.List;
 
 public record CreateBeachCommand(
         //attributi beach
-        int ownerId,
+        Integer ownerId,
         BeachGeneral beachGeneral,
         BeachInventory beachInventory,
         BeachServices beachServices,
@@ -27,15 +27,6 @@ public record CreateBeachCommand(
 ) {
     //costruttore compatto per assicurarsi l'integrità dei valori
     public CreateBeachCommand {
-        if (ownerId < 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
         if (beachGeneral == null) throw new IllegalArgumentException("ERROR: beachGeneral cannot be null");
-        if (extraInfo == null) extraInfo = "";
-
-        if (isNullOrBlank(street) || isNullOrBlank(streetNumber) || isNullOrBlank(city) || isNullOrBlank(zipCode) || isNullOrBlank(country))
-            throw new IllegalArgumentException("ERROR: one or more fields for Address are null/blank");
-    }
-
-    private static boolean isNullOrBlank(String s) {
-        return s == null || s.isBlank();
     }
 }

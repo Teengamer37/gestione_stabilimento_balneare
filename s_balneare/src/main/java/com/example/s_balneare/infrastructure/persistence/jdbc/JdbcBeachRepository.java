@@ -24,12 +24,12 @@ public class JdbcBeachRepository implements BeachRepository {
     //DA USARE SE E SOLO SE SI HA UN'ISTANZA LIBERA E NON ASSOCIATA DI ADDRESS
     //SE USATA A CASO -> EXCEPION 100%
     @Override
-    public int save(Beach beach) {
+    public Integer save(Beach beach) {
         //apro connessione
         try (Connection connection = dataSource.getConnection()) {
             try {
                 connection.setAutoCommit(false);
-                int beachId = save(beach, connection);
+                Integer beachId = save(beach, connection);
                 connection.commit();
                 return beachId;
             } catch (SQLException e) {
@@ -55,14 +55,14 @@ public class JdbcBeachRepository implements BeachRepository {
 
     //inserimento nuova spiaggia nel DB
     @Override
-    public int save(Beach beach, Connection conn) {
+    public Integer save(Beach beach, Connection conn) {
         String sqlBeach = "INSERT INTO beaches (name, description, telephoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlInventory = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlServices = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlParking = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
-            int newId;
+            Integer newId;
 
             //passo 1: inserisco in beaches gli oggetti Beach e BeachGeneral
             try (PreparedStatement statement = conn.prepareStatement(sqlBeach, Statement.RETURN_GENERATED_KEYS)) {
@@ -71,7 +71,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
                 statement.setString(1, general.getName());
                 statement.setString(2, general.getDescription());
-                statement.setString(3, general.getTelephoneNumber());
+                statement.setString(3, general.getPhoneNumber());
                 statement.setInt(4, beach.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());
@@ -138,6 +138,9 @@ public class JdbcBeachRepository implements BeachRepository {
     //aggiorno spiaggia presente nel DB
     @Override
     public void update(Beach beach) {
+        //check validità ID
+        if (beach.getId() == null || beach.getId() <= 0) throw new IllegalArgumentException("ERROR: beach must have a valid ID");
+
         String sqlBeach = "UPDATE beaches SET name = ?, description = ?, telephoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, ownerId = ? WHERE id = ?";
 
         //apro connessione
@@ -152,7 +155,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
                     statement.setString(1, general.getName());
                     statement.setString(2, general.getDescription());
-                    statement.setString(3, general.getTelephoneNumber());
+                    statement.setString(3, general.getPhoneNumber());
                     statement.setInt(4, beach.getAddressId());
                     statement.setString(5, beach.getExtraInfo());
                     statement.setBoolean(6, beach.isActive());
@@ -316,7 +319,10 @@ public class JdbcBeachRepository implements BeachRepository {
 
     //permette di eliminare una spiaggia
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         String sqlServices = "DELETE FROM beach_services WHERE beachId = ?";
         String sqlInventory = "DELETE FROM beach_inventories WHERE beachId = ?";
         String sqlParking = "DELETE FROM parkings WHERE beachId = ?";
@@ -388,7 +394,7 @@ public class JdbcBeachRepository implements BeachRepository {
                         int id = rs.getInt("id");
                         String name = rs.getString("name");
                         String description = rs.getString("description");
-                        String telephoneNumber = rs.getString("telephoneNumber");
+                        String telephoneNumber = rs.getString("phoneNumber");
 
                         BeachGeneral general = new BeachGeneral(name, description, telephoneNumber);
 
@@ -442,7 +448,10 @@ public class JdbcBeachRepository implements BeachRepository {
 
     //cerca una spiaggia per ID e la restituisce
     @Override
-    public Optional<Beach> findById(int id) {
+    public Optional<Beach> findById(Integer id) {
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         String sql = "SELECT b.*, " +
                      "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
                      "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
@@ -464,7 +473,7 @@ public class JdbcBeachRepository implements BeachRepository {
                     //passo 1: ricostruisco BeachGeneral
                     String name = rs.getString("name");
                     String description = rs.getString("description");
-                    String telephoneNumber = rs.getString("telephoneNumber");
+                    String telephoneNumber = rs.getString("phoneNumber");
 
                     BeachGeneral general = new BeachGeneral(name, description, telephoneNumber);
 
@@ -534,7 +543,9 @@ public class JdbcBeachRepository implements BeachRepository {
     //TODO: spostare funzione in JdbcSeasonRepository
     //cerca le stagioni di una spiaggia
     @Override
-    public List<Integer> findBeachSeasonIds(int beachId) {
+    public List<Integer> findBeachSeasonIds(Integer beachId) {
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
         List<Integer> ids = new ArrayList<>();
         String sql = "SELECT pricingsId FROM seasons WHERE beachId = ?";
 

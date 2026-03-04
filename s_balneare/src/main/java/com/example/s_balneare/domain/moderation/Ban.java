@@ -5,31 +5,31 @@ import java.time.Instant;
 //TODO: da implementarla nel pattern DDD-lite
 
 public class Ban {
-    private final int id;
-    private final int bannedId;
+    private final Integer id;
+    private final Integer bannedId;
     private final BanType banType;
-    private final int bannedFromBeachId;
-    private final int adminId;
+    private final Integer bannedFromBeachId;
+    private final Integer adminId;
 
     private final String reason;
     private final Instant createdAt;
 
-    public Ban(int id, int bannedId, BanType banType, int bannedFromBeachId, int adminId, String reason) {
-        if (bannedId <= 0) throw new IllegalArgumentException("ERROR: bannedId not valid");
+    public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
+        if (bannedId == null ||bannedId <= 0) throw new IllegalArgumentException("ERROR: bannedId not valid");
         if (banType == null) throw new IllegalArgumentException("ERROR: banType not valid");
-        if (adminId <= 0) throw new IllegalArgumentException("ERROR: adminId not valid");
+        if (adminId == null || adminId <= 0) throw new IllegalArgumentException("ERROR: adminId not valid");
 
-        if (banType == BanType.BEACH && bannedFromBeachId <= 0) {
+        if (banType == BanType.BEACH && (bannedFromBeachId == null || bannedFromBeachId <= 0)) {
             throw new IllegalArgumentException("ERROR: bannedFromBeachID must be set for BEACH ban");
         }
 
         if (banType == BanType.APPLICATION) {
-            this.bannedFromBeachId = 0;
+            this.bannedFromBeachId = null;
         } else {
             this.bannedFromBeachId = bannedFromBeachId;
         }
 
-        if (reason == null) {
+        if (reason == null || reason.isBlank()) {
             throw new IllegalArgumentException("ERROR: reason must be set");
         }
 
@@ -41,11 +41,11 @@ public class Ban {
         this.createdAt = Instant.now();
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public int getBannedId() {
+    public Integer getBannedId() {
         return bannedId;
     }
 
@@ -53,11 +53,11 @@ public class Ban {
         return banType;
     }
 
-    public int getBannedFromBeachId() {
+    public Integer getBannedFromBeachId() {
         return bannedFromBeachId;
     }
 
-    public int getAdminId() {
+    public Integer getAdminId() {
         return adminId;
     }
 

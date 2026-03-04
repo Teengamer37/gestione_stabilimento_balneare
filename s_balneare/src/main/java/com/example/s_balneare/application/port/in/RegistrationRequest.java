@@ -4,7 +4,7 @@ import com.example.s_balneare.domain.user.Role;
 
 public class RegistrationRequest {
     //attributi comuni a tutti gli utenti
-    private final int id;
+    private final Integer id;
     private final Role type;
     private final String email;
     private final String username;
@@ -13,7 +13,7 @@ public class RegistrationRequest {
 
     //attributi esclusivi del customer
     private final String phoneNumber;
-    private final int addressId;
+    private final Integer addressId;
     private final boolean active;
 
     //costruttore privato: l'oggetto può essere creato solo tramite il Builder
@@ -36,9 +36,9 @@ public class RegistrationRequest {
     public String getName() { return name; }
     public String getSurname() { return surname; }
     public String getPhoneNumber() { return phoneNumber; }
-    public int getAddressId() { return addressId; }
+    public Integer getAddressId() { return addressId; }
     public boolean isActive(){return active;}
-    public int getId() { return id; }
+    public Integer getId() { return id; }
 
     // --- INNER CLASS BUILDER ---
     public static class Builder {
@@ -51,7 +51,7 @@ public class RegistrationRequest {
         private String surname;
         private String phoneNumber;
         private Integer addressId ;
-        private boolean active;// Default a 0
+        private boolean active;
 
         //il costruttore del Builder richiede i parametri minimi obbligatori per OGNI utente
         public Builder(Role type, String email, String username) {
@@ -61,7 +61,7 @@ public class RegistrationRequest {
         }
 
         //utilizzato quando si preleva dati dal DB per settare l'ID, se altrimenti la richiesta è nuova l'ID è nullo
-        public Builder DatabaseRequest(int id){
+        public Builder DatabaseRequest(Integer id){
             this.id = id;
             return this;
         }
@@ -73,7 +73,7 @@ public class RegistrationRequest {
             return this;
         }
         //utilizzato solo per i customer
-        public Builder withCustomerData(String phoneNumber, int addressId, boolean active) {
+        public Builder withCustomerData(String phoneNumber, Integer addressId, boolean active) {
             this.phoneNumber = phoneNumber;
             this.addressId = addressId;
             this.active= active;
@@ -87,14 +87,14 @@ public class RegistrationRequest {
             return new RegistrationRequest(this);
         }
 
-        public void customerRegistrationRequestLegal(){
+        public void customerRegistrationRequestLegal() {
             if (type == Role.CUSTOMER) {
                 if (phoneNumber == null || addressId == null)
                     throw new IllegalArgumentException("ERROR: required fields are mandatory");
             }
         }
 
-        public void registrationRequestLegal(){
+        public void registrationRequestLegal() {
             if (type == null || name == null || surname == null || username == null || email == null) {
                 throw new IllegalArgumentException("ERROR: required fields are mandatory");
             }

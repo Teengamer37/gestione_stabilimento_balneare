@@ -4,6 +4,8 @@ import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcOwnerUserRepos
 
 //TODO: da fare
 
-public class OwnerUserService extends  AppUserService{
-    public OwnerUserService(JdbcOwnerUserRepository jdbcOwnerUserRepository) {super(jdbcOwnerUserRepository);}
+public class OwnerUserService extends AppUserService {
+    public OwnerUserService(JdbcOwnerUserRepository jdbcOwnerUserRepository) {
+        super(jdbcOwnerUserRepository);
+    }
 }

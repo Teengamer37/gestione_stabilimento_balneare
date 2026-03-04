@@ -19,7 +19,7 @@ public class AddressService {
     }
 
     //aggiornamento indirizzo presente nel DB
-    public void updateAddress(int id, Address address) {
+    public void updateAddress(Integer id, Address address) {
         Address a = getAddressOrThrow(id);
 
         Address updated = a
@@ -34,7 +34,7 @@ public class AddressService {
     }
 
     //ricerca indirizzo nel DB
-    public Address getAddress(int id) {
+    public Address getAddress(Integer id) {
         return getAddressOrThrow(id);
     }
 
@@ -49,13 +49,13 @@ public class AddressService {
     }
 
     //eliminazione indirizzo dal DB
-    public void deleteAddress(int id) {
+    public void deleteAddress(Integer id) {
         addressRepository.delete(id);
     }
 
     //metodo privato che serve nelle operazioni sensibili (in questo caso in update)
     //cerca in DB -> se restituisce NULL, allora interrompo tutto
-    private Address getAddressOrThrow(int id) {
+    private Address getAddressOrThrow(Integer id) {
         return addressRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Address not found with id: " + id));
     }

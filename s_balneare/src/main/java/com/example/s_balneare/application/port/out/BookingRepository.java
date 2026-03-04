@@ -8,11 +8,11 @@ import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo Booking
 public interface BookingRepository {
-    int save(Booking booking);
-    void delete(int id);
+    Integer save(Booking booking);
+    void delete(Integer id);
     void update(Booking booking);
-    Optional<Booking> findById(int id);
+    Optional<Booking> findById(Integer id);
 
     //trova spot occupati per una data specifica
-    List<Integer> findOccupiedSpots(int beachId, LocalDate date);
+    List<Integer> findOccupiedSpots(Integer beachId, LocalDate date);
 }

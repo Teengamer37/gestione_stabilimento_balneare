@@ -12,7 +12,7 @@ public record BeachInventory(
     public BeachInventory {
         if (countOmbrelloni < 0 || countTende < 0 || countExtraSdraio < 0 ||
                 countExtraLettini < 0 || countExtraSedie < 0 || countCamerini < 0) {
-            throw new IllegalArgumentException("Inventory counts cannot be negative.");
+            throw new IllegalArgumentException("ERROR: inventory counts cannot be negative");
         }
     }
 

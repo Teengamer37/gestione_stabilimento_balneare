@@ -5,17 +5,17 @@ import java.time.Instant;
 //TODO: da implementarla nel pattern DDD-lite
 
 public class Review {
-    private final int id;
-    private final int beachId;
-    private final int customerId;
+    private final Integer id;
+    private final Integer beachId;
+    private final Integer customerId;
 
     private final int rating;               //da 1 a 5
     private final String comment;
     private final Instant createdAt;
 
-    public Review(int id, int beachId, int customerId, int rating, String comment) {
+    public Review(Integer id, Integer beachId, Integer customerId, int rating, String comment) {
         if (rating < 1 || rating > 5) throw new IllegalArgumentException("ERROR: rating must be between 1 and 5");
-        if (beachId <= 0 || customerId <= 0) throw new IllegalArgumentException("ERROR: beachId and customerId are not valid");
+        if (beachId == null || customerId == null || beachId <= 0 || customerId <= 0) throw new IllegalArgumentException("ERROR: beachId and/or customerId are not valid");
 
         this.id = id;
         this.beachId = beachId;

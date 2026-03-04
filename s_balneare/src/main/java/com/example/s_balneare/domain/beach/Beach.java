@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Beach {
     private final Integer id;
-    private int ownerId;
+    private Integer ownerId;
 
-    private final int addressId;
+    private final Integer addressId;
     private BeachGeneral beachGeneral;
     private BeachInventory beachInventory;
     private BeachServices beachServices;
@@ -18,7 +18,7 @@ public class Beach {
     private boolean active;
 
     //costruttore
-    public Beach(Integer id, int ownerId, int addressId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
+    public Beach(Integer id, Integer ownerId, Integer addressId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
         this.id = id;
         setOwnerId(ownerId);
         this.addressId = addressId;
@@ -36,10 +36,10 @@ public class Beach {
     public Integer getId() {
         return id;
     }
-    public int getOwnerId() {
+    public Integer getOwnerId() {
         return ownerId;
     }
-    public int getAddressId() {
+    public Integer getAddressId() {
         return addressId;
     }
     public BeachGeneral getBeachGeneral() {
@@ -77,8 +77,11 @@ public class Beach {
      */
 
     //permette di aggiungere/rimuovere un owner alla/dalla spiaggia
-    public void setOwnerId(int ownerId) {
-        if (ownerId < 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
+    public void setOwnerId(Integer ownerId) {
+        //controllo prima se null, poi se ID è valido
+        //(se arrivo al secondo if con un valore null, ho NullPointerException)
+        if (ownerId == null) throw new IllegalArgumentException("ERROR: ownerId cannot be null");
+        if (ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
         this.ownerId = ownerId;
     }
 
@@ -87,42 +90,49 @@ public class Beach {
      */
 
     //aggiunge una stagione
-    public void addSeason(int seasonId) {
+    public void addSeason(Integer seasonId) {
+        if (seasonId == null) throw new IllegalArgumentException("ERROR: seasonId cannot be null");
         if (seasonId <= 0) throw new IllegalArgumentException("ERROR: seasonId not valid");
         seasonIds.add(seasonId);
     }
 
     //aggiunge una lista di stagioni
     public void addSeasons(List<Integer> seasonIds) {
+        //controllo lista se vuota
         if (seasonIds == null || seasonIds.isEmpty()) throw new IllegalArgumentException("ERROR: no list to add to seasons");
-        for (int seasonId : seasonIds) {
-            if (seasonId <= 0) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not valid");
+        //controllo integrità dei valori inseriti nella stagione
+        for (Integer seasonId : seasonIds) {
+            if (seasonId == null || seasonId <= 0) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not valid");
         }
         this.seasonIds.addAll(seasonIds);
     }
 
     //rimuove una stagione
-    public void removeSeason (int seasonId) {
+    public void removeSeason (Integer seasonId) {
+        //controllo valore passato
+        if (seasonId == null) throw new IllegalArgumentException("ERROR: seasonId cannot be null");
         if (seasonId <= 0) throw new IllegalArgumentException("ERROR: seasonId not valid");
-        if (seasonIds.contains(seasonId)) seasonIds.remove(Integer.valueOf(seasonId));
+
+        //tentativo eliminazione
+        if (seasonIds.contains(seasonId)) seasonIds.remove(seasonId);
         else throw new IllegalArgumentException("ERROR: seasonId not found in seasons");
     }
 
     //rimuove una lista di stagioni
     public void removeSeasons (List<Integer> seasonIds) {
         if (seasonIds == null || seasonIds.isEmpty()) throw new IllegalArgumentException("ERROR: no list to remove from seasons");
-        for (int seasonId : seasonIds) {
-            if (seasonId <= 0) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not valid");
+        for (Integer seasonId : seasonIds) {
+            if (seasonId == null || seasonId <= 0) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not valid");
             if (!this.seasonIds.contains(seasonId)) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not found in seasons");
         }
         this.seasonIds.removeAll(seasonIds);
     }
 
-    //gestisce lo stato di attività della spiaggia nella piattaforma (verifica se è conforme all'attivazione,
-    //ovvero se ha tutti i campi compilati)
+    //gestisce lo stato di attività della spiaggia nella piattaforma
+    //(verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati)
     public void setActive(boolean active) {
         if (active) {
-            if (ownerId == 0 || beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasonIds == null || seasonIds.isEmpty()) {
+            if (beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasonIds == null || seasonIds.isEmpty()) {
                 throw new IllegalStateException("ERROR: beach can be set to active only if owner, general, inventory, services, parking and season(s) are set");
             }
         }
@@ -131,22 +141,22 @@ public class Beach {
 
     //metodi update per vari attributi
     public void updateGeneralInfo(BeachGeneral newGeneral) {
-        if (newGeneral == null) throw new IllegalArgumentException("ERROR: General info cannot be null");
+        if (newGeneral == null) throw new IllegalArgumentException("ERROR: General info cannot be reverted to null");
         this.beachGeneral = newGeneral;
     }
 
     public void updateInventory(BeachInventory newInventory) {
-        if (newInventory == null) throw new IllegalArgumentException("ERROR: Inventory cannot be null");
+        if (newInventory == null) throw new IllegalArgumentException("ERROR: Inventory cannot be reverted to null");
         this.beachInventory = newInventory;
     }
 
     public void updateServices(BeachServices newServices) {
-        if (newServices == null) throw new IllegalArgumentException("ERROR: Services cannot be null");
+        if (newServices == null) throw new IllegalArgumentException("ERROR: Services cannot be reverted to null");
         this.beachServices = newServices;
     }
 
     public void updateParking(Parking newParking) {
-        if (newParking == null) throw new IllegalArgumentException("ERROR: Parking cannot be null");
+        if (newParking == null) throw new IllegalArgumentException("ERROR: Parking cannot be reverted to null");
         this.parking = newParking;
     }
 }

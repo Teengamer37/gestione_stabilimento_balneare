@@ -25,18 +25,18 @@ public class CreateBeachService implements CreateBeachUseCase {
 
     //crea spiaggia date address e info su beach
     @Override
-    public int createBeach(CreateBeachCommand command) {
+    public Integer createBeach(CreateBeachCommand command) {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
             try {
                 //passo 1: creazione address e salvataggio nel DB
                 Address address = new Address(0, command.street(), command.streetNumber(), command.city(), command.zipCode(), command.country());
                 //addressId serve per recuperare l'ID generato dal DB
-                int addressId = addressRepository.save(address, connection);
+                Integer addressId = addressRepository.save(address, connection);
 
                 //passo 2: creazione spiaggia e salvataggio nel DB
                 Beach beach = new Beach(0, command.ownerId(), addressId, command.beachGeneral(), command.beachInventory(), command.beachServices(), command.parking(), command.extraInfo(), command.seasonIds(), command.active());
-                int beachId = beachRepository.save(beach, connection);
+                Integer beachId = beachRepository.save(beach, connection);
 
                 //passo 3: fine transaction e ritorno il nuovo ID della spiaggia
                 connection.commit();

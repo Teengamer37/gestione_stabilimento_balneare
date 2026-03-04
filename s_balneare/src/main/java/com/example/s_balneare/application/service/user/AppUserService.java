@@ -8,11 +8,17 @@ import com.example.s_balneare.domain.user.AppUser;
 public abstract class AppUserService {
     protected final AppUserRepository appUserRepository;
 
-    public AppUserService(AppUserRepository appUserRepository) {this.appUserRepository = appUserRepository;}
+    public AppUserService(AppUserRepository appUserRepository) {
+        this.appUserRepository = appUserRepository;
+    }
 
-    public int createUser(AppUser user, String password){return appUserRepository.save(user,password);}
+    public int createUser(AppUser user, String password){
+        return appUserRepository.save(user,password);
+    }
     //create address
-    public void deleteUser(int id) {appUserRepository.delete(id);}
+    public void deleteUser(int id) {
+        appUserRepository.delete(id);
+    }
     //delete address
     //possibilità di aggiornare address ed eliminarlo e aggiungerlo
 
@@ -20,15 +26,15 @@ public abstract class AppUserService {
         //operazione di aggiornamento del nome
         appUserRepository.update(user, null);
     }
-    public void updateSurname(AppUser user, String surname){
+    public void updateSurname(AppUser user, String surname) {
         //operazione di aggiornamento del cognome
         appUserRepository.update(user, null);
     }
-    public void updateUsername(AppUser user, String username){
+    public void updateUsername(AppUser user, String username) {
         //operazione di aggiornamento del username
         appUserRepository.update(user, null);
     }
-    public void updateEmail(AppUser user, String email){
+    public void updateEmail(AppUser user, String email) {
         //operazione di aggiornamento
         appUserRepository.update(user, null);
     }

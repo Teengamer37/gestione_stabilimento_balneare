@@ -5,9 +5,9 @@ import java.util.List;
 
 public class Booking {
     //dati booking
-    private final int id;
-    private final int beachId;
-    private final int customerId;
+    private final Integer id;
+    private final Integer beachId;
+    private final Integer customerId;
     private final LocalDate date;
 
     //oggetti booking
@@ -23,10 +23,14 @@ public class Booking {
     //costruttore fatto con Builder Pattern
     private Booking(BookingBuilder builder) {
         //check dati final
-        if (builder.beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid for booking " + builder.id);
-        if (builder.customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + builder.id);
+        if (builder.beachId == null || builder.beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid for booking " + builder.id);
+        if (builder.customerId == null || builder.customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + builder.id);
         if (builder.date == null) throw new IllegalArgumentException("ERROR: date cannot be null for booking " + builder.id);
+        //controllo prima se lista è null, poi controllo se contengo ID validi nella lista
         if (builder.spotIds == null || builder.spotIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + builder.id);
+        for (Integer spotId : builder.spotIds) {
+            if (spotId == null || spotId <= 0) throw new IllegalArgumentException("ERROR: at least one spotId is not valid for booking " + builder.id);
+        }
 
         //check integrità interi
         if (builder.extraSdraio < 0 || builder.extraLettini < 0 || builder.extraSedie < 0 || builder.camerini < 0) {
@@ -47,9 +51,9 @@ public class Booking {
 
     //builder pattern
     public static class BookingBuilder {
-        private int id;
-        private final int beachId;
-        private final int customerId;
+        private Integer id;
+        private final Integer beachId;
+        private final Integer customerId;
         private final LocalDate date;
 
         private final List<Integer> spotIds;
@@ -61,7 +65,7 @@ public class Booking {
         private BookingStatus status = BookingStatus.PENDING;
 
         //costruttore per booking salvati nel DB (con ID)
-        public BookingBuilder(int id, int beachId, int customerId, LocalDate date, List<Integer> spotIds) {
+        public BookingBuilder(Integer id, Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
             this.id = id;
             this.beachId = beachId;
             this.customerId = customerId;
@@ -70,7 +74,7 @@ public class Booking {
         }
 
         //costruttore per salvataggio nuovo booking (senza ID)
-        public BookingBuilder(int beachId, int customerId, LocalDate date, List<Integer> spotIds) {
+        public BookingBuilder(Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
             this.id = 0;
             this.beachId = beachId;
             this.customerId = customerId;
@@ -108,13 +112,13 @@ public class Booking {
     }
 
     // getters (NO SETTERS)
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-    public int getBeachId() {
+    public Integer getBeachId() {
         return beachId;
     }
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
     public LocalDate getDate() {

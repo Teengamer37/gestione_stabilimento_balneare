@@ -1,7 +1,6 @@
 package com.example.s_balneare.application.service;
 
 import com.example.s_balneare.application.port.out.BookingRepository;
-import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.booking.Booking;
 
 import java.util.List;
@@ -19,7 +18,7 @@ public class BookingService {
         //check spot occupati
         List<Integer> occupiedSpots = bookingRepository.findOccupiedSpots(booking.getBeachId(), booking.getDate());
 
-        for (int spotId : booking.getSpotIds()) {
+        for (Integer spotId : booking.getSpotIds()) {
             if (occupiedSpots.contains(spotId)) {
                 throw new IllegalArgumentException("ERROR: Spot " + spotId + " is already occupied on " + booking.getDate());
             }
@@ -29,7 +28,7 @@ public class BookingService {
     }
 
     //ricerca, aggiorna stato in CONFIRMED e salva booking nel DB
-    public void confirmBooking(int id) {
+    public void confirmBooking(Integer id) {
         Booking booking = getBookingOrThrow(id);
 
         booking.confirmBooking();
@@ -38,7 +37,7 @@ public class BookingService {
     }
 
     //ricerca, aggiorna stato in REJECTED e salva booking nel DB
-    public void rejectBooking(int id) {
+    public void rejectBooking(Integer id) {
         Booking booking = getBookingOrThrow(id);
 
         booking.rejectBooking();
@@ -47,7 +46,7 @@ public class BookingService {
     }
 
     //ricerca, aggiorna stato in CANCELLED e salva booking nel DB
-    public void cancelBooking(int id) {
+    public void cancelBooking(Integer id) {
         Booking booking = getBookingOrThrow(id);
 
         booking.cancelBooking();
@@ -56,7 +55,7 @@ public class BookingService {
     }
 
     //ricerca, aggiorna gli extra e salva booking nel DB
-    public void addExtras (int id,
+    public void addExtras (Integer id,
                            int extraSdraio, int extraLettini,
                            int extraCamerini, int extraSedie,
                            int availableSdraio, int availableLettini,
@@ -73,7 +72,7 @@ public class BookingService {
 
     //metodo privato che serve nelle operazioni sensibili (in questo caso negli update)
     //cerca in DB -> se restituisce NULL, allora interrompo tutto
-    private Booking getBookingOrThrow(int id) {
+    private Booking getBookingOrThrow(Integer id) {
         return bookingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Booking not found with id: " + id));
     }

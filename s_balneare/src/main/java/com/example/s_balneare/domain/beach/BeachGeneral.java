@@ -3,17 +3,18 @@ package com.example.s_balneare.domain.beach;
 public class BeachGeneral {
     private final String name;
     private final String description;
-    private final String telephoneNumber;
+    private final String phoneNumber;
 
     //costruttore
-    public BeachGeneral(String name, String description, String telephoneNumber) {
+    public BeachGeneral(String name, String description, String phoneNumber) {
         validateName(name);
         validateDescription(description);
-        validateTelephoneNumber(telephoneNumber);
+        //guarda validatePhoneNumber()
+        String cleaned = validatePhoneNumber(phoneNumber);
 
         this.name = name;
         this.description = description;
-        this.telephoneNumber = telephoneNumber;
+        this.phoneNumber = cleaned;
     }
 
     //getters
@@ -23,22 +24,22 @@ public class BeachGeneral {
     public String getDescription() {
         return description;
     }
-    public String getTelephoneNumber() {
-        return telephoneNumber;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     //metodi wither
     public BeachGeneral withName(String name) {
         validateName(name);
-        return new BeachGeneral(name, description, telephoneNumber);
+        return new BeachGeneral(name, description, phoneNumber);
     }
     public BeachGeneral withDescription(String description) {
         validateDescription(description);
-        return new BeachGeneral(name, description, telephoneNumber);
+        return new BeachGeneral(name, description, phoneNumber);
     }
-    public BeachGeneral withTelephoneNumber(String telephoneNumber) {
-        validateTelephoneNumber(telephoneNumber);
-        return new BeachGeneral(name, description, telephoneNumber);
+    public BeachGeneral withPhoneNumber(String phoneNumber) {
+        String cleaned = validatePhoneNumber(phoneNumber);
+        return new BeachGeneral(name, description, cleaned);
     }
 
     //metodi di validazione privati
@@ -49,11 +50,14 @@ public class BeachGeneral {
     private void validateDescription(String description) {
         if (description.length() > 512) throw new IllegalArgumentException("ERROR: description cannot exceed 512 characters");
     }
-    private void validateTelephoneNumber(String telephoneNumber) {
-        if (telephoneNumber == null) throw new IllegalArgumentException("ERROR: telephoneNumber cannot be null");
+    //l'unica validazione che restituisce il valore indietro
+    //se l'utente inserisce "+39 363 363 3633", il metodo ritorna "+393633633633" (no spazi)
+    private String validatePhoneNumber(String telephoneNumber) {
+        if (telephoneNumber == null) throw new IllegalArgumentException("ERROR: phoneNumber cannot be null");
         String cleaned = telephoneNumber.replaceAll("\\s", "");
-        if (cleaned.isBlank()) throw new IllegalArgumentException("ERROR: telephoneNumber cannot be blank");
-        if (cleaned.length() > 50) throw new IllegalArgumentException("ERROR: telephoneNumber cannot exceed 50 characters");
-        if (!cleaned.matches("^\\+\\d+$")) throw new IllegalArgumentException("ERROR: telephoneNumber not valid");
+        if (cleaned.isBlank()) throw new IllegalArgumentException("ERROR: phoneNumber cannot be blank");
+        if (cleaned.length() > 50) throw new IllegalArgumentException("ERROR: phoneNumber cannot exceed 50 characters");
+        if (!cleaned.matches("^\\+\\d+$")) throw new IllegalArgumentException("ERROR: phoneNumber not valid");
+        return cleaned;
     }
 }

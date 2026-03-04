@@ -10,12 +10,12 @@ import java.util.Optional;
 public class JdbcAdminUserRepository implements AppUserRepository {
 
     @Override
-    public int save(AppUser user, String password) {
+    public Integer save(AppUser user, String password) {
         return 0;
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
 
     }
 
@@ -25,7 +25,7 @@ public class JdbcAdminUserRepository implements AppUserRepository {
     }
 
     @Override
-    public Optional<AppUser> findById(int id) {
+    public Optional<AppUser> findById(Integer id) {
         return Optional.empty();
     }
 

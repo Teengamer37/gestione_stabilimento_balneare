@@ -14,10 +14,15 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
     public JdbcCustomerUserRepository(Connection connection) {this.connection=connection; }
 
     @Override
-    public int save(AppUser inputUser, String password){
+    public Integer save(AppUser inputUser, String password){
+        //check validità inputUser
         if (!(inputUser instanceof CustomerUser user)){
             throw new RuntimeException("ERROR: user is not a CustomerUser");
         }
+        //check validità password
+        if (password == null || password.isBlank()) throw new IllegalArgumentException("ERROR: password must not be null");
+
+
         String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
                 "VALUES(?, ?, ?, ?, ?)";
         String sqlCustomer = "INSERT INTO customers(id,telephoneNumber, addressId, active)" + "VALUES(?,?,?)";
@@ -54,7 +59,7 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
 
 
     @Override
-    public void delete(int id) {
+    public void delete(Integer id) {
     }
 
     @Override
@@ -63,7 +68,7 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
     }
 
     @Override
-    public Optional<AppUser> findById(int id) {
+    public Optional<AppUser> findById(Integer id) {
         return Optional.empty();
     }
 

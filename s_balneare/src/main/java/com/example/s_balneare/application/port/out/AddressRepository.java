@@ -8,12 +8,12 @@ import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo Address
 public interface AddressRepository {
-    int save(Address address);
-    int save(Address address, Connection connection);
+    Integer save(Address address);
+    Integer save(Address address, Connection connection);
     void update(Address address);
-    Optional<Address> findById(int id);
+    Optional<Address> findById(Integer id);
     List<Address> findByCity(String city);
     List<Address> findByCountry(String country);
     List<Address> findAll();
-    void delete(int id);
+    void delete(Integer id);
 }

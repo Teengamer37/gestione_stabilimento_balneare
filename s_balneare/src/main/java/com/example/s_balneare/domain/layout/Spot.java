@@ -3,20 +3,20 @@ package com.example.s_balneare.domain.layout;
 //TODO: da implementarla nel pattern DDD-lite
 
 public class Spot {
-    private final int id;
+    private final Integer id;
     private final SpotType type;
 
     private final int row;
     private final int column;
 
-    public Spot(int id, SpotType type, int row, int column) {
+    public Spot(Integer id, SpotType type, int row, int column) {
         this.id = id;
         this.type = type;
         this.row = row;
         this.column = column;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
