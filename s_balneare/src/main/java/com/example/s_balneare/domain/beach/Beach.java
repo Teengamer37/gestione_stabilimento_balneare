@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Beach {
-    private final int id;
+    private final Integer id;
     private int ownerId;
 
     private final int addressId;
@@ -18,7 +18,7 @@ public class Beach {
     private boolean active;
 
     //costruttore
-    public Beach(int id, int ownerId, int addressId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
+    public Beach(Integer id, int ownerId, int addressId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
         this.id = id;
         setOwnerId(ownerId);
         this.addressId = addressId;
@@ -33,7 +33,7 @@ public class Beach {
     }
 
     //getters
-    public int getId() {
+    public Integer getId() {
         return id;
     }
     public int getOwnerId() {
