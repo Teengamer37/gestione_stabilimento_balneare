@@ -14,7 +14,10 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
     public JdbcCustomerUserRepository(Connection connection) {this.connection=connection; }
 
     @Override
-    public int save(CustomerUser user, String password){
+    public int save(AppUser inputUser, String password){
+        if (!(inputUser instanceof CustomerUser user)){
+            throw new RuntimeException("Invalid type!");
+        }
         String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
                 "VALUES(?, ?, ?, ?, ?)";
         String sqlCustomer = "INSERT INTO customers(id,telephoneNumber, addressId, active)" + "VALUES(?,?,?)";

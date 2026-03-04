@@ -1,6 +1,6 @@
 package com.example.s_balneare.domain.user;
 
-//TODO: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite, guardare i costruttori
 
 public final class CustomerUser extends AppUser {
     private String phoneNumber;
@@ -14,6 +14,8 @@ public final class CustomerUser extends AppUser {
         this.addressId = addressId;
         this.active = active;
     }
+
+    public CustomerUser(Integer id){super(id);}
 
     @Override
     public Role getRole() {

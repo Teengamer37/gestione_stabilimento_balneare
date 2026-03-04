@@ -1,9 +1,9 @@
 package com.example.s_balneare.domain.user;
 
-//TODO: da implementarla nel pattern DDD-lite
+//TODO: da implementarla nel pattern DDD-lite, guardare i costruttori
 
 public abstract class AppUser {
-    private final int id;
+    private final Integer id;
     private String email;
     private String username;
     private String name;
@@ -17,13 +17,13 @@ public abstract class AppUser {
         this.surname = surname;
     }
 
-    protected AppUser(int id){
+    protected AppUser(Integer id){
         this.id = id;
     }
 
     public abstract Role getRole();
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
