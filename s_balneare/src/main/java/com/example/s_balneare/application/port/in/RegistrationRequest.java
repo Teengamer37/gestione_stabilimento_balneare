@@ -89,13 +89,13 @@ public class RegistrationRequest {
         public void CustomerRegistrationRequestLegal(){
             if (type == Role.CUSTOMER) {
                 if (phoneNumber == null || addressId == null)
-                    throw new IllegalArgumentException("Required fields are mandatory");
+                    throw new IllegalArgumentException("ERROR: Required fields are mandatory");
             }
         }
 
         public void RegistrationRequestLegal(){
             if (type == null || name == null || surname == null || username == null || email == null) {
-                throw new IllegalArgumentException("Required fields are mandatory");
+                throw new IllegalArgumentException("ERROR: Required fields are mandatory");
             }
         }
     }

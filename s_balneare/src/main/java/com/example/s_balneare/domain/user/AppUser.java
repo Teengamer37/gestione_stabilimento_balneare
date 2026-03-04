@@ -9,9 +9,9 @@ public abstract class AppUser {
 
     // Costruttore completo: garantisce che l'oggetto nasca VALIDO
     protected AppUser(Integer id, String email, String username, String name, String surname) {
-        if (email == null || !email.contains("@")) throw new IllegalArgumentException("Email non valida");
-        if (username == null || username.isBlank()) throw new IllegalArgumentException("Username obbligatorio");
-        if (name == null || surname == null) throw new IllegalArgumentException("Dati anagrafici obbligatori");
+        if (email == null || !email.contains("@")) throw new IllegalArgumentException("ERROR: Invalid email");
+        if (username == null || username.isBlank()) throw new IllegalArgumentException("ERROR: Username required");
+        if (name == null || surname == null) throw new IllegalArgumentException("ERROR: personal data required");
 
         this.id = id;
         this.email = email;
@@ -24,12 +24,12 @@ public abstract class AppUser {
 
     // Metodi di Business invece dei Setter
     public void changeEmail(String newEmail) {
-        if (newEmail == null || !newEmail.contains("@")) throw new IllegalArgumentException("Nuova email non valida");
+        if (newEmail == null || !newEmail.contains("@")) throw new IllegalArgumentException("ERROR: New email is invalid");
         this.email = newEmail;
     }
 
     public void updateProfile(String name, String surname) {
-        if (name == null || surname == null) throw new IllegalArgumentException("Dati non validi");
+        if (name == null || surname == null) throw new IllegalArgumentException("ERROR: Invalid name or surname");
         this.name = name;
         this.surname = surname;
     }
