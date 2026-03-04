@@ -6,11 +6,9 @@ import com.example.s_balneare.application.factory.OwnerFactory;
 
 public final class OwnerUser extends AppUser {
 
-    public OwnerUser(int id, String email, String username, String name, String surname, boolean active) {
+    public OwnerUser(int id, String email, String username, String name, String surname) {
         super(id, email, username, name, surname);
     }
-
-    public OwnerUser(Integer id) {super(id);}
 
     @Override
     public Role getRole() {

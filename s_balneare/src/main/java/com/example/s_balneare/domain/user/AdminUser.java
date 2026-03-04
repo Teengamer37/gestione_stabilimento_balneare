@@ -4,11 +4,9 @@ package com.example.s_balneare.domain.user;
 
 
 public final class AdminUser extends AppUser {
-    public AdminUser(int id, String email, String username, String name, String surname, boolean active) {
+    public AdminUser(int id, String email, String username, String name, String surname) {
         super(id, email, username, name, surname);
     }
-
-    public AdminUser(Integer id){super(id);}
 
     @Override
     public Role getRole() {

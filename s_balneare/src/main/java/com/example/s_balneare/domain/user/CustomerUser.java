@@ -1,46 +1,34 @@
 package com.example.s_balneare.domain.user;
 
-//TODO: da implementarla nel pattern DDD-lite, guardare i costruttori
-
 public final class CustomerUser extends AppUser {
     private String phoneNumber;
     private int addressId;
     private boolean active;
 
-
-    public CustomerUser(int id, String email, String username, String name, String surname, boolean active, String phoneNumber, int addressId) {
+    // Costruttore atomico: riceve tutto e valida tutto
+    public CustomerUser(Integer id, String email, String username, String name, String surname,
+                        String phoneNumber, int addressId, boolean active) {
         super(id, email, username, name, surname);
+
+        if (phoneNumber == null || phoneNumber.isBlank()) throw new IllegalArgumentException("Mandatory telephone number for Customer");
+
         this.phoneNumber = phoneNumber;
         this.addressId = addressId;
         this.active = active;
     }
 
-    public CustomerUser(Integer id){super(id);}
-
     @Override
-    public Role getRole() {
-        return Role.CUSTOMER;
+    public Role getRole() { return Role.CUSTOMER; }
+
+    public void changePhoneNumber(String newPhone) {
+        if (newPhone == null) throw new IllegalArgumentException("Invalid phone");
+        this.phoneNumber = newPhone;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
+    public void activate() { this.active = true; }
+    public void deactivate() { this.active = false; }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public int getAddress() {
-        return addressId;
-    }
-
-    public void setAddressId(int addressId) {
-        this.addressId = addressId;
-    }
-
-    public int getAddressId() {return addressId;}
-
-    public boolean isActive() {return active;}
-
-    public void setActive(boolean active) {this.active = active;}
+    public String getPhoneNumber() { return phoneNumber; }
+    public int getAddressId() { return addressId; }
+    public boolean isActive() { return active; }
 }

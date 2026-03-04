@@ -1,62 +1,43 @@
 package com.example.s_balneare.domain.user;
 
-//TODO: da implementarla nel pattern DDD-lite, guardare i costruttori
-
 public abstract class AppUser {
-    private final Integer id;
+    private final Integer id; // Immutabile
     private String email;
     private String username;
     private String name;
     private String surname;
 
-    protected AppUser(int id, String email, String username, String name, String surname) {
+    // Costruttore completo: garantisce che l'oggetto nasca VALIDO
+    protected AppUser(Integer id, String email, String username, String name, String surname) {
+        if (email == null || !email.contains("@")) throw new IllegalArgumentException("Email non valida");
+        if (username == null || username.isBlank()) throw new IllegalArgumentException("Username obbligatorio");
+        if (name == null || surname == null) throw new IllegalArgumentException("Dati anagrafici obbligatori");
+
         this.id = id;
         this.email = email;
         this.username = username;
         this.name = name;
         this.surname = surname;
-    }
-
-    protected AppUser(Integer id){
-        this.id = id;
     }
 
     public abstract Role getRole();
 
-    public Integer getId() {
-        return id;
+    // Metodi di Business invece dei Setter
+    public void changeEmail(String newEmail) {
+        if (newEmail == null || !newEmail.contains("@")) throw new IllegalArgumentException("Nuova email non valida");
+        this.email = newEmail;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
+    public void updateProfile(String name, String surname) {
+        if (name == null || surname == null) throw new IllegalArgumentException("Dati non validi");
         this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
         this.surname = surname;
     }
 
+    // Getter (Sola lettura)
+    public Integer getId() { return id; }
+    public String getEmail() { return email; }
+    public String getUsername() { return username; }
+    public String getName() { return name; }
+    public String getSurname() { return surname; }
 }
