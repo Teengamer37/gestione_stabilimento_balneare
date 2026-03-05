@@ -1,14 +1,14 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.AdminUserRepository;
-import com.example.s_balneare.application.port.out.AppUserRepository;
+import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;
 
 import java.util.Optional;
 
 //TODO: continuare l'implementazione
 
-public class JdbcAdminUserRepository implements AppUserRepository, AdminUserRepository {
+public class JdbcAdminUserRepository implements AdminUserRepository {
 
     @Override
     public Integer save(AppUser user, String password) {
@@ -31,22 +31,22 @@ public class JdbcAdminUserRepository implements AppUserRepository, AdminUserRepo
     }
 
     @Override
-    public Optional<AppUser> findById(Integer id) {
+    public Optional findById(Integer id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<AppUser> findByUsername(String username) {
+    public Optional findByUsername(String username) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<AppUser> findByEmail(String email) {
+    public Optional findByEmail(String email) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<AppUser> findAll() {
+    public Optional findAll() {
         return Optional.empty();
     }
 

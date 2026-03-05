@@ -2,6 +2,7 @@ package com.example.s_balneare.application.service.user;
 
 import com.example.s_balneare.application.port.out.AppUserRepository;
 import com.example.s_balneare.domain.user.AppUser;
+import com.example.s_balneare.domain.user.CustomerUser;
 
 //TODO: gestione metodi per operare su address creare nuova classe
 
