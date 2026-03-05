@@ -24,8 +24,7 @@ public final class CustomerUser extends AppUser {
         this.phoneNumber = newPhone;
     }
 
-    public void activate() { this.active = true; }
-    public void deactivate() { this.active = false; }
+    public void setActive(boolean active) {this.active = active;}
 
     public String getPhoneNumber() { return phoneNumber; }
     public int getAddressId() { return addressId; }

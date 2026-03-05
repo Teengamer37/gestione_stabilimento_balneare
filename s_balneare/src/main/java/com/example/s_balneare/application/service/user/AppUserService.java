@@ -23,31 +23,27 @@ public abstract class AppUserService {
     public void updateName(Integer id, String name) {
         AppUser appUser = getUserOrThrow(id);
         appUser.changeName(name);
-        appUserRepository.update(appUser, null);
+        appUserRepository.update(appUser);
     }
     public void updateSurname(Integer id, String surname) {
         AppUser appUser = getUserOrThrow(id);
         appUser.changeSurname(surname);
-        appUserRepository.update(appUser, null);
+        appUserRepository.update(appUser);
     }
     public void updateUsername(Integer id, String username) {
         AppUser appUser = getUserOrThrow(id);
         appUser.changeUsername(username);
-        appUserRepository.update(appUser, null);
+        appUserRepository.update(appUser);
     }
     public void updateEmail(Integer id, String email) {
         AppUser appUser = getUserOrThrow(id);
         appUser.changeEmail(email);
-        appUserRepository.update(appUser, null);
+        appUserRepository.update(appUser);
     }
     public void updatePassword(Integer id, String password){
         AppUser appUser = getUserOrThrow(id);
-        //TODO: appUserRepository.updatePassword(appUser, password);
-        appUserRepository.update(appUser, password);
+        appUserRepository.updatePassword(appUser, password);
     }
 
-    private AppUser getUserOrThrow(Integer id){
-        return appUserRepository.findById(id)
-                .orElseThrow(()->new IllegalArgumentException("ERROR: User not found with id: " + id));
-    }
+    protected abstract AppUser getUserOrThrow(Integer id);
 }

@@ -21,7 +21,12 @@ public class JdbcAdminUserRepository implements AppUserRepository, AdminUserRepo
     }
 
     @Override
-    public void update(AppUser user, String password) {
+    public void update(AppUser user) {
+
+    }
+
+    @Override
+    public void updatePassword(AppUser user, String password) {
 
     }
 

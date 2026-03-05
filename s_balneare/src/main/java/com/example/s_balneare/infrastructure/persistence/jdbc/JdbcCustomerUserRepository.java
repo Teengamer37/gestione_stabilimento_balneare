@@ -64,7 +64,12 @@ public class JdbcCustomerUserRepository implements AppUserRepository, CustomerUs
     }
 
     @Override
-    public void update(AppUser user, String password) {
+    public void update(AppUser user) {
+
+    }
+
+    @Override
+    public void updatePassword(AppUser user, String password) {
 
     }
 
