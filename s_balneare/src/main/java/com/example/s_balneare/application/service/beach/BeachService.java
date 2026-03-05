@@ -54,7 +54,7 @@ public class BeachService {
     //aggiornamento info extra spiaggia
     public void updateExtraInfo(Integer id, String extraInfo) {
         Beach beach = getBeachOrThrow(id);
-        beach.editExtraInfo(extraInfo);
+        beach.updateExtraInfo(extraInfo);
         beachRepository.update(beach);
     }
 

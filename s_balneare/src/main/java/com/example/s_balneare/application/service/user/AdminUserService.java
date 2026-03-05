@@ -1,7 +1,5 @@
 package com.example.s_balneare.application.service.user;
 
-//TODO: controllo warning, è finità così avendo tutto implementato in AppUserService
-
 import com.example.s_balneare.application.port.out.AdminUserRepository;
 import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;

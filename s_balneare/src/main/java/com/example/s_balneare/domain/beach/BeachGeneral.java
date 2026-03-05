@@ -1,7 +1,5 @@
 package com.example.s_balneare.domain.beach;
 
-//TODO this.phoneNumber = validatePhoneNumber(phoneNumber); ??
-
 public class BeachGeneral {
     private final String name;
     private final String description;
@@ -11,12 +9,11 @@ public class BeachGeneral {
     public BeachGeneral(String name, String description, String phoneNumber) {
         validateName(name);
         validateDescription(description);
-        //guarda validatePhoneNumber()
-        String cleaned = validatePhoneNumber(phoneNumber);
 
         this.name = name;
         this.description = description;
-        this.phoneNumber = cleaned;
+        //guarda validatePhoneNumber()
+        this.phoneNumber = validatePhoneNumber(phoneNumber);
     }
 
     //getters

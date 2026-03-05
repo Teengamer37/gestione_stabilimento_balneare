@@ -3,7 +3,6 @@ package com.example.s_balneare.application.service.user;
 import com.example.s_balneare.application.port.out.AppUserRepository;
 import com.example.s_balneare.domain.user.AppUser;
 
-//TODO: questione esxport moduli warning appUserRepository controlla anche in booking
 //TODO: gestione metodi per operare su address creare nuova classe
 
 public abstract class AppUserService {

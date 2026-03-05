@@ -56,7 +56,7 @@ public class JdbcBeachRepository implements BeachRepository {
     //inserimento nuova spiaggia nel DB
     @Override
     public Integer save(Beach beach, Connection conn) {
-        String sqlBeach = "INSERT INTO beaches (name, description, telephoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlBeach = "INSERT INTO beaches (name, description, phoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlInventory = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlServices = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlParking = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) VALUES (?, ?, ?, ?, ?, ?)";
@@ -141,7 +141,7 @@ public class JdbcBeachRepository implements BeachRepository {
         //check validità ID
         if (beach.getId() == null || beach.getId() <= 0) throw new IllegalArgumentException("ERROR: beach must have a valid ID");
 
-        String sqlBeach = "UPDATE beaches SET name = ?, description = ?, telephoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, ownerId = ? WHERE id = ?";
+        String sqlBeach = "UPDATE beaches SET name = ?, description = ?, phoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, ownerId = ? WHERE id = ?";
 
         //apro connessione
         try (Connection connection = dataSource.getConnection()) {

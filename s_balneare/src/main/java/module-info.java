@@ -12,12 +12,8 @@ module com.example.s_balneare {
     exports com.example.s_balneare.domain.review;
     exports com.example.s_balneare.domain.moderation;
 
-    exports com.example.s_balneare.application.auth;
-    exports com.example.s_balneare.application.beach;
-    exports com.example.s_balneare.application.booking;
-    exports com.example.s_balneare.application.review;
-    exports com.example.s_balneare.application.moderation;
     exports com.example.s_balneare.application.service.user;
     exports com.example.s_balneare.application.factory;
     exports com.example.s_balneare.application.port.in;
+    exports com.example.s_balneare.application.port.out;
 }

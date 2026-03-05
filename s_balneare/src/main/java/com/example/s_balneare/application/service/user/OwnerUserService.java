@@ -5,8 +5,6 @@ import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.CustomerUser;
 import com.example.s_balneare.domain.user.OwnerUser;
 
-//TODO: controllo warning, è finità così avendo tutto implementato in AppUserService
-
 public class OwnerUserService extends AppUserService {
     public OwnerUserService(OwnerUserRepository appUserRepository) {
         super(appUserRepository);
