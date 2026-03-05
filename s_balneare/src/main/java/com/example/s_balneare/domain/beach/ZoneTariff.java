@@ -2,13 +2,13 @@ package com.example.s_balneare.domain.beach;
 
 //TODO: da implementarla nel pattern DDD-lite
 
-public class ZonePricing {
+public class ZoneTariff {
     private final Integer id;
     private final Integer zoneId;
     private double priceOmbrellone;
     private double priceTenda;
 
-    public ZonePricing(Integer id, Integer zoneId, double priceOmbrellone, double priceTenda) {
+    public ZoneTariff(Integer id, Integer zoneId, double priceOmbrellone, double priceTenda) {
         if (priceOmbrellone <= 0 || priceTenda <= 0) throw new IllegalArgumentException("ERROR: price(s) must be > 0");
 
         this.id = id;

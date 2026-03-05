@@ -1,8 +1,9 @@
-package com.example.s_balneare.infrastructure.persistence.jdbc;
+package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
 import com.example.s_balneare.application.port.out.BeachRepository;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.common.TransactionContext;
+import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -13,8 +14,16 @@ import java.util.Optional;
 public class JdbcBeachRepository implements BeachRepository {
     private final DataSource dataSource;
 
+    private final JdbcBeachInventoryDao inventoryDao;
+    private final JdbcBeachServicesDao servicesDao;
+    private final JdbcParkingDao parkingDao;
+
     public JdbcBeachRepository(DataSource dataSource) {
         this.dataSource = dataSource;
+
+        this.inventoryDao = new JdbcBeachInventoryDao();
+        this.servicesDao = new JdbcBeachServicesDao();
+        this.parkingDao = new JdbcParkingDao();
     }
 
     //---- METODO HELPER ----
@@ -68,9 +77,6 @@ public class JdbcBeachRepository implements BeachRepository {
         Connection connection = getConnection(context);
 
         String sqlBeach = "INSERT INTO beaches (name, description, phoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlInventory = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String sqlServices = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        String sqlParking = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) VALUES (?, ?, ?, ?, ?, ?)";
 
         try {
             Integer newId;
@@ -97,47 +103,17 @@ public class JdbcBeachRepository implements BeachRepository {
 
             //passo 2: inserisco in beach_inventories l'oggetto BeachInventory (se presente)
             if (beach.getBeachInventory() != null) {
-                try (PreparedStatement statement = connection.prepareStatement(sqlInventory)) {
-                    BeachInventory inventory = beach.getBeachInventory();
-                    statement.setInt(1, newId);
-                    statement.setInt(2, inventory.countOmbrelloni());
-                    statement.setInt(3, inventory.countTende());
-                    statement.setInt(4, inventory.countExtraSdraio());
-                    statement.setInt(5, inventory.countExtraLettini());
-                    statement.setInt(6, inventory.countExtraSedie());
-                    statement.setInt(7, inventory.countCamerini());
-                    statement.executeUpdate();
-                }
+                inventoryDao.upsert(newId, beach.getBeachInventory(), connection);
             }
 
             //passo 3: inserisco in beach_services l'oggetto BeachService (se presente)
             if (beach.getBeachServices() != null) {
-                try (PreparedStatement statement = connection.prepareStatement(sqlServices)) {
-                    BeachServices services = beach.getBeachServices();
-                    statement.setInt(1, newId);
-                    statement.setBoolean(2, services.bathrooms());
-                    statement.setBoolean(3, services.showers());
-                    statement.setBoolean(4, services.pool());
-                    statement.setBoolean(5, services.bar());
-                    statement.setBoolean(6, services.restaurant());
-                    statement.setBoolean(7, services.wifi());
-                    statement.setBoolean(8, services.volleyballField());
-                    statement.executeUpdate();
-                }
+                servicesDao.upsert(newId, beach.getBeachServices(), connection);
             }
 
             //passo 4: inserisco in parkings l'oggetto Parking (se presente)
             if (beach.getParking() != null) {
-                try (PreparedStatement statement = connection.prepareStatement(sqlParking)) {
-                    Parking parking = beach.getParking();
-                    statement.setInt(1, newId);
-                    statement.setInt(2, parking.nAutoPark());
-                    statement.setInt(3, parking.nMotoPark());
-                    statement.setInt(4, parking.nBikePark());
-                    statement.setInt(5, parking.nElectricPark());
-                    statement.setBoolean(6, parking.CCTV());
-                    statement.executeUpdate();
-                }
+                parkingDao.upsert(newId, beach.getParking(), connection);
             }
 
             return newId;
@@ -178,25 +154,25 @@ public class JdbcBeachRepository implements BeachRepository {
                 //passo 2: aggiorno/inserisco dati nuovi su BeachInventory (o elimino dati)
                 //dalla tabella beach_inventories
                 if (beach.getBeachInventory() != null) {
-                    upsertInventory(beach, connection);
+                    inventoryDao.upsert(beach.getId(), beach.getBeachInventory(), connection);
                 } else {
-                    deleteComponent(beach.getId(), "beach_inventories");
+                    inventoryDao.delete(beach.getId(), connection);
                 }
 
                 //passo 3: aggiorno/inserisco dati nuovi su BeachService (o elimino dati)
                 //dalla tabella beach_services
                 if (beach.getBeachServices() != null) {
-                    upsertServices(beach, connection);
+                    servicesDao.upsert(beach.getId(), beach.getBeachServices(), connection);
                 } else {
-                    deleteComponent(beach.getId(), "beach_services");
+                    servicesDao.delete(beach.getId(), connection);
                 }
 
                 //passo 4: aggiorno/inserisco dati nuovi su Parking (o elimino dati)
                 //dalla tabella parkings
                 if (beach.getParking() != null) {
-                    upsertParking(beach, connection);
+                    parkingDao.upsert(beach.getId(), beach.getParking(), connection);
                 } else {
-                    deleteComponent(beach.getId(), "parkings");
+                    parkingDao.delete(beach.getId(), connection);
                 }
 
                 connection.commit();
@@ -219,124 +195,12 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //permette di aggiornare beach_inventories
-    private void upsertInventory(Beach beach, Connection connection) throws SQLException {
-        //UPDATE se nel caso abbiamo già un beach_inventories istanziato nel DB
-        String updateSql = "UPDATE beach_inventories SET countOmbrelloni = ?, countTende = ?, countExtraSdraio = ?, countExtraLettini = ?, countExtraSedie = ?, countCamerini = ? WHERE beachId = ?";
-        try (PreparedStatement st = connection.prepareStatement(updateSql)) {
-            BeachInventory inv = beach.getBeachInventory();
-            st.setInt(1, inv.countOmbrelloni());
-            st.setInt(2, inv.countTende());
-            st.setInt(3, inv.countExtraSdraio());
-            st.setInt(4, inv.countExtraLettini());
-            st.setInt(5, inv.countExtraSedie());
-            st.setInt(6, inv.countCamerini());
-            st.setInt(7, beach.getId());
-            int rows = st.executeUpdate();
-
-            if (rows == 0) {
-                //INSERT altrimenti
-                String insertSql = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement insertSt = connection.prepareStatement(insertSql)) {
-                    insertSt.setInt(1, beach.getId());
-                    insertSt.setInt(2, inv.countOmbrelloni());
-                    insertSt.setInt(3, inv.countTende());
-                    insertSt.setInt(4, inv.countExtraSdraio());
-                    insertSt.setInt(5, inv.countExtraLettini());
-                    insertSt.setInt(6, inv.countExtraSedie());
-                    insertSt.setInt(7, inv.countCamerini());
-                    insertSt.executeUpdate();
-                }
-            }
-        }
-    }
-
-    //permette di aggiornare beach_services
-    private void upsertServices(Beach beach, Connection connection) throws SQLException {
-        //UPDATE se nel caso abbiamo già un beach_services istanziato nel DB
-        String updateSql = "UPDATE beach_services SET bathrooms = ?, showers = ?, pool = ?, bar = ?, restaurant = ?, wifi = ?, volleyballField = ? WHERE beachId = ?";
-        try (PreparedStatement st = connection.prepareStatement(updateSql)) {
-            BeachServices srv = beach.getBeachServices();
-            st.setBoolean(1, srv.bathrooms());
-            st.setBoolean(2, srv.showers());
-            st.setBoolean(3, srv.pool());
-            st.setBoolean(4, srv.bar());
-            st.setBoolean(5, srv.restaurant());
-            st.setBoolean(6, srv.wifi());
-            st.setBoolean(7, srv.volleyballField());
-            st.setInt(8, beach.getId());
-            int rows = st.executeUpdate();
-
-            if (rows == 0) {
-                //INSERT altrimenti
-                String insertSql = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement insertSt = connection.prepareStatement(insertSql)) {
-                    insertSt.setInt(1, beach.getId());
-                    insertSt.setBoolean(2, srv.bathrooms());
-                    insertSt.setBoolean(3, srv.showers());
-                    insertSt.setBoolean(4, srv.pool());
-                    insertSt.setBoolean(5, srv.bar());
-                    insertSt.setBoolean(6, srv.restaurant());
-                    insertSt.setBoolean(7, srv.wifi());
-                    insertSt.setBoolean(8, srv.volleyballField());
-                    insertSt.executeUpdate();
-                }
-            }
-        }
-    }
-
-    //permette di aggiornare parkings
-    private void upsertParking(Beach beach, Connection connection) throws SQLException {
-        //UPDATE se nel caso abbiamo già un parking istanziato nel DB
-        String updateSql = "UPDATE parkings SET nAutoPark = ?, nMotoPark = ?, nBikePark = ?, nElectricPark = ?, CCTV = ? WHERE beachId = ?";
-        try (PreparedStatement st = connection.prepareStatement(updateSql)) {
-            Parking p = beach.getParking();
-            st.setInt(1, p.nAutoPark());
-            st.setInt(2, p.nMotoPark());
-            st.setInt(3, p.nBikePark());
-            st.setInt(4, p.nElectricPark());
-            st.setBoolean(5, p.CCTV());
-            st.setInt(6, beach.getId());
-            int rows = st.executeUpdate();
-
-            if (rows == 0) {
-                //INSERT altrimenti
-                String insertSql = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) VALUES (?, ?, ?, ?, ?, ?)";
-                try (PreparedStatement insertSt = connection.prepareStatement(insertSql)) {
-                    insertSt.setInt(1, beach.getId());
-                    insertSt.setInt(2, p.nAutoPark());
-                    insertSt.setInt(3, p.nMotoPark());
-                    insertSt.setInt(4, p.nBikePark());
-                    insertSt.setInt(5, p.nElectricPark());
-                    insertSt.setBoolean(6, p.CCTV());
-                    insertSt.executeUpdate();
-                }
-            }
-        }
-    }
-
-    //permette di eliminare righe da una tabella
-    private void deleteComponent(int beachId, String tableName) throws SQLException {
-        String sql = "DELETE FROM " + tableName + " WHERE beachId = ?";
-
-        //apro connessione
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement st = connection.prepareStatement(sql)) {
-                st.setInt(1, beachId);
-                st.executeUpdate();
-            }
-        }
-    }
-
     //permette di eliminare una spiaggia
     @Override
     public void delete(Integer id) {
         //check validità ID
         if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
-        String sqlServices = "DELETE FROM beach_services WHERE beachId = ?";
-        String sqlInventory = "DELETE FROM beach_inventories WHERE beachId = ?";
-        String sqlParking = "DELETE FROM parkings WHERE beachId = ?";
         String sqlBeach = "DELETE FROM beaches WHERE id = ?";
 
         //apro connessione
@@ -345,20 +209,11 @@ public class JdbcBeachRepository implements BeachRepository {
                 connection.setAutoCommit(false);
 
                 //cancello riga da beach_services
-                try (PreparedStatement st = connection.prepareStatement(sqlServices)) {
-                    st.setInt(1, id);
-                    st.executeUpdate();
-                }
+                servicesDao.delete(id, connection);
                 //cancello riga da beach_inventories
-                try (PreparedStatement st = connection.prepareStatement(sqlInventory)) {
-                    st.setInt(1, id);
-                    st.executeUpdate();
-                }
+                inventoryDao.delete(id, connection);
                 //cancello riga da parkings
-                try (PreparedStatement st = connection.prepareStatement(sqlParking)) {
-                    st.setInt(1, id);
-                    st.executeUpdate();
-                }
+                parkingDao.delete(id, connection);
                 //elimino la spiaggia
                 try (PreparedStatement st = connection.prepareStatement(sqlBeach)) {
                     st.setInt(1, id);
