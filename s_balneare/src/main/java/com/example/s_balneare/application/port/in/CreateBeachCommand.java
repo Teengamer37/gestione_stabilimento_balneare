@@ -1,9 +1,6 @@
 package com.example.s_balneare.application.port.in;
 
-import com.example.s_balneare.domain.beach.BeachGeneral;
-import com.example.s_balneare.domain.beach.BeachInventory;
-import com.example.s_balneare.domain.beach.BeachServices;
-import com.example.s_balneare.domain.beach.Parking;
+import com.example.s_balneare.domain.beach.*;
 
 import java.util.List;
 
@@ -14,7 +11,7 @@ public record CreateBeachCommand(
         BeachInventory beachInventory,
         BeachServices beachServices,
         Parking parking,
-        List<Integer> seasonIds,
+        List<Season> seasons,
         String extraInfo,
         boolean active,
 

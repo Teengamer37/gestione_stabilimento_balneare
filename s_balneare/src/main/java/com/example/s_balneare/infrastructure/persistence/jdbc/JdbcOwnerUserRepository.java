@@ -1,10 +1,10 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.OwnerUserRepository;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.OwnerUser;
 
-import java.sql.Connection;
 import java.util.Optional;
 
 //FIXME: un macello qui pt2
@@ -12,7 +12,7 @@ import java.util.Optional;
 public class JdbcOwnerUserRepository implements OwnerUserRepository {
 
     @Override
-    public Integer save(OwnerUser user, String password, Connection conn) {
+    public Integer save(OwnerUser user, String password, TransactionContext context) {
         return 0;
     }
 

@@ -1,11 +1,7 @@
 package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.out.BeachRepository;
-import com.example.s_balneare.domain.beach.Beach;
-import com.example.s_balneare.domain.beach.BeachGeneral;
-import com.example.s_balneare.domain.beach.BeachInventory;
-import com.example.s_balneare.domain.beach.BeachServices;
-import com.example.s_balneare.domain.beach.Parking;
+import com.example.s_balneare.domain.beach.*;
 
 import java.util.List;
 
@@ -66,31 +62,31 @@ public class BeachService {
     }
 
     //aggiunta stagione in una determinata spiaggia
-    public void addSeason(Integer id, Integer seasonId) {
+    public void addSeason(Integer id, Season season) {
         Beach beach = getBeachOrThrow(id);
-        beach.addSeason(seasonId);
+        beach.addSeason(season);
         beachRepository.update(beach);
     }
 
     //aggiunta lista di stagioni in una determinata spiaggia
-    public void addSeasons(Integer id, List<Integer> seasonIds) {
+    public void addSeasons(Integer id, List<Season> seasons) {
         Beach beach = getBeachOrThrow(id);
-        beach.addSeasons(seasonIds);
+        beach.addSeasons(seasons);
         beachRepository.update(beach);
     }
 
     //eliminazione stagione da una determinata spiaggia
-    public void removeSeason(Integer id, Integer seasonId) {
+    public void removeSeason(Integer id, Season season) {
         Beach beach = getBeachOrThrow(id);
-        beach.removeSeason(seasonId);
+        beach.removeSeason(season);
         beachRepository.update(beach);
     }
 
     //eliminazione lista di stagioni da una determinata spiaggia
     //-> se SOLO UNA delle stagioni non esiste, l'azione viene revocata
-    public void removeSeasons(Integer id, List<Integer> seasonIds) {
+    public void removeSeasons(Integer id, List<Season> seasons) {
         Beach beach = getBeachOrThrow(id);
-        beach.removeSeasons(seasonIds);
+        beach.removeSeasons(seasons);
         beachRepository.update(beach);
     }
 

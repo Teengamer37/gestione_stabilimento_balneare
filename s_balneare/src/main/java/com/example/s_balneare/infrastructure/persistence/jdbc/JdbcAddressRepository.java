@@ -2,6 +2,7 @@ package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.AddressRepository;
 import com.example.s_balneare.domain.common.Address;
+import com.example.s_balneare.domain.common.TransactionContext;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -16,12 +17,23 @@ public class JdbcAddressRepository implements AddressRepository {
         this.dataSource = dataSource;
     }
 
+    //---- METODO HELPER ----
+    //prende il token vuoto (TransactionContext)
+    //lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+    private Connection getConnection(TransactionContext context) {
+        if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
+            throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
+        }
+        return jdbcContext.getConnection();
+    }
+
     //salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User
     //DA USARE SOLO SE SI HA INTENZIONE IN UN FUTURO VICINO DI ESEGUIRE MANUALMENTE UN SALVATAGGIO DI BEACH O USER
     @Override
     public Integer save(Address address) {
         try (Connection connection = dataSource.getConnection()) {
-            return save(address, connection);
+            TransactionContext context = new JdbcTransactionManager.JdbcTransactionContext(connection);
+            return save(address, context);
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to get connection for saving address", e);
         }
@@ -30,7 +42,10 @@ public class JdbcAddressRepository implements AddressRepository {
     //salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User
     //usato direttamente dagli use cases di Beach e User, nessun rischio di avere address non associati
     @Override
-    public Integer save(Address address, Connection connection) {
+    public Integer save(Address address, TransactionContext context) {
+        //estraggo la connection JDBC
+        Connection connection = getConnection(context);
+
         String sql = "INSERT INTO addresses (street, streetNumber, city, zipCode, country) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

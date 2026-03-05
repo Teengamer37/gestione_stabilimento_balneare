@@ -1,11 +1,8 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.BeachRepository;
-import com.example.s_balneare.domain.beach.Beach;
-import com.example.s_balneare.domain.beach.BeachGeneral;
-import com.example.s_balneare.domain.beach.BeachInventory;
-import com.example.s_balneare.domain.beach.BeachServices;
-import com.example.s_balneare.domain.beach.Parking;
+import com.example.s_balneare.domain.beach.*;
+import com.example.s_balneare.domain.common.TransactionContext;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -20,16 +17,27 @@ public class JdbcBeachRepository implements BeachRepository {
         this.dataSource = dataSource;
     }
 
+    //---- METODO HELPER ----
+    //prende il token vuoto (TransactionContext)
+    //lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+    private Connection getConnection(TransactionContext context) {
+        if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
+            throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
+        }
+        return jdbcContext.getConnection();
+    }
+
     //inserimento nuova spiaggia nel DB
     //DA USARE SE E SOLO SE SI HA UN'ISTANZA LIBERA E NON ASSOCIATA DI ADDRESS
-    //SE USATA A CASO -> EXCEPION 100%
+    //SE USATA A CASO -> EXCEPTION 100%
     @Override
     public Integer save(Beach beach) {
         //apro connessione
         try (Connection connection = dataSource.getConnection()) {
             try {
                 connection.setAutoCommit(false);
-                Integer beachId = save(beach, connection);
+                TransactionContext context = new JdbcTransactionManager.JdbcTransactionContext(connection);
+                Integer beachId = save(beach, context);
                 connection.commit();
                 return beachId;
             } catch (SQLException e) {
@@ -55,7 +63,10 @@ public class JdbcBeachRepository implements BeachRepository {
 
     //inserimento nuova spiaggia nel DB
     @Override
-    public Integer save(Beach beach, Connection conn) {
+    public Integer save(Beach beach, TransactionContext context) {
+        //estraggo la connection JDBC
+        Connection connection = getConnection(context);
+
         String sqlBeach = "INSERT INTO beaches (name, description, phoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlInventory = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) VALUES (?, ?, ?, ?, ?, ?, ?)";
         String sqlServices = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -65,7 +76,7 @@ public class JdbcBeachRepository implements BeachRepository {
             Integer newId;
 
             //passo 1: inserisco in beaches gli oggetti Beach e BeachGeneral
-            try (PreparedStatement statement = conn.prepareStatement(sqlBeach, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlBeach, Statement.RETURN_GENERATED_KEYS)) {
                 BeachGeneral general = beach.getBeachGeneral();
                 if (general == null) throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when saving a beach.");
 
@@ -86,7 +97,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
             //passo 2: inserisco in beach_inventories l'oggetto BeachInventory (se presente)
             if (beach.getBeachInventory() != null) {
-                try (PreparedStatement statement = conn.prepareStatement(sqlInventory)) {
+                try (PreparedStatement statement = connection.prepareStatement(sqlInventory)) {
                     BeachInventory inventory = beach.getBeachInventory();
                     statement.setInt(1, newId);
                     statement.setInt(2, inventory.countOmbrelloni());
@@ -101,7 +112,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
             //passo 3: inserisco in beach_services l'oggetto BeachService (se presente)
             if (beach.getBeachServices() != null) {
-                try (PreparedStatement statement = conn.prepareStatement(sqlServices)) {
+                try (PreparedStatement statement = connection.prepareStatement(sqlServices)) {
                     BeachServices services = beach.getBeachServices();
                     statement.setInt(1, newId);
                     statement.setBoolean(2, services.bathrooms());
@@ -117,7 +128,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
             //passo 4: inserisco in parkings l'oggetto Parking (se presente)
             if (beach.getParking() != null) {
-                try (PreparedStatement statement = conn.prepareStatement(sqlParking)) {
+                try (PreparedStatement statement = connection.prepareStatement(sqlParking)) {
                     Parking parking = beach.getParking();
                     statement.setInt(1, newId);
                     statement.setInt(2, parking.nAutoPark());
@@ -526,10 +537,11 @@ public class JdbcBeachRepository implements BeachRepository {
                     String extraInfo = rs.getString("extraInfo");
                     boolean active = rs.getBoolean("active");
 
+                    //FIXME: attenzione qui!!!
                     //passo 6: salvo le stagioni
-                    List<Integer> seasonIds = findBeachSeasonIds(id);
+                    List<Season> seasons = findBeachSeasons(id);
 
-                    Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasonIds, active);
+                    Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, active);
                     return Optional.of(beach);
                 }
             } catch (SQLException e) {
@@ -540,12 +552,13 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //TODO: spostare funzione in JdbcSeasonRepository
+    //FIXME: modificare funzione!
     //cerca le stagioni di una spiaggia
     @Override
-    public List<Integer> findBeachSeasonIds(Integer beachId) {
+    public List<Season> findBeachSeasons(Integer beachId) {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
+        /*
         List<Integer> ids = new ArrayList<>();
         String sql = "SELECT pricingsId FROM seasons WHERE beachId = ?";
 
@@ -564,6 +577,8 @@ public class JdbcBeachRepository implements BeachRepository {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to get connection", e);
         }
-        return ids;
+         */
+
+        return new ArrayList<>();
     }
 }

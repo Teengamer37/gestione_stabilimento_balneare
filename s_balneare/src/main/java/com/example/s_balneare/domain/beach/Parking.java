@@ -49,6 +49,17 @@ public record Parking(
         private int nElectricPark = 0;
         private boolean CCTV = false;
 
+        public Builder() {}
+
+        //costruttore copia
+        public Builder(Parking original) {
+            this.nAutoPark = original.nAutoPark;
+            this.nMotoPark = original.nMotoPark;
+            this.nBikePark = original.nBikePark;
+            this.nElectricPark = original.nElectricPark;
+            this.CCTV = original.CCTV;
+        }
+
         public Builder nAutoPark(int val) { nAutoPark = val; return this; }
         public Builder nMotoPark(int val) { nMotoPark = val; return this; }
         public Builder nBikePark(int val) { nBikePark = val; return this; }

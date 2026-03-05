@@ -1,10 +1,10 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.AdminUserRepository;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;
 
-import java.sql.Connection;
 import java.util.Optional;
 
 //TODO: continuare l'implementazione
@@ -13,7 +13,7 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
 
 
     @Override
-    public Integer save(AdminUser user, String password, Connection conn) {
+    public Integer save(AdminUser user, String password, TransactionContext context) {
         return 0;
     }
 

@@ -13,14 +13,15 @@ public class Beach {
     private BeachInventory beachInventory;
     private BeachServices beachServices;
     private Parking parking;
-    private final List<Integer> seasonIds;
+    private final List<Season> seasons;
 
     private String extraInfo;
     private boolean active;
 
 
     //costruttore
-    public Beach(Integer id, Integer ownerId, Integer addressId, BeachGeneral beachGeneral, BeachInventory beachInventory, BeachServices beachServices, Parking parking, String extraInfo, List<Integer> seasonIds, boolean active) {
+    public Beach(Integer id, Integer ownerId, Integer addressId, BeachGeneral beachGeneral, BeachInventory beachInventory,
+                 BeachServices beachServices, Parking parking, String extraInfo, List<Season> seasons, boolean active) {
         this.id = id;
         updateOwnerId(ownerId);
         if (addressId == null) throw new IllegalArgumentException("ERROR: addressId cannot be null");
@@ -30,8 +31,8 @@ public class Beach {
         this.beachServices = beachServices;
         this.parking = parking;
         updateExtraInfo(extraInfo);
-        if (seasonIds == null || seasonIds.isEmpty()) this.seasonIds = new ArrayList<Integer>();
-        else this.seasonIds = new ArrayList<>(seasonIds);
+        if (seasons == null || seasons.isEmpty()) this.seasons = new ArrayList<Season>();
+        else this.seasons = new ArrayList<>(seasons);
         setActive(active);
     }
 
@@ -61,8 +62,8 @@ public class Beach {
     public String getExtraInfo() {
         return extraInfo;
     }
-    public List<Integer> getSeasonIds() {
-        return seasonIds;
+    public List<Season> getSeasons() {
+        return seasons;
     }
     public boolean isActive() {
         return active;
@@ -86,40 +87,40 @@ public class Beach {
     }
 
     //aggiunge una stagione
-    public void addSeason(Integer seasonId) {
-        checkSeasonId(seasonId);
-        seasonIds.add(seasonId);
+    public void addSeason(Season season) {
+        checkSeason(season);
+        seasons.add(season);
     }
 
     //aggiunge una lista di stagioni
-    public void addSeasons(List<Integer> seasonIds) {
-        checkSeasonIds(seasonIds);
-        this.seasonIds.addAll(seasonIds);
+    public void addSeasons(List<Season> seasons) {
+        checkSeasons(seasons);
+        this.seasons.addAll(seasons);
     }
 
     //rimuove una stagione
-    public void removeSeason (Integer seasonId) {
-        checkSeasonId(seasonId);
+    public void removeSeason (Season season) {
+        checkSeason(season);
         //tentativo eliminazione
-        if (seasonIds.contains(seasonId)) seasonIds.remove(seasonId);
+        if (seasons.contains(season)) seasons.remove(season);
         else throw new IllegalArgumentException("ERROR: seasonId not found in seasons");
     }
 
     //rimuove una lista di stagioni
-    public void removeSeasons (List<Integer> seasonIds) {
-        checkSeasonIds(seasonIds);
+    public void removeSeasons (List<Season> seasons) {
+        checkSeasons(seasons);
         //mi assicuro che TUTTE le stagioni nella lista siano presenti nella spiaggia
-        for (Integer seasonId : seasonIds) {
-            if (!this.seasonIds.contains(seasonId)) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not found in seasons");
+        for (Season season : seasons) {
+            if (!this.seasons.contains(season)) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not found in seasons");
         }
-        this.seasonIds.removeAll(seasonIds);
+        this.seasons.removeAll(seasons);
     }
 
     //gestisce lo stato di attività della spiaggia nella piattaforma
     //(verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati)
     public void setActive(boolean active) {
         if (active) {
-            if (beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasonIds == null || seasonIds.isEmpty()) {
+            if (beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasons == null || seasons.isEmpty()) {
                 throw new IllegalStateException("ERROR: beach can be set to active only if owner, general, inventory, services, parking and season(s) are set");
             }
         }
@@ -158,16 +159,15 @@ public class Beach {
         if (ownerId == null) throw new IllegalArgumentException("ERROR: ownerId cannot be null");
         if (ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
     }
-    private void checkSeasonId(Integer seasonId) {
-        if (seasonId == null) throw new IllegalArgumentException("ERROR: seasonId cannot be null");
-        if (seasonId <= 0) throw new IllegalArgumentException("ERROR: seasonId not valid");
+    private void checkSeason(Season season) {
+        if (season == null) throw new IllegalArgumentException("ERROR: season cannot be null");
     }
-    private void checkSeasonIds(List<Integer> seasonIds) {
+    private void checkSeasons(List<Season> seasons) {
         //controllo lista se vuota
-        if (seasonIds == null || seasonIds.isEmpty()) throw new IllegalArgumentException("ERROR: list not valid");
+        if (seasons == null || seasons.isEmpty()) throw new IllegalArgumentException("ERROR: list not valid");
         //controllo integrità dei valori inseriti nella stagione
-        for (Integer seasonId : seasonIds) {
-            if (seasonId == null || seasonId <= 0) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not valid");
+        for (Season season : seasons) {
+            if (season == null) throw new IllegalArgumentException("ERROR: at least one season in the list is null");
         }
     }
     private void checkGeneralInfo(BeachGeneral newGeneral) {

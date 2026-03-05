@@ -1,6 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.CustomerUserRepository;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.*;
 
 import javax.sql.DataSource;
@@ -16,8 +17,21 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
         this.dataSource = dataSource;
     }
 
+    //---- METODO HELPER ----
+    //prende il token vuoto (TransactionContext)
+    //lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+    private Connection getConnection(TransactionContext context) {
+        if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
+            throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
+        }
+        return jdbcContext.getConnection();
+    }
+
     @Override
-    public Integer save(CustomerUser user, String password, Connection conn) {
+    public Integer save(CustomerUser user, String password, TransactionContext context) {
+        //estraggo la connection JDBC
+        Connection conn = getConnection(context);
+
         if (password == null || password.isBlank())
             throw new IllegalArgumentException("ERROR: password must not be null");
 

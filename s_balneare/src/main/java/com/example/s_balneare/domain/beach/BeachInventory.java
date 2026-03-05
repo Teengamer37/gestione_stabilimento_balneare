@@ -55,6 +55,18 @@ public record BeachInventory(
         private int countExtraSedie = 0;
         private int countCamerini = 0;
 
+        public Builder() {}
+
+        //costruttore copia
+        public Builder(BeachInventory original) {
+            this.countOmbrelloni = original.countOmbrelloni;
+            this.countTende = original.countTende;
+            this.countExtraSdraio = original.countExtraSdraio;
+            this.countExtraLettini = original.countExtraLettini;
+            this.countExtraSedie = original.countExtraSedie;
+            this.countCamerini = original.countCamerini;
+        }
+
         public Builder countOmbrelloni(int val) { countOmbrelloni = val; return this; }
         public Builder countTende(int val) { countTende = val; return this; }
         public Builder countExtraSdraio(int val) { countExtraSdraio = val; return this; }

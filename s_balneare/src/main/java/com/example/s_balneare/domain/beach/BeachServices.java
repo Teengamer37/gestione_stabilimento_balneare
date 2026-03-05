@@ -51,6 +51,19 @@ public record BeachServices(
         private boolean wifi = false;
         private boolean volleyballField = false;
 
+        public Builder() {}
+
+        //costruttore copia
+        public Builder(BeachServices original) {
+            this.bathrooms = original.bathrooms;
+            this.showers = original.showers;
+            this.pool = original.pool;
+            this.bar = original.bar;
+            this.restaurant = original.restaurant;
+            this.wifi = original.wifi;
+            this.volleyballField = original.volleyballField;
+        }
+
         public Builder bathrooms(boolean val) { bathrooms = val; return this; }
         public Builder showers(boolean val) { showers = val; return this; }
         public Builder pool(boolean val) { pool = val; return this; }

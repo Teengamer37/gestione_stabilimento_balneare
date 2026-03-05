@@ -182,13 +182,7 @@ public class JdbcBookingRepository implements BookingRepository {
                     } while (rs.next());
 
                     //costruisco il Booking
-                    Booking booking = new Booking.BookingBuilder(id, beachId, customerId, date, spotIds)
-                            .extraSdraio(extraSdraio)
-                            .extraLettini(extraLettini)
-                            .extraSedie(extraSedie)
-                            .camerini(camerini)
-                            .status(status)
-                            .build();
+                    Booking booking = new Booking(id, beachId, customerId, date, spotIds, extraSdraio, extraLettini, extraSedie, camerini, status);
 
                     return Optional.of(booking);
                 }

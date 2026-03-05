@@ -1,6 +1,7 @@
 package com.example.s_balneare.domain.booking;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Booking {
@@ -20,96 +21,44 @@ public class Booking {
     //stato booking
     private BookingStatus status;
 
-    //costruttore fatto con Builder Pattern
-    private Booking(BookingBuilder builder) {
-        //check dati final
-        if (builder.beachId == null || builder.beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid for booking " + builder.id);
-        if (builder.customerId == null || builder.customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + builder.id);
-        if (builder.date == null) throw new IllegalArgumentException("ERROR: date cannot be null for booking " + builder.id);
-        //controllo prima se lista è null, poi controllo se contengo ID validi nella lista
-        if (builder.spotIds == null || builder.spotIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + builder.id);
-        for (Integer spotId : builder.spotIds) {
-            if (spotId == null || spotId <= 0) throw new IllegalArgumentException("ERROR: at least one spotId is not valid for booking " + builder.id);
-        }
+    //costruttore completo (per booking caricati dal DB)
+    public Booking(Integer id, Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds,
+                   int extraSdraio, int extraLettini, int extraSedie, int camerini, BookingStatus status) {
+        this.id = id;
 
-        //check integrità interi
-        if (builder.extraSdraio < 0 || builder.extraLettini < 0 || builder.extraSedie < 0 || builder.camerini < 0) {
-            throw new IllegalArgumentException("ERROR: extra quantity must be >=0 for booking " + builder.id);
-        }
+        //check + assegnazione valore
+        checkBeachId(beachId);
+        this.beachId = beachId;
 
-        this.id = builder.id;
-        this.beachId = builder.beachId;
-        this.customerId = builder.customerId;
-        this.date = builder.date;
-        this.spotIds = builder.spotIds;
-        this.extraSdraio = builder.extraSdraio;
-        this.extraLettini = builder.extraLettini;
-        this.extraSedie = builder.extraSedie;
-        this.camerini = builder.camerini;
-        this.status = builder.status;
+        checkCustomerId(customerId);
+        this.customerId = customerId;
+
+        checkDate(date);
+        this.date = date;
+
+        checkSpotIds(spotIds);
+        this.spotIds = new ArrayList<>(spotIds);
+
+        checkInitialQuantity(extraSdraio);
+        this.extraSdraio = extraSdraio;
+
+        checkInitialQuantity(extraLettini);
+        this.extraLettini = extraLettini;
+
+        checkInitialQuantity(extraSedie);
+        this.extraSedie = extraSedie;
+
+        checkInitialQuantity(camerini);
+        this.camerini = camerini;
+
+        this.status = status != null ? status : BookingStatus.PENDING;
     }
 
-    //builder pattern
-    public static class BookingBuilder {
-        private Integer id;
-        private final Integer beachId;
-        private final Integer customerId;
-        private final LocalDate date;
-
-        private final List<Integer> spotIds;
-        private int extraSdraio = 0;
-        private int extraLettini = 0;
-        private int extraSedie = 0;
-        private int camerini = 0;
-
-        private BookingStatus status = BookingStatus.PENDING;
-
-        //costruttore per booking salvati nel DB (con ID)
-        public BookingBuilder(Integer id, Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
-            this.id = id;
-            this.beachId = beachId;
-            this.customerId = customerId;
-            this.date = date;
-            this.spotIds = spotIds;
-        }
-
-        //costruttore per salvataggio nuovo booking (senza ID)
-        public BookingBuilder(Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
-            this.id = 0;
-            this.beachId = beachId;
-            this.customerId = customerId;
-            this.date = date;
-            this.spotIds = spotIds;
-        }
-
-        //adders per attributi opzionali
-        public BookingBuilder extraSdraio(int quantity) {
-            extraSdraio += quantity;
-            return this;
-        }
-        public BookingBuilder extraLettini(int quantity) {
-            extraLettini += quantity;
-            return this;
-        }
-        public BookingBuilder extraSedie(int quantity) {
-            extraSedie += quantity;
-            return this;
-        }
-        public BookingBuilder camerini(int quantity) {
-            camerini += quantity;
-            return this;
-        }
-
-        public BookingBuilder status(BookingStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        //build
-        public Booking build() {
-            return new Booking(this);
-        }
+    //costruttore per salvataggio nuovo booking (senza ID, extra a 0, status PENDING)
+    public Booking(Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
+        this(0, beachId, customerId, date, spotIds, 0, 0, 0, 0, BookingStatus.PENDING);
     }
+
 
     // getters (NO SETTERS)
     public Integer getId() {
@@ -136,102 +85,114 @@ public class Booking {
     public int getExtraSedie() {
         return extraSedie;
     }
-    public int getCamerini() {return camerini;}
+    public int getCamerini() {
+        return camerini;
+    }
     public BookingStatus getStatus() {
         return status;
     }
 
+
+    //---- METODI DI BUSINESS ----
     //conferma booking solo se status == PENDING
     public void confirmBooking() {
-        if (status != BookingStatus.PENDING) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be pending in order to be confirmed");
-        }
+        checkStatusIsPending("be confirmed");
         status = BookingStatus.CONFIRMED;
     }
 
     //rifiuta booking solo se status == PENDING
     public void rejectBooking() {
-        if (status == BookingStatus.PENDING) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be pending in order to be rejected");
-        }
+        checkStatusIsPending("be rejected");
         status = BookingStatus.REJECTED;
     }
 
     //cancella booking solo se status == PENDING || CONFIRMED
     public void cancelBooking() {
-        if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to be cancelled");
-        }
-
+        checkStatusPendingOrConfirmed("be cancelled");
         status = BookingStatus.CANCELLED;
     }
 
     //aggiungi extra sdraio con controlli
     public void addExtraSdraio(int quantity, int availableSdraio) {
-        if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to add extra quantity");
-        }
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("ERROR: quantity must be > 0");
-        }
-        if (quantity > availableSdraio) {
-            throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
-        }
+        checkStatusPendingOrConfirmed("add extra quantity");
+        checkAddedQuantity(quantity, availableSdraio);
 
         extraSdraio += quantity;
-        if (status == BookingStatus.CONFIRMED) {
-            status = BookingStatus.PENDING;
-        }
+        revertToPendingIfConfirmed();
     }
 
     //aggiungi extra lettini con controlli
     public void addExtraLettini(int quantity, int availableLettini) {
-        if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to add extra quantity");
-        }
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("ERROR: quantity must be > 0");
-        }
-        if (quantity > availableLettini) {
-            throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
-        }
+        checkStatusPendingOrConfirmed("add extra quantity");
+        checkAddedQuantity(quantity, availableLettini);
 
         extraLettini += quantity;
-        if (status == BookingStatus.CONFIRMED) {
-            status = BookingStatus.PENDING;
-        }
+        revertToPendingIfConfirmed();
     }
 
     //aggiungi extra sedie con controlli
     public void addExtraSedie(int quantity, int availableSedie) {
-        if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to add extra quantity");
-        }
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("ERROR: quantity must be > 0");
-        }
-        if (quantity > availableSedie) {
-            throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
-        }
+        checkStatusPendingOrConfirmed("add extra quantity");
+        checkAddedQuantity(quantity, availableSedie);
 
         extraSedie += quantity;
+        revertToPendingIfConfirmed();
+    }
+
+    //aggiungi camerini con controlli
+    public void addCamerini(int quantity, int availableCamerini) {
+        checkStatusPendingOrConfirmed("add extra quantity");
+        checkAddedQuantity(quantity, availableCamerini);
+
+        camerini += quantity;
+    }
+
+    //Helper interno per i business methods
+    private void revertToPendingIfConfirmed() {
         if (status == BookingStatus.CONFIRMED) {
             status = BookingStatus.PENDING;
         }
     }
 
-    //aggiungi camerini con controlli
-    public void addCamerini(int quantity, int availableCamerini) {
-        if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
-            throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to add extra quantity");
+
+    //---- METODI CHECKERS ----
+    private void checkBeachId(Integer beachId) {
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid for booking " + id);
+    }
+    private void checkCustomerId(Integer customerId) {
+        if (customerId == null || customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + id);
+    }
+    private void checkDate(LocalDate date) {
+        if (date == null) throw new IllegalArgumentException("ERROR: date cannot be null for booking " + id);
+    }
+    private void checkSpotIds(List<Integer> spotIds) {
+        if (spotIds == null || spotIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + id);
+        for (Integer spotId : spotIds) {
+            if (spotId == null || spotId <= 0) throw new IllegalArgumentException("ERROR: at least one spotId is not valid for booking " + id);
         }
+    }
+    private void checkInitialQuantity(int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("ERROR: extra quantity must be >= 0 for booking " + id);
+        }
+    }
+    private void checkAddedQuantity(int quantity, int available) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("ERROR: quantity must be > 0");
         }
-        if (quantity > availableCamerini) {
+        if (quantity > available) {
             throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
         }
-
-        camerini += quantity;
+    }
+    private void checkStatusIsPending(String action) {
+        // Corretto il bug originale (era == invece di !=)
+        if (status != BookingStatus.PENDING) {
+            throw new IllegalStateException("ERROR: booking " + id + " has to be pending in order to " + action);
+        }
+    }
+    private void checkStatusPendingOrConfirmed(String action) {
+        if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
+            throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to " + action);
+        }
     }
 }
