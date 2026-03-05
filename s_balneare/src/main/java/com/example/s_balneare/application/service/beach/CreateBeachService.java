@@ -31,7 +31,7 @@ public class CreateBeachService implements CreateBeachUseCase {
             Integer addressId = addressRepository.save(address, context);
 
             //passo 2: creazione spiaggia e salvataggio nel DB
-            Beach beach = new Beach(0, command.ownerId(), addressId, command.beachGeneral(), command.beachInventory(), command.beachServices(), command.parking(), command.extraInfo(), command.seasons(), command.active());
+            Beach beach = new Beach(0, command.ownerId(), addressId, command.beachGeneral(), command.beachInventory(), command.beachServices(), command.parking(), command.extraInfo(), command.seasons(), command.zones(), command.active());
             Integer beachId = beachRepository.save(beach, context);
 
             //passo 3: fine transaction e ritorno il nuovo ID della spiaggia

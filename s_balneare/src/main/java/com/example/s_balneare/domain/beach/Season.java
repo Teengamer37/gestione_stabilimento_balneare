@@ -8,8 +8,8 @@ public record Season(
         String name,
         LocalDate startDate,
         LocalDate endDate,
-        Integer pricingsId,
-        List<Integer> zonePricingIds
+        Pricing pricing,
+        List<ZoneTariff> zoneTariffs
 ) {
 
     //costruttore compatto per assicurarsi l'integrità dei valori
@@ -20,11 +20,11 @@ public record Season(
         if (startDate == null || endDate == null) throw new IllegalArgumentException("ERROR: dates cannot be null");
         if (!startDate.isBefore(endDate)) throw new IllegalArgumentException("ERROR: endDate must be strictly after startDate");
 
-        if (pricingsId == null || pricingsId <= 0) throw new IllegalArgumentException("ERROR: pricingsId not valid");
+        if (pricing == null) throw new IllegalArgumentException("ERROR: pricing cannot be null");
 
-        if (zonePricingIds == null || zonePricingIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set for season");
-        for (Integer zId : zonePricingIds) {
-            if (zId == null || zId <= 0) throw new IllegalArgumentException("ERROR: at least one zonePricingId is not valid");
+        if (zoneTariffs == null || zoneTariffs.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zoneTariff must be set for season");
+        for (ZoneTariff zoneTariff : zoneTariffs) {
+            if (zoneTariff == null) throw new IllegalArgumentException("ERROR: at least one zoneTariff is not valid");
         }
     }
 
@@ -37,16 +37,16 @@ public record Season(
 
     //metodi wither
     public Season withName(String name) {
-        return new Season(name, startDate, endDate, pricingsId, zonePricingIds);
+        return new Season(name, startDate, endDate, pricing, zoneTariffs);
     }
     public Season withDates(LocalDate startDate, LocalDate endDate) {
-        return new Season(name, startDate, endDate, pricingsId, zonePricingIds);
+        return new Season(name, startDate, endDate, pricing, zoneTariffs);
     }
-    public Season withPricingsId(Integer pricingsId) {
-        return new Season(name, startDate, endDate, pricingsId, zonePricingIds);
+    public Season withPricing(Pricing pricing) {
+        return new Season(name, startDate, endDate, pricing, zoneTariffs);
     }
-    public Season withZonePricingIds(List<Integer> zonePricingIds) {
-        return new Season(name, startDate, endDate, pricingsId, zonePricingIds);
+    public Season withZoneTariffs(List<ZoneTariff> zoneTariffs) {
+        return new Season(name, startDate, endDate, pricing, zoneTariffs);
     }
 
     //pattern Builder
@@ -58,8 +58,8 @@ public record Season(
         private String name;
         private LocalDate startDate;
         private LocalDate endDate;
-        private Integer pricingsId;
-        private List<Integer> zonePricingIds = new ArrayList<>();
+        private Pricing pricing;
+        private List<ZoneTariff> zoneTariffs = new ArrayList<>();
 
         public Builder() {}
 
@@ -68,21 +68,21 @@ public record Season(
             this.name = original.name();
             this.startDate = original.startDate();
             this.endDate = original.endDate();
-            this.pricingsId = original.pricingsId();
-            this.zonePricingIds = new ArrayList<>(original.zonePricingIds());
+            this.pricing = original.pricing();
+            this.zoneTariffs = new ArrayList<>(original.zoneTariffs());
         }
 
         public Builder name(String val) { name = val; return this; }
         public Builder startDate(LocalDate val) { startDate = val; return this; }
         public Builder endDate(LocalDate val) { endDate = val; return this; }
-        public Builder pricingsId(Integer val) { pricingsId = val; return this; }
-        public Builder zonePricingIds(List<Integer> val) {
-            if (val != null) this.zonePricingIds = new ArrayList<>(val);
+        public Builder pricing(Pricing val) { pricing = val; return this; }
+        public Builder zoneTariffs(List<ZoneTariff> val) {
+            if (val != null) this.zoneTariffs = new ArrayList<>(val);
             return this;
         }
 
         public Season build() {
-            return new Season(name, startDate, endDate, pricingsId, zonePricingIds);
+            return new Season(name, startDate, endDate, pricing, zoneTariffs);
         }
     }
 }

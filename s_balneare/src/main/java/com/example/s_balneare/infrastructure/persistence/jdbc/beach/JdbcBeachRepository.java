@@ -3,6 +3,7 @@ package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 import com.example.s_balneare.application.port.out.BeachRepository;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.common.TransactionContext;
+import com.example.s_balneare.domain.layout.Zone;
 import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
 
 import javax.sql.DataSource;
@@ -300,7 +301,7 @@ public class JdbcBeachRepository implements BeachRepository {
                         boolean active = rs.getBoolean("active");
 
                         //passo 5: aggiungo alla lista
-                        beaches.add(new Beach(id, ownerId, addressId, general, null, services, parking, extraInfo, null, active));
+                        beaches.add(new Beach(id, ownerId, addressId, general, null, services, parking, extraInfo, null, null, active));
                     }
                 }
             } catch (SQLException e) {
@@ -395,8 +396,9 @@ public class JdbcBeachRepository implements BeachRepository {
                     //FIXME: attenzione qui!!!
                     //passo 6: salvo le stagioni
                     List<Season> seasons = findBeachSeasons(id);
+                    List<Zone> zones = new ArrayList<>();
 
-                    Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, active);
+                    Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, zones, active);
                     return Optional.of(beach);
                 }
             } catch (SQLException e) {

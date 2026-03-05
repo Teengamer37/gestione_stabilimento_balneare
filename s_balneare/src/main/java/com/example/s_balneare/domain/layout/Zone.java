@@ -1,35 +1,58 @@
 package com.example.s_balneare.domain.layout;
 
+import java.util.ArrayList;
 import java.util.List;
 
-//TODO: da implementarla nel pattern DDD-lite
+public record Zone(
+        String name,
+        List<Spot> spots
+) {
+    public Zone {
+        if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: Zone name cannot be blank");
+        if (name.length() > 50) throw new IllegalArgumentException("ERROR: Zone name cannot exceed 50 characters");
 
-public class Zone {
-    private final Integer id;
-    private String name;
-    private List<Integer> spotIds;
-
-    public Zone(Integer id, String name, List<Integer> spotIds) {
-        if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: beachName cannot be empty");
-
-        this.id = id;
-        this.name = name;
-        this.spotIds = spotIds;
+        //protegge la lista da modifiche esterne
+        spots = (spots == null) ? List.of() : List.copyOf(spots);
     }
 
-    public Integer getId() {
-        return id;
+    //Static Factory per una Zone nuova
+    public static Zone create(String name) {
+        return new Zone(name, new ArrayList<>());
     }
 
-    public String getName() {
-        return name;
+    //metodi wither
+    public Zone withName(String newName) {
+        return new Zone(newName, spots);
+    }
+    public Zone withSpots(List<Spot> newSpots) {
+        return new Zone(name, newSpots);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    //pattern Builder
+    public static Builder builder() {
+        return new Builder();
     }
 
-    public List<Integer> getSpotIds() {
-        return spotIds;
+    public static class Builder {
+        private String name;
+        private List<Spot> spots = new ArrayList<>();
+
+        public Builder() {}
+
+        //costruttore copia
+        public Builder(Zone original) {
+            this.name = original.name();
+            this.spots = new ArrayList<>(original.spots());
+        }
+
+        public Builder name(String val) { name = val; return this; }
+        public Builder spots(List<Spot> val) {
+            if (val != null) this.spots = new ArrayList<>(val);
+            return this;
+        }
+
+        public Zone build() {
+            return new Zone(name, spots);
+        }
     }
 }

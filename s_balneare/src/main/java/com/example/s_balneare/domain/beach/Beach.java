@@ -1,5 +1,7 @@
 package com.example.s_balneare.domain.beach;
 
+import com.example.s_balneare.domain.layout.Zone;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class Beach {
     private BeachServices beachServices;
     private Parking parking;
     private final List<Season> seasons;
+    private final List<Zone> zones;
 
     private String extraInfo;
     private boolean active;
@@ -21,7 +24,7 @@ public class Beach {
 
     //costruttore
     public Beach(Integer id, Integer ownerId, Integer addressId, BeachGeneral beachGeneral, BeachInventory beachInventory,
-                 BeachServices beachServices, Parking parking, String extraInfo, List<Season> seasons, boolean active) {
+                 BeachServices beachServices, Parking parking, String extraInfo, List<Season> seasons, List<Zone> zones, boolean active) {
         this.id = id;
         updateOwnerId(ownerId);
         if (addressId == null) throw new IllegalArgumentException("ERROR: addressId cannot be null");
@@ -31,8 +34,12 @@ public class Beach {
         this.beachServices = beachServices;
         this.parking = parking;
         updateExtraInfo(extraInfo);
+
         if (seasons == null || seasons.isEmpty()) this.seasons = new ArrayList<Season>();
         else this.seasons = new ArrayList<>(seasons);
+        if (zones == null || zones.isEmpty()) this.zones = new ArrayList<Zone>();
+        else this.zones = new ArrayList<>(zones);
+
         setActive(active);
     }
 
@@ -64,6 +71,9 @@ public class Beach {
     }
     public List<Season> getSeasons() {
         return seasons;
+    }
+    public List<Zone> getZones() {
+        return zones;
     }
     public boolean isActive() {
         return active;
@@ -99,7 +109,7 @@ public class Beach {
     }
 
     //rimuove una stagione
-    public void removeSeason (Season season) {
+    public void removeSeason(Season season) {
         checkSeason(season);
         //tentativo eliminazione
         if (seasons.contains(season)) seasons.remove(season);
@@ -107,13 +117,43 @@ public class Beach {
     }
 
     //rimuove una lista di stagioni
-    public void removeSeasons (List<Season> seasons) {
+    public void removeSeasons(List<Season> seasons) {
         checkSeasons(seasons);
         //mi assicuro che TUTTE le stagioni nella lista siano presenti nella spiaggia
         for (Season season : seasons) {
             if (!this.seasons.contains(season)) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not found in seasons");
         }
         this.seasons.removeAll(seasons);
+    }
+
+    //aggiunge una zona
+    public void addZone(Zone zone) {
+        checkZone(zone);
+        zones.add(zone);
+    }
+
+    //aggiunge una lista di zone
+    public void addZones(List<Zone> zones) {
+        checkZones(zones);
+        this.zones.addAll(zones);
+    }
+
+    //rimuove una stagione
+    public void removeZone(Zone zone) {
+        checkZone(zone);
+        //tentativo eliminazione
+        if (zones.contains(zone)) zones.remove(zone);
+        else throw new IllegalArgumentException("ERROR: zoneId not found in zone");
+    }
+
+    //rimuove una lista di stagioni
+    public void removeZones(List<Zone> zones) {
+        checkZones(zones);
+        //mi assicuro che TUTTE le zone nella lista siano riferiti alla spiaggia
+        for (Zone zone : zones) {
+            if (!this.zones.contains(zone)) throw new IllegalArgumentException("ERROR: at least one zoneId in the list is not found in zone");
+        }
+        this.zones.removeAll(zones);
     }
 
     //gestisce lo stato di attività della spiaggia nella piattaforma
@@ -168,6 +208,17 @@ public class Beach {
         //controllo integrità dei valori inseriti nella stagione
         for (Season season : seasons) {
             if (season == null) throw new IllegalArgumentException("ERROR: at least one season in the list is null");
+        }
+    }
+    private void checkZone(Zone zone) {
+        if (zone == null) throw new IllegalArgumentException("ERROR: zone cannot be null");
+    }
+    private void checkZones(List<Zone> zones) {
+        //controllo lista se vuota
+        if (zones == null || zones.isEmpty()) throw new IllegalArgumentException("ERROR: list not valid");
+        //controllo integrità dei valori inseriti nella zona
+        for (Zone zone : zones) {
+            if (zone == null) throw new IllegalArgumentException("ERROR: at least one zone in the list is null");
         }
     }
     private void checkGeneralInfo(BeachGeneral newGeneral) {

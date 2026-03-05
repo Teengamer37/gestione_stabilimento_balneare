@@ -1,6 +1,7 @@
 package com.example.s_balneare.application.port.in;
 
 import com.example.s_balneare.domain.beach.*;
+import com.example.s_balneare.domain.layout.Zone;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ public record CreateBeachCommand(
         BeachServices beachServices,
         Parking parking,
         List<Season> seasons,
+        List<Zone> zones,
         String extraInfo,
         boolean active,
 
