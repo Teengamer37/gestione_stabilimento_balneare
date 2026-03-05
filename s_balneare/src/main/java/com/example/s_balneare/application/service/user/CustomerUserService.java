@@ -25,12 +25,13 @@ public class CustomerUserService extends AppUserService {
     }
 
      @Override
-     public CustomerUser getUserOrThrow(Integer id) {
+     protected CustomerUser getUserOrThrow(Integer id) {
         AppUser user = appUserRepository.findById(id)
                 .orElseThrow(()->new IllegalArgumentException("ERROR: User not found with id: " + id));
-         if (!(user instanceof CustomerUser appUser)){
+        if (!(user instanceof CustomerUser appUser)){
              throw new RuntimeException("ERROR: user is not a CustomerUser");
-         }
-         return appUser;
+        }
+        return appUser;
      }
+
 }

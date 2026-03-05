@@ -18,7 +18,7 @@ public class AdminUserService extends AppUserService {
         AppUser user = appUserRepository.findById(id)
                 .orElseThrow(()->new IllegalArgumentException("ERROR: User not found with id: " + id));
         if (!(user instanceof AdminUser appUser)){
-            throw new RuntimeException("ERROR: user is not a CustomerUser");
+            throw new RuntimeException("ERROR: user is not a AdminUser");
         }
         return appUser;
     }

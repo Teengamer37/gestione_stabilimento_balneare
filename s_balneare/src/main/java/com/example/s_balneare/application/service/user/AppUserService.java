@@ -13,9 +13,8 @@ public abstract class AppUserService {
         this.appUserRepository = appUserRepository;
     }
 
-    public int createUser(AppUser user, String password){
-        return appUserRepository.save(user,password);
-    }
+    public int createUser(AppUser user, String password){return appUserRepository.save(user,password);}
+
     public void deleteUser(int id) {
         appUserRepository.delete(id);
     }
