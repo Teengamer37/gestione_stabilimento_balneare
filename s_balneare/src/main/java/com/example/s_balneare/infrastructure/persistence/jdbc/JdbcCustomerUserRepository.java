@@ -11,21 +11,21 @@ import java.util.Optional;
 public class JdbcCustomerUserRepository implements CustomerUserRepository {
     private final Connection connection;
 
-    public JdbcCustomerUserRepository(Connection connection) {this.connection=connection; }
+    public JdbcCustomerUserRepository(Connection connection) {
+        this.connection = connection;
+    }
 
     @Override
-    public Integer save(AppUser inputUser, String password){
+    public Integer save(CustomerUser user, String password) {
         //check validità inputUser
-        if (!(inputUser instanceof CustomerUser user)){
-            throw new RuntimeException("ERROR: user is not a CustomerUser");
-        }
         //check validità password
-        if (password == null || password.isBlank()) throw new IllegalArgumentException("ERROR: password must not be null");
+        if (password == null || password.isBlank())
+            throw new IllegalArgumentException("ERROR: password must not be null");
 
 
         String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
                 "VALUES(?, ?, ?, ?, ?)";
-        String sqlCustomer = "INSERT INTO customers(id,telephoneNumber, addressId, active)" + "VALUES(?,?,?)";
+        String sqlCustomer = "INSERT INTO customers(id,phoneNumber, addressId, active)" + "VALUES(?,?,?,?)";
         try {
             connection.setAutoCommit(false);
             int newId;
@@ -43,10 +43,10 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
                 }
             }
 
-            try(PreparedStatement statement = connection.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement statement = connection.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setInt(1, newId);
                 statement.setString(2, user.getPhoneNumber());
-                statement.setInt(3,user.getAddressId());
+                statement.setInt(3, user.getAddressId());
                 statement.setBoolean(4, user.isActive());
                 statement.executeUpdate();
             }
@@ -54,16 +54,16 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
             throw new RuntimeException(e);
         }
 
-        return  1;
+        return 1;
     }
-
 
     @Override
     public void delete(Integer id) {
+
     }
 
     @Override
-    public void update(AppUser user) {
+    public void update(CustomerUser user) {
 
     }
 
@@ -73,27 +73,27 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
     }
 
     @Override
-    public Optional findById(Integer id) {
+    public Optional<CustomerUser> findById(Integer id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findByUsername(String username) {
+    public Optional<CustomerUser> findByUsername(String username) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findByEmail(String email) {
+    public Optional<CustomerUser> findByEmail(String email) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findAll() {
+    public Optional<CustomerUser> findAll() {
         return Optional.empty();
     }
 
     @Override
-    public Optional<AppUser> findByPhoneNumber(String phoneNumber) {
+    public Optional<CustomerUser> findByPhoneNumber(String phoneNumber) {
         return Optional.empty();
     }
 }

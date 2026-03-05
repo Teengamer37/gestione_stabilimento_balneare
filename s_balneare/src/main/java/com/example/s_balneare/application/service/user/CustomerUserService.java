@@ -7,7 +7,7 @@ import com.example.s_balneare.domain.user.CustomerUser;
 
 //TODO: da fare
 
-public class CustomerUserService extends AppUserService {
+public class CustomerUserService extends AppUserService<CustomerUser> {
     public CustomerUserService(CustomerUserRepository appUserRepository) {
         super(appUserRepository);
     }
@@ -24,14 +24,5 @@ public class CustomerUserService extends AppUserService {
         appUserRepository.update(appUser);
     }
 
-     @Override
-     protected CustomerUser getUserOrThrow(Integer id) {
-        AppUser user = appUserRepository.findById(id)
-                .orElseThrow(()->new IllegalArgumentException("ERROR: User not found with id: " + id));
-        if (!(user instanceof CustomerUser appUser)){
-             throw new RuntimeException("ERROR: user is not a CustomerUser");
-        }
-        return appUser;
-     }
 
 }

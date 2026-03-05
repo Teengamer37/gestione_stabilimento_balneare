@@ -4,5 +4,5 @@ import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;
 
 //Per future implementazioni
-public interface AdminUserRepository extends AppUserRepository {
+public interface AdminUserRepository extends AppUserRepository<AdminUser> {
 }
