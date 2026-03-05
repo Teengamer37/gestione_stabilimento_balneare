@@ -4,6 +4,7 @@ import com.example.s_balneare.application.port.out.AdminUserRepository;
 import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;
 
+import java.sql.Connection;
 import java.util.Optional;
 
 //TODO: continuare l'implementazione
@@ -12,7 +13,7 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
 
 
     @Override
-    public Integer save(AdminUser user, String password) {
+    public Integer save(AdminUser user, String password, Connection conn) {
         return 0;
     }
 

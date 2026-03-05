@@ -4,6 +4,7 @@ import com.example.s_balneare.application.port.out.OwnerUserRepository;
 import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.OwnerUser;
 
+import java.sql.Connection;
 import java.util.Optional;
 
 //FIXME: un macello qui pt2
@@ -11,7 +12,7 @@ import java.util.Optional;
 public class JdbcOwnerUserRepository implements OwnerUserRepository {
 
     @Override
-    public Integer save(OwnerUser user, String password) {
+    public Integer save(OwnerUser user, String password, Connection conn) {
         return 0;
     }
 

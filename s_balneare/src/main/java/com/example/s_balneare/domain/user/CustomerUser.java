@@ -1,10 +1,8 @@
 package com.example.s_balneare.domain.user;
 
-//TODO gestione  addressId  come in beach
-
 public final class CustomerUser extends AppUser {
     private String phoneNumber;
-    private Integer addressId;
+    private final Integer addressId;
     private boolean active;
 
     //costruttore

@@ -5,8 +5,6 @@ import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.CustomerUser;
 
-//TODO: da fare
-
 public class CustomerUserService extends AppUserService<CustomerUser> {
     public CustomerUserService(CustomerUserRepository appUserRepository) {
         super(appUserRepository);

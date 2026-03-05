@@ -2,11 +2,12 @@ package com.example.s_balneare.application.port.out;
 
 import com.example.s_balneare.domain.user.AppUser;
 
+import java.sql.Connection;
 import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo AppUser
 public interface AppUserRepository <T extends AppUser>{
-    Integer save(T user, String password);
+    Integer save(T user, String password, Connection conn);
     void delete(Integer id);
     void update(T user);
     void updatePassword(AppUser user, String password);

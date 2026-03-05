@@ -3,34 +3,32 @@ package com.example.s_balneare.infrastructure.persistence.jdbc;
 import com.example.s_balneare.application.port.out.CustomerUserRepository;
 import com.example.s_balneare.domain.user.*;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.Optional;
 
 //FIXME: un macello qui
 
 public class JdbcCustomerUserRepository implements CustomerUserRepository {
-    private final Connection connection;
+    private final DataSource dataSource;
 
-    public JdbcCustomerUserRepository(Connection connection) {
-        this.connection = connection;
+    public JdbcCustomerUserRepository(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
-    public Integer save(CustomerUser user, String password) {
-        //check validità inputUser
-        //check validità password
+    public Integer save(CustomerUser user, String password, Connection conn) {
         if (password == null || password.isBlank())
             throw new IllegalArgumentException("ERROR: password must not be null");
-
 
         String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
                 "VALUES(?, ?, ?, ?, ?)";
         String sqlCustomer = "INSERT INTO customers(id,phoneNumber, addressId, active)" + "VALUES(?,?,?,?)";
-        try {
-            connection.setAutoCommit(false);
-            int newId;
 
-            try (PreparedStatement statement = connection.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
+        try {
+            int newId;
+            //Inserisco prima il record in app_users
+            try (PreparedStatement statement = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, user.getName());
                 statement.setString(2, user.getSurname());
                 statement.setString(3, user.getUsername());
@@ -39,22 +37,21 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
                 statement.executeUpdate();
                 try (ResultSet rs = statement.getGeneratedKeys()) {
                     if (rs.next()) newId = rs.getInt(1);
-                    else throw new SQLException("ERROR: SQL FAILED, no ID generated for beach");
+                    else throw new SQLException("ERROR: SQL FAILED, no ID generated for customer");
                 }
-            }
-
-            try (PreparedStatement statement = connection.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
+            }//Gestione in createUser del rollback per non creare solo la prima tabella
+            //Inserisco record nella tabella customers, una volta ottenuto l'id dalla tabella app_users
+            try (PreparedStatement statement = conn.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setInt(1, newId);
                 statement.setString(2, user.getPhoneNumber());
                 statement.setInt(3, user.getAddressId());
                 statement.setBoolean(4, user.isActive());
                 statement.executeUpdate();
             }
+            return newId;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("ERROR: unable to save customer",e);
         }
-
-        return 1;
     }
 
     @Override
