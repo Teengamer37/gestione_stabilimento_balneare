@@ -1,16 +1,5 @@
 package com.example.s_balneare.domain.user;
 
-/*
-    FIXME: aggiungere controlli dimensione dati stringhe:
-
-    esempio estratto da Address:
-    if (street.length() > 255) throw new IllegalArgumentException("ERROR: street cannot exceed 255 characters");
-    if (streetNumber.length() > 10) throw new IllegalArgumentException("ERROR: streetNumber cannot exceed 10 characters");
-    if (city.length() > 100) throw new IllegalArgumentException("ERROR: city cannot exceed 100 characters");
-    if (zipCode.length() > 20) throw new IllegalArgumentException("ERROR: zip code cannot exceed 20 characters");
-    if (country.length() > 100) throw new IllegalArgumentException("ERROR: country cannot exceed 100 characters");
- */
-
 public abstract class AppUser {
     private final Integer id;
     private String email;
@@ -19,10 +8,10 @@ public abstract class AppUser {
     private String surname;
 
     protected AppUser(Integer id, String email, String username, String name, String surname) {
-        if (email == null || !email.contains("@")) throw new IllegalArgumentException("ERROR: invalid email");
-        if (username == null || username.isBlank()) throw new IllegalArgumentException("ERROR: username required");
-        if (name == null || surname == null) throw new IllegalArgumentException("ERROR: personal data required");
-
+        checkEmail(email);
+        checkName(name);
+        checkSurname(surname);
+        checkUsername(username);
         this.id = id;
         this.email = email;
         this.username = username;
@@ -33,15 +22,21 @@ public abstract class AppUser {
     public abstract Role getRole();
 
     //metodi di Business
-    public void changeEmail(String newEmail) {
-        if (newEmail == null || !newEmail.contains("@")) throw new IllegalArgumentException("ERROR: invalid email");
-        this.email = newEmail;
+    public void changeEmail(String email) {
+        checkEmail(email);
+        this.email = email;
     }
 
     public void updateProfile(String name, String surname) {
-        if (name == null || surname == null) throw new IllegalArgumentException("ERROR: invalid name and/or surname");
+        checkName(name);
+        checkSurname(surname);
         this.name = name;
         this.surname = surname;
+    }
+
+    public void changeUsername(String username) {
+        checkUsername(username);
+        this.username = username;
     }
 
     //getters
@@ -50,4 +45,26 @@ public abstract class AppUser {
     public String getUsername() { return username; }
     public String getName() { return name; }
     public String getSurname() { return surname; }
+
+    //metodi di controllo integrità dati
+    private void checkEmail(String email) {
+        if (email == null || email.isBlank()) throw new IllegalArgumentException("ERROR: missing email");
+        if (email.length() > 80 || email.length() < 6)  throw new IllegalArgumentException("ERROR: invalid email length");
+        if (!email.contains("@") || email.contains("..")) throw new IllegalArgumentException("ERROR: invalid email address");
+    }
+
+    private void checkName(String name){
+        if(name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: invalid name");
+        if (name.length() > 100)  throw new IllegalArgumentException("ERROR: name cannot exceed 100 characters");
+    }
+
+    private void checkSurname(String surname){
+        if(surname == null || surname.isBlank()) throw new IllegalArgumentException("ERROR: invalid surname");
+        if (surname.length() > 50)  throw new IllegalArgumentException("ERROR: surname cannot exceed 50 characters");
+    }
+
+    private void checkUsername(String username){
+        if(username == null || username.isBlank()) throw new IllegalArgumentException("ERROR: invalid username");
+        if (username.length() > 50)  throw new IllegalArgumentException("ERROR: username cannot exceed 50 characters");
+    }
 }

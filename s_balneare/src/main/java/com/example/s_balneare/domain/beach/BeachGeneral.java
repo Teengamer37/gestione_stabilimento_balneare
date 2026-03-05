@@ -1,5 +1,7 @@
 package com.example.s_balneare.domain.beach;
 
+//TODO this.phoneNumber = validatePhoneNumber(phoneNumber); ??
+
 public class BeachGeneral {
     private final String name;
     private final String description;

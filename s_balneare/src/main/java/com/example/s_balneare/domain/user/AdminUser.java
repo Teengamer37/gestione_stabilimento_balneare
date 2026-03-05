@@ -1,7 +1,5 @@
 package com.example.s_balneare.domain.user;
 
-//TODO: da implementarla nel pattern DDD-lite, guardare i costruttori
-
 
 public final class AdminUser extends AppUser {
     public AdminUser(Integer id, String email, String username, String name, String surname) {

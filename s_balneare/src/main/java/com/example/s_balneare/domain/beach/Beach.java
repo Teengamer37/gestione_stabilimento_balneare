@@ -1,5 +1,8 @@
 package com.example.s_balneare.domain.beach;
 
+//TODO uniformità codice con beach general App user sull'organizzazione dei controlli
+// TODO updateAddress  e controllo che l'id non sia nullo?
+
 import java.util.ArrayList;
 import java.util.List;
 
