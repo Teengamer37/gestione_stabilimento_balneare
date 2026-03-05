@@ -1,6 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.AppUserRepository;
+import com.example.s_balneare.application.port.out.CustomerUserRepository;
 import com.example.s_balneare.domain.user.*;
 
 import java.sql.*;
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 //FIXME: un macello qui
 
-public class JdbcCustomerUserRepository implements AppUserRepository {
+public class JdbcCustomerUserRepository implements AppUserRepository, CustomerUserRepository {
     private final Connection connection;
 
     public JdbcCustomerUserRepository(Connection connection) {this.connection=connection; }
@@ -79,6 +80,11 @@ public class JdbcCustomerUserRepository implements AppUserRepository {
 
     @Override
     public Optional<AppUser> findByEmail(String email) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<AppUser> findAll() {
         return Optional.empty();
     }
 

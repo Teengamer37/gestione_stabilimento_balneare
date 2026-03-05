@@ -1,13 +1,14 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
 import com.example.s_balneare.application.port.out.AppUserRepository;
+import com.example.s_balneare.application.port.out.OwnerUserRepository;
 import com.example.s_balneare.domain.user.AppUser;
 
 import java.util.Optional;
 
 //FIXME: un macello qui pt2
 
-public class JdbcOwnerUserRepository implements AppUserRepository {
+public class JdbcOwnerUserRepository implements AppUserRepository, OwnerUserRepository {
 
     @Override
     public Integer save(AppUser user, String password) {
@@ -40,7 +41,7 @@ public class JdbcOwnerUserRepository implements AppUserRepository {
     }
 
     @Override
-    public Optional<AppUser> findByPhoneNumber(String phoneNumber) {
+    public Optional<AppUser> findAll() {
         return Optional.empty();
     }
 }

@@ -1,11 +1,12 @@
 package com.example.s_balneare.application.service.user;
 
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcAdminUserRepository;
+//TODO: controllo warning, è finità così avendo tutto implementato in AppUserService
 
-//TODO: da fare
+import com.example.s_balneare.application.port.out.AdminUserRepository;
+
 
 public class AdminUserService extends AppUserService {
-    public AdminUserService(JdbcAdminUserRepository jdbcAdminUserRepository) {
-        super(jdbcAdminUserRepository);
+    public AdminUserService(AdminUserRepository appUserRepository) {
+        super(appUserRepository);
     }
 }

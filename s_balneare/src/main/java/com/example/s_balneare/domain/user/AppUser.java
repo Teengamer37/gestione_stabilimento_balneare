@@ -27,10 +27,13 @@ public abstract class AppUser {
         this.email = email;
     }
 
-    public void updateProfile(String name, String surname) {
+    public void changeName(String name) {
         checkName(name);
-        checkSurname(surname);
         this.name = name;
+    }
+
+    public void changeSurname(String surname){
+        checkSurname(surname);
         this.surname = surname;
     }
 

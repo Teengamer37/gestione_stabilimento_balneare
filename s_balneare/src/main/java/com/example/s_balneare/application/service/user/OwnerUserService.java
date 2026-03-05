@@ -1,11 +1,11 @@
 package com.example.s_balneare.application.service.user;
 
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcOwnerUserRepository;
+import com.example.s_balneare.application.port.out.OwnerUserRepository;
 
-//TODO: da fare
+//TODO: controllo warning, è finità così avendo tutto implementato in AppUserService
 
 public class OwnerUserService extends AppUserService {
-    public OwnerUserService(JdbcOwnerUserRepository jdbcOwnerUserRepository) {
-        super(jdbcOwnerUserRepository);
+    public OwnerUserService(OwnerUserRepository appUserRepository) {
+        super(appUserRepository);
     }
 }

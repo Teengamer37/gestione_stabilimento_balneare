@@ -9,10 +9,15 @@ public interface AppUserRepository {
     Integer save(AppUser user, String password);
     void delete(Integer id);
     void update(AppUser user, String password);
+    //TODO: scelta implementativa modifica password scegli come vuoi fare:
+    //Se scegli di avere due update fai refactor dell'update soprastante eliminando l'attributo password successivamente
+    //leva dai commenti il metodo sottostante e spostati in AppUserService e rendi codice il commento
+    // TODO: appUserRepository.updatePassword(appUser, password);
+    //void updatePassword(AppUser user, String password)
     Optional<AppUser> findById(Integer id);
     Optional<AppUser> findByUsername(String username);
     Optional<AppUser> findByEmail(String email);
-    Optional<AppUser> findByPhoneNumber(String phoneNumber);
+    Optional<AppUser> findAll();
 }
 
 //consiglio: farei 3 interfacce diverse
