@@ -11,7 +11,7 @@ import java.util.Optional;
 public class JdbcOwnerUserRepository implements OwnerUserRepository {
 
     @Override
-    public Integer save(AppUser user, String password) {
+    public Integer save(OwnerUser user, String password) {
         return 0;
     }
 
@@ -21,7 +21,7 @@ public class JdbcOwnerUserRepository implements OwnerUserRepository {
     }
 
     @Override
-    public void update(AppUser user) {
+    public void update(OwnerUser user) {
 
     }
 
@@ -31,22 +31,22 @@ public class JdbcOwnerUserRepository implements OwnerUserRepository {
     }
 
     @Override
-    public Optional findById(Integer id) {
+    public Optional<OwnerUser> findById(Integer id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findByUsername(String username) {
+    public Optional<OwnerUser> findByUsername(String username) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findByEmail(String email) {
+    public Optional<OwnerUser> findByEmail(String email) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findAll() {
+    public Optional<OwnerUser> findAll() {
         return Optional.empty();
     }
 }

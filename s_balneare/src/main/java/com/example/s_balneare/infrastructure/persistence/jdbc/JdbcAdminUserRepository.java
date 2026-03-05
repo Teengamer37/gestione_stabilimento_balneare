@@ -10,8 +10,9 @@ import java.util.Optional;
 
 public class JdbcAdminUserRepository implements AdminUserRepository {
 
+
     @Override
-    public Integer save(AppUser user, String password) {
+    public Integer save(AdminUser user, String password) {
         return 0;
     }
 
@@ -21,7 +22,7 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
     }
 
     @Override
-    public void update(AppUser user) {
+    public void update(AdminUser user) {
 
     }
 
@@ -31,23 +32,22 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
     }
 
     @Override
-    public Optional findById(Integer id) {
+    public Optional<AdminUser> findById(Integer id) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findByUsername(String username) {
+    public Optional<AdminUser> findByUsername(String username) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findByEmail(String email) {
+    public Optional<AdminUser> findByEmail(String email) {
         return Optional.empty();
     }
 
     @Override
-    public Optional findAll() {
+    public Optional<AdminUser> findAll() {
         return Optional.empty();
     }
-
 }
