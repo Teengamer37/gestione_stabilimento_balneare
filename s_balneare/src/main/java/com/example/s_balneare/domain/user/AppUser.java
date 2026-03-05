@@ -22,22 +22,22 @@ public abstract class AppUser {
     public abstract Role getRole();
 
     //metodi di Business
-    public void changeEmail(String email) {
+    public void updateEmail(String email) {
         checkEmail(email);
         this.email = email;
     }
 
-    public void changeName(String name) {
+    public void updateName(String name) {
         checkName(name);
         this.name = name;
     }
 
-    public void changeSurname(String surname){
+    public void updateSurname(String surname){
         checkSurname(surname);
         this.surname = surname;
     }
 
-    public void changeUsername(String username) {
+    public void updateUsername(String username) {
         checkUsername(username);
         this.username = username;
     }

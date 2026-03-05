@@ -2,7 +2,6 @@ package com.example.s_balneare.application.service.user;
 
 import com.example.s_balneare.application.port.out.AppUserRepository;
 import com.example.s_balneare.domain.user.AppUser;
-import com.example.s_balneare.domain.user.CustomerUser;
 
 //TODO: gestione metodi per operare su address creare nuova classe
 
@@ -21,22 +20,22 @@ public abstract class AppUserService<T extends AppUser> {
 
     public void updateName(Integer id, String name) {
         T appUser = getUserOrThrow(id);
-        appUser.changeName(name);
+        appUser.updateName(name);
         appUserRepository.update(appUser);
     }
     public void updateSurname(Integer id, String surname) {
         T appUser = getUserOrThrow(id);
-        appUser.changeSurname(surname);
+        appUser.updateSurname(surname);
         appUserRepository.update(appUser);
     }
     public void updateUsername(Integer id, String username) {
         T appUser = getUserOrThrow(id);
-        appUser.changeUsername(username);
+        appUser.updateUsername(username);
         appUserRepository.update(appUser);
     }
     public void updateEmail(Integer id, String email) {
         T appUser = getUserOrThrow(id);
-        appUser.changeEmail(email);
+        appUser.updateEmail(email);
         appUserRepository.update(appUser);
     }
     public void updatePassword(Integer id, String password){
