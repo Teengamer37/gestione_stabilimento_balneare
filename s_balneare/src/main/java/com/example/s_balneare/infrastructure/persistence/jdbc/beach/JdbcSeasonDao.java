@@ -5,9 +5,16 @@ import com.example.s_balneare.domain.beach.Season;
 import com.example.s_balneare.domain.beach.ZoneTariff;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 class JdbcSeasonDao {
+    private final JdbcZoneDao zoneDao;
+
+    public JdbcSeasonDao(JdbcZoneDao zoneDao) {
+        this.zoneDao = zoneDao;
+    }
+
     //sincronizzo tutto il grafo di una lista di stagioni
     //creazione pricing -> season -> zone -> zoneTariff
     void syncSeasons(Integer beachId, List<Season> seasons, Connection connection) throws SQLException {
@@ -25,6 +32,19 @@ class JdbcSeasonDao {
             upsertSeasonRow(beachId, season, pricingId, connection);
 
             //passo 3: gestione Zone e ZoneTariff
+            //raccolgo tutti i nomi delle zone coinvolte in tutte le stagioni
+            List<String> zoneNames = new ArrayList<>();
+            for (Season s : seasons) {
+                if (s.zoneTariffs() != null) {
+                    for (ZoneTariff zt : s.zoneTariffs()) {
+                        if (!zoneNames.contains(zt.zoneName())) zoneNames.add(zt.zoneName());
+                    }
+                }
+            }
+            //creo le Zones in un colpo solo
+            zoneDao.ensureZonesExist(beachId, zoneNames, connection);
+
+            //mi occupo ora delle ZoneTariffs
             upsertZonesAndTariffs(beachId, season, connection);
         }
     }
@@ -44,11 +64,21 @@ class JdbcSeasonDao {
         upsertSeasonRow(beachId, season, pricingId, connection);
 
         //passo 3: gestione Zone e ZoneTariff
+        //raccolgo tutti i nomi delle zone coinvolte nella stagione
+        List<String> zoneNames = new ArrayList<>();
+        if (season.zoneTariffs() != null) {
+            for (ZoneTariff zt : season.zoneTariffs()) {
+                if (!zoneNames.contains(zt.zoneName())) zoneNames.add(zt.zoneName());
+            }
+        }
+        //creo le Zones in un colpo solo
+        zoneDao.ensureZonesExist(beachId, zoneNames, connection);
+
+        //mi occupo ora delle ZoneTariffs
         upsertZonesAndTariffs(beachId, season, connection);
     }
 
-
-    //HELPERS
+    //HELPERS DI SYNC
     private int upsertPricing(Pricing p, Connection connection) throws SQLException {
         //caso 1: Pricing già presente -> UPDATE
         if (p.id() != null && p.id() > 0) {
@@ -118,38 +148,152 @@ class JdbcSeasonDao {
     private void upsertZonesAndTariffs(Integer beachId, Season s, Connection connection) throws SQLException {
         if (s.zoneTariffs() == null || s.zoneTariffs().isEmpty()) throw new IllegalArgumentException("ERROR: at least one zoneTariff must be set for season for update");
 
-        for (ZoneTariff tariff : s.zoneTariffs()) {
-            //verifico se la Zone esiste nel DB
-            //con INSERT IGNORE se una Zone esiste già per questa Beach, non la riaggiunge
-            //al contrario, se NON esiste, essa viene aggiunta
-            String insertZone = "INSERT IGNORE INTO zones (name, beachId) " +
-                    "VALUES (?, ?)";
+        //inserisco/aggiorno la ZoneTariff per quella Zone in questa Season
+        //stessa logica di prima: se esiste già, aggiorno solo alcuni parametri
+        String upsertTariff = "INSERT INTO zone_tariffs (seasonName, beachId, zoneName, priceOmbrellone, priceTenda) VALUES (?, ?, ?, ?, ?) " +
+                "ON DUPLICATE KEY UPDATE priceOmbrellone = ?, priceTenda = ?";
 
-            try (PreparedStatement ps = connection.prepareStatement(insertZone)) {
-                ps.setString(1, tariff.zoneName());
-                ps.setInt(2, beachId);
-                ps.executeUpdate();
-            }
-
-            //inserisco/aggiorno la ZoneTariff per quella Zone in questa Season
-            //stessa logica di prima: se esiste già, aggiorno solo alcuni parametri
-            String upsertTariff = "INSERT INTO zone_tariffs (seasonName, beachId, zoneName, priceOmbrellone, priceTenda) VALUES (?, ?, ?, ?, ?) " +
-                    "ON DUPLICATE KEY UPDATE priceOmbrellone = ?, priceTenda = ?";
-
-            try (PreparedStatement ps = connection.prepareStatement(upsertTariff)) {
+        try (PreparedStatement ps = connection.prepareStatement(upsertTariff)) {
+            for (ZoneTariff zt : s.zoneTariffs()) {
                 //parametri INSERT
                 ps.setString(1, s.name());
                 ps.setInt(2, beachId);
-                ps.setString(3, tariff.zoneName());
-                ps.setDouble(4, tariff.priceOmbrellone());
-                ps.setDouble(5, tariff.priceTenda());
+                ps.setString(3, zt.zoneName());
+                ps.setDouble(4, zt.priceOmbrellone());
+                ps.setDouble(5, zt.priceTenda());
 
                 //parametri UPDATE
-                ps.setDouble(6, tariff.priceOmbrellone());
-                ps.setDouble(7, tariff.priceTenda());
+                ps.setDouble(6, zt.priceOmbrellone());
+                ps.setDouble(7, zt.priceTenda());
 
-                ps.executeUpdate();
+                ps.addBatch();
             }
+            ps.executeBatch();
+        }
+    }
+
+
+    //elimina tutte le stagioni di una spiaggia (usato quando si elimina l'intera Beach)
+    //NOTA: non vado ad eliminare le zone; usare metodo di JdbcZoneDao se si vuole procedere con anche l’eliminazione delle zone
+    void deleteAllSeasons(Integer beachId, Connection connection) throws SQLException {
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
+
+        //passo 1: trovo tutti gli ID dei Pricing associati alla Beach
+        List<Integer> pricingIds = getPricingIdsForBeach(beachId, connection);
+
+        //passo 2: elimino le dipendenze (ZoneTariff)
+        deleteAllZoneTariffs(beachId, connection);
+
+        //passo 3: elimino le Season
+        deleteSeasonsRow(beachId, connection);
+
+        //passo 4: elimino i Pricing
+        deletePricings(pricingIds, connection);
+    }
+
+    //elimina una determinata stagione di una spiaggia
+    //NOTA: non vado ad eliminare le zone; usare metodo di JdbcZoneDao se si vuole procedere con anche l’eliminazione delle zone
+    void deleteSeason(Integer beachId, String seasonName, Connection connection) throws SQLException {
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
+        if (seasonName == null || seasonName.isEmpty()) throw new IllegalArgumentException("ERROR: seasonName not valid");
+
+        //passo 1: trovo l'ID Pricing per questa Season
+        Integer pricingId = getPricingIdForSeason(beachId, seasonName, connection);
+
+        //passo 2: elimino le ZoneTariff associate a questa Season
+        deleteZoneTariffsForSeason(beachId, seasonName, connection);
+
+        //passo 3: elimino Season
+        deleteSingleSeasonRow(beachId, seasonName, connection);
+
+        //passo 4: elimino Pricing
+        if (pricingId != null) {
+            deletePricings(List.of(pricingId), connection);
+        }
+    }
+
+
+    //HELPERS DI DELETE
+    //genera lista di ID di pricings associati ad una determinata Beach
+    private List<Integer> getPricingIdsForBeach(Integer beachId, Connection conn) throws SQLException {
+        List<Integer> ids = new ArrayList<>();
+
+        String sql = "SELECT pricingsId FROM seasons WHERE beachId = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ids.add(rs.getInt(1));
+            }
+        }
+
+        return ids;
+    }
+
+    //ritorna ID di un record di pricings associato ad una determinata Season
+    private Integer getPricingIdForSeason(Integer beachId, String seasonName, Connection conn) throws SQLException {
+        String sql = "SELECT pricingsId FROM seasons WHERE beachId = ? AND name = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setString(2, seasonName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        }
+
+        return null;
+    }
+
+    //cancella tutte le ZoneTariff di tutte le Zone di una determinata Beach
+    private void deleteAllZoneTariffs(Integer beachId, Connection conn) throws SQLException {
+        String sql = "DELETE FROM zone_tariffs WHERE beachId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.executeUpdate();
+        }
+    }
+
+    //cancella tutte le ZoneTariff di tutte le Zone di una determinata Season
+    private void deleteZoneTariffsForSeason(Integer beachId, String seasonName, Connection conn) throws SQLException {
+        String sql = "DELETE FROM zone_tariffs WHERE beachId = ? AND seasonName = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setString(2, seasonName);
+            ps.executeUpdate();
+        }
+    }
+
+    //cancella tutte le Season di una determinata Beach
+    private void deleteSeasonsRow(Integer beachId, Connection conn) throws SQLException {
+        String sql = "DELETE FROM seasons WHERE beachId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.executeUpdate();
+        }
+    }
+
+    //cancella una determinata Season di una determinata Beach
+    private void deleteSingleSeasonRow(Integer beachId, String seasonName, Connection conn) throws SQLException {
+        String sql = "DELETE FROM seasons WHERE beachId = ? AND name = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setString(2, seasonName);
+            ps.executeUpdate();
+        }
+    }
+
+    //cancella varie righe di pricings
+    private void deletePricings(List<Integer> pricingIds, Connection conn) throws SQLException {
+        if (pricingIds == null || pricingIds.isEmpty()) return;
+
+        String sql = "DELETE FROM pricings WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (Integer id : pricingIds) {
+                ps.setInt(1, id);
+                ps.addBatch();
+            }
+            ps.executeBatch();
         }
     }
 }

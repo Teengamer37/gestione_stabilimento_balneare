@@ -18,6 +18,9 @@ public class JdbcBeachRepository implements BeachRepository {
     private final JdbcBeachInventoryDao inventoryDao;
     private final JdbcBeachServicesDao servicesDao;
     private final JdbcParkingDao parkingDao;
+    private final JdbcZoneDao zoneDao;
+    private final JdbcSeasonDao seasonDao;
+    private final JdbcSpotDao spotDao;
 
     public JdbcBeachRepository(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -25,6 +28,9 @@ public class JdbcBeachRepository implements BeachRepository {
         this.inventoryDao = new JdbcBeachInventoryDao();
         this.servicesDao = new JdbcBeachServicesDao();
         this.parkingDao = new JdbcParkingDao();
+        this.zoneDao = new JdbcZoneDao();
+        this.seasonDao = new JdbcSeasonDao(zoneDao);
+        this.spotDao = new JdbcSpotDao(zoneDao);
     }
 
     //---- METODO HELPER ----
@@ -117,6 +123,14 @@ public class JdbcBeachRepository implements BeachRepository {
                 parkingDao.upsert(newId, beach.getParking(), connection);
             }
 
+            //passo 5: inserisco in pricings, seasons, zone e zone_tariffs la lista di Seasons
+            if (beach.getSeasons() != null) {
+                seasonDao.syncSeasons(newId, beach.getSeasons(), connection);
+            }
+
+            //passo 6: inserisco in spots gli Spot di ciascuna Zone che fa parte di Beach
+            spotDao.syncZones(newId, beach.getZones(), connection);
+
             return newId;
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to save beach", e);
@@ -176,6 +190,14 @@ public class JdbcBeachRepository implements BeachRepository {
                     parkingDao.delete(beach.getId(), connection);
                 }
 
+                //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff (o elimino dati)
+                if (beach.getSeasons() != null) {
+                    seasonDao.syncSeasons(beach.getId(), beach.getSeasons(), connection);
+                } else {
+                    seasonDao.delete(beach.getId(), connection);
+                }
+
+
                 connection.commit();
             } catch (SQLException e) {
                 try {
@@ -196,6 +218,7 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
+    //TODO: controlla necessità TransactionContext
     //permette di eliminare una spiaggia
     @Override
     public void delete(Integer id) {

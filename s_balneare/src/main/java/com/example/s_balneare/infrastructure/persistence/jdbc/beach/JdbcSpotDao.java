@@ -6,20 +6,33 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 class JdbcSpotDao {
+    private final JdbcZoneDao zoneDao;
+
+    public JdbcSpotDao(JdbcZoneDao zoneDao) {
+        this.zoneDao = zoneDao;
+    }
+
     //sincronizzo tutto il grafo di una lista di spot
     //creazione zone -> spots
     void syncZones(Integer beachId, List<Zone> zones, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
         if (zones == null || zones.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set");
 
-        for (Zone zone : zones) {
-            //passo 1: verifico se Zone esiste nel DB
-            ensureZoneExists(beachId, zone.name(), connection);
+        //raccolgo i nomi delle zone
+        List<String> zoneNames = new ArrayList<>();
+        for (Zone z : zones) {
+            zoneNames.add(z.name());
+        }
 
-            //passo 2: salvo gli Spot appartenenti a questa Zone
+        //creazione zone (se non già inserite)
+        zoneDao.ensureZonesExist(beachId, zoneNames, connection);
+
+        for (Zone zone : zones) {
+            //aggiungo/aggiorno gli Spot per ogni Zone
             upsertSpotsForZone(beachId, zone.name(), zone.spots(), connection);
         }
     }
@@ -29,26 +42,15 @@ class JdbcSpotDao {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
         if (zone == null) throw new IllegalArgumentException("ERROR: zone not valid");
 
-        //passo 1: verifico se Zone esiste nel DB
-        ensureZoneExists(beachId, zone.name(), connection);
+        //creazione zone (se non già inserite)
+        zoneDao.ensureZoneExists(beachId, zone.name(), connection);
 
-        //passo 2: salvo gli Spot appartenenti a questa Zone
+        //aggiungo/aggiorno gli Spot per ogni Zone
         upsertSpotsForZone(beachId, zone.name(), zone.spots(), connection);
     }
 
 
     //HELPERS
-    private void ensureZoneExists(Integer beachId, String zoneName, Connection conn) throws SQLException {
-        //INSERT IGNORE: se Zone presente, essa non viene aggiunta
-        String sql = "INSERT IGNORE INTO zones (name, beachId) VALUES (?, ?)";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, zoneName);
-            ps.setInt(2, beachId);
-            ps.executeUpdate();
-        }
-    }
-
     private void upsertSpotsForZone(Integer beachId, String zoneName, List<Spot> spots, Connection conn) throws SQLException {
         if (spots == null || spots.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be set for zone");
 

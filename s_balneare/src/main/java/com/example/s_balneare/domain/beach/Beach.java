@@ -100,12 +100,38 @@ public class Beach {
     public void addSeason(Season season) {
         checkSeason(season);
         seasons.add(season);
+        
+        //aggiunge automaticamente le zone definite nella stagione se non esistono già
+        for (ZoneTariff tariff : season.zoneTariffs()) {
+            //cerco se la Zone definita in ZoneTariff esiste già dentro zones
+            boolean zoneExists = zones.stream()
+                    .anyMatch(z -> z.name().equals(tariff.zoneName()));
+
+            //se non esiste, allora la aggiungo dentro zones
+            if (!zoneExists) {
+                zones.add(Zone.create(tariff.zoneName()));
+            }
+        }
     }
 
     //aggiunge una lista di stagioni
     public void addSeasons(List<Season> seasons) {
         checkSeasons(seasons);
         this.seasons.addAll(seasons);
+
+        //aggiunge automaticamente le zone definite nella stagione se non esistono già
+        for (Season season : seasons) {
+            for (ZoneTariff tariff : season.zoneTariffs()) {
+                //cerco se la Zone definita in ZoneTariff esiste già dentro zones
+                boolean zoneExists = zones.stream()
+                        .anyMatch(z -> z.name().equals(tariff.zoneName()));
+
+                //se non esiste, allora la aggiungo dentro zones
+                if (!zoneExists) {
+                    zones.add(Zone.create(tariff.zoneName()));
+                }
+            }
+        }
     }
 
     //rimuove una stagione
@@ -126,16 +152,22 @@ public class Beach {
         this.seasons.removeAll(seasons);
     }
 
-    //aggiunge una zona
+    //aggiunge o aggiorna una zona
     public void addZone(Zone zone) {
         checkZone(zone);
+        //rimuove la zona esistente se presente, per poi aggiungerla (aggiornamento)
+        zones.removeIf(z -> z.name().equals(zone.name()));
         zones.add(zone);
     }
 
-    //aggiunge una lista di zone
-    public void addZones(List<Zone> zones) {
-        checkZones(zones);
-        this.zones.addAll(zones);
+    //aggiunge o aggiorna una lista di zone
+    public void addZones(List<Zone> newZones) {
+        checkZones(newZones);
+        for (Zone newZone : newZones) {
+            //rimuove la zona esistente se presente, per poi aggiungerla (aggiornamento)
+            this.zones.removeIf(z -> z.name().equals(newZone.name()));
+            this.zones.add(newZone);
+        }
     }
 
     //rimuove una stagione
@@ -212,6 +244,7 @@ public class Beach {
     }
     private void checkZone(Zone zone) {
         if (zone == null) throw new IllegalArgumentException("ERROR: zone cannot be null");
+        // Removed the check that required the zone to be present in a season
     }
     private void checkZones(List<Zone> zones) {
         //controllo lista se vuota
