@@ -53,8 +53,8 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
                     if (rs.next()) newId = rs.getInt(1);
                     else throw new SQLException("ERROR: SQL FAILED, no ID generated for customer");
                 }
-            }//Gestione in createUser del rollback per non creare solo la prima tabella
-            //Inserisco record nella tabella customers, una volta ottenuto l'id dalla tabella app_users
+            }
+            //Non si necessita di un rollback perchè necessita di un executeTransaction a causa del legame con address
             try (PreparedStatement statement = conn.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setInt(1, newId);
                 statement.setString(2, user.getPhoneNumber());
@@ -69,8 +69,26 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Integer id, TransactionContext context) {
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
+        Connection conn = getConnection(context);
+        String sqlUser = "DELETE FROM app_users WHERE id = ?";
+        String sqlCustomer = "DELETE FROM customers WHERE id = ?";
+
+        try {
+            try(PreparedStatement statement = conn.prepareStatement(sqlCustomer)){
+                statement.setInt(1, id);
+                statement.executeUpdate();
+            }
+            try(PreparedStatement statement = conn.prepareStatement(sqlUser)){
+                statement.setInt(1, id);
+                statement.executeUpdate();
+            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to delete customer", e);
+        }
     }
 
     @Override
@@ -108,3 +126,4 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
         return Optional.empty();
     }
 }
+

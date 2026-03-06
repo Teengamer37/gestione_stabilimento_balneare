@@ -195,7 +195,6 @@ public class JdbcBeachRepository implements BeachRepository {
             throw new RuntimeException("ERROR: unable to get connection", e);
         }
     }
-
     //permette di eliminare una spiaggia
     @Override
     public void delete(Integer id) {

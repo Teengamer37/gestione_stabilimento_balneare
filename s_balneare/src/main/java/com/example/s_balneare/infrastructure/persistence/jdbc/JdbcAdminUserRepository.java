@@ -18,7 +18,7 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Integer id, TransactionContext context) {
 
     }
 

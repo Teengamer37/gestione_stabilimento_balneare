@@ -15,7 +15,7 @@ public abstract class AppUserService<T extends AppUser> {
     //public int createUser(T user, String password){return appUserRepository.save(user,password);}
 
     public void deleteUser(int id) {
-        appUserRepository.delete(id);
+        appUserRepository.delete(id, );
     }
 
     public void updateName(Integer id, String name) {
