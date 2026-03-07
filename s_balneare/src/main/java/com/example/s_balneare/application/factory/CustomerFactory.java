@@ -6,7 +6,7 @@ import com.example.s_balneare.domain.user.CustomerUser;
 
 public class CustomerFactory extends UserFactory {
     @Override
-    public AppUser createUser(RegistrationRequest request) {
+    public CustomerUser createUser(RegistrationRequest request) {
         return new CustomerUser(
                 request.getId(),
                 request.getEmail(),
