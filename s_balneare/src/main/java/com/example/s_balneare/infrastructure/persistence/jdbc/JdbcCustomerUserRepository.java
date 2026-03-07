@@ -55,7 +55,7 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
                 }
             }
             //Non si necessita di un rollback perchè necessita di un executeTransaction a causa del legame con address
-            try (PreparedStatement statement = conn.prepareStatement(sqlCustomer, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement statement = conn.prepareStatement(sqlCustomer)) {
                 statement.setInt(1, newId);
                 statement.setString(2, user.getPhoneNumber());
                 statement.setInt(3, user.getAddressId());
@@ -92,13 +92,47 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
     }
 
     @Override
-    public void update(CustomerUser user) {
+    public void update(CustomerUser user, TransactionContext context) {
+        if (user.getId() == null || user.getId() <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+        Connection conn = getConnection(context);
+        String sqlUser = "UPDATE app_users SET name = ?, surname = ?, username = ?, email = ? WHERE id = ?";
+        String sqlCustomer = "UPDATE customers SET phoneNumber = ?, addressId = ?, active = ? WHERE id = ?";
+        try {
+                try (PreparedStatement statement = conn.prepareStatement(sqlUser)) {
+                statement.setString(1, user.getName());
+                statement.setString(2, user.getSurname());
+                statement.setString(3, user.getUsername());
+                statement.setString(4, user.getEmail());
+                statement.setInt(5, user.getId());
+                statement.executeUpdate();
+            }
+                try (PreparedStatement statement = conn.prepareStatement(sqlCustomer)) {
+                    statement.setString(1, user.getPhoneNumber());
+                    statement.setInt(2, user.getAddressId());
+                    statement.setBoolean(3, user.isActive());
+                    statement.setInt(4, user.getId());
+                    statement.executeUpdate();
+                }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to update customer", e);
+        }
 
     }
 
     @Override
-    public void updatePassword(AppUser user, String password) {
-
+    //TODO: (Scrivimi qui come vuoi che faccia ed eseguo) questo metodo è comune a tutti gli user
+    // pensavo la creazione di un classe padre jdbc per gli user
+    public void updatePassword(AppUser user, String hashedPassword, TransactionContext context) {
+        if (user.getId() == null || user.getId() <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+        Connection conn = getConnection(context);
+        String sqlUser = "UPDATE app_users SET hashPassword = ? WHERE id = ?";
+        try(PreparedStatement statement = conn.prepareStatement(sqlUser)){
+            statement.setString(1, hashedPassword);
+            statement.setInt(2, user.getId());
+            statement.executeUpdate();
+        }catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to update customer password", e);
+        }
     }
 
     @Override

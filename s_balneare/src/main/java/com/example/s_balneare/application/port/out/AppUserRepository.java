@@ -9,8 +9,8 @@ import java.util.Optional;
 public interface AppUserRepository <T extends AppUser>{
     Integer save(T user, String password, TransactionContext context);
     void delete(Integer id, TransactionContext context);
-    void update(T user);
-    void updatePassword(AppUser user, String password);
+    void update(T user, TransactionContext context);
+    void updatePassword(AppUser user, String password, TransactionContext context);
     Optional<T> findById(Integer id);
     Optional<T> findByUsername(String username);
     Optional<T> findByEmail(String email);

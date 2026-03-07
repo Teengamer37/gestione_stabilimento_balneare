@@ -22,12 +22,12 @@ public class JdbcOwnerUserRepository implements OwnerUserRepository {
     }
 
     @Override
-    public void update(OwnerUser user) {
+    public void update(OwnerUser user, TransactionContext context) {
 
     }
 
     @Override
-    public void updatePassword(AppUser user, String password) {
+    public void updatePassword(AppUser user, String password, TransactionContext context) {
 
     }
 

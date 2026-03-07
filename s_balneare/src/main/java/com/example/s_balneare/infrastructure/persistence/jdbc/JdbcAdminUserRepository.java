@@ -23,12 +23,12 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
     }
 
     @Override
-    public void update(AdminUser user) {
+    public void update(AdminUser user, TransactionContext context) {
 
     }
 
     @Override
-    public void updatePassword(AppUser user, String password) {
+    public void updatePassword(AppUser user, String password, TransactionContext context) {
 
     }
 

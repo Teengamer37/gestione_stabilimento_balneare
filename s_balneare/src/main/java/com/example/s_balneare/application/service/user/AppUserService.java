@@ -21,26 +21,26 @@ public abstract class AppUserService<T extends AppUser> {
     public void updateName(Integer id, String name) {
         T appUser = getUserOrThrow(id);
         appUser.updateName(name);
-        appUserRepository.update(appUser);
+        appUserRepository.update(appUser, );
     }
     public void updateSurname(Integer id, String surname) {
         T appUser = getUserOrThrow(id);
         appUser.updateSurname(surname);
-        appUserRepository.update(appUser);
+        appUserRepository.update(appUser, );
     }
     public void updateUsername(Integer id, String username) {
         T appUser = getUserOrThrow(id);
         appUser.updateUsername(username);
-        appUserRepository.update(appUser);
+        appUserRepository.update(appUser, );
     }
     public void updateEmail(Integer id, String email) {
         T appUser = getUserOrThrow(id);
         appUser.updateEmail(email);
-        appUserRepository.update(appUser);
+        appUserRepository.update(appUser, );
     }
     public void updatePassword(Integer id, String password){
         T appUser = getUserOrThrow(id);
-        appUserRepository.updatePassword(appUser, password);
+        appUserRepository.updatePassword(appUser, password, );
     }
 
     protected T getUserOrThrow(Integer id){
