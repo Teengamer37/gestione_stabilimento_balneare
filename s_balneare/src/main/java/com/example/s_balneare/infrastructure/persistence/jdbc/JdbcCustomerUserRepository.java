@@ -1,5 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
+import com.example.s_balneare.application.port.in.RegistrationRequest;
 import com.example.s_balneare.application.port.out.CustomerUserRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.*;
@@ -136,7 +137,32 @@ public class JdbcCustomerUserRepository implements CustomerUserRepository {
     }
 
     @Override
+    //TODO: per la costruzione del costumer utilizzo il costruttore di customero passo per la request e poi alla factory,
+    // io sono per la seconda opzione, sostituisci il commento con quello che ritieni più consono io eseguo
     public Optional<CustomerUser> findById(Integer id) {
+        if (id == null || id <= 0) return Optional.empty();
+        // Query con JOIN per recuperare tutti i dati dell'entità specializzata
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
+                "c.phoneNumber, c.addressId, c.active " +
+                "FROM app_users u " +
+                "INNER JOIN customers c ON u.id = c.id " +
+                "WHERE u.id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    // Costruisco l'oggetto Request e mando alla factory
+                    //RegistrationRequest request = new RegistrationRequest(
+                    //);
+
+                    //return Optional.of(user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find customer by id", e);
+        }
         return Optional.empty();
     }
 
