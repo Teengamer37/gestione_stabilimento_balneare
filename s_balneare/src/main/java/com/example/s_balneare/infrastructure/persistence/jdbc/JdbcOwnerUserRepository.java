@@ -5,6 +5,7 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.OwnerUser;
 
+import java.util.List;
 import java.util.Optional;
 
 //FIXME: un macello qui pt2
@@ -47,7 +48,7 @@ public class JdbcOwnerUserRepository implements OwnerUserRepository {
     }
 
     @Override
-    public Optional<OwnerUser> findAll() {
+    public List<OwnerUser> findAll() {
         return Optional.empty();
     }
 }

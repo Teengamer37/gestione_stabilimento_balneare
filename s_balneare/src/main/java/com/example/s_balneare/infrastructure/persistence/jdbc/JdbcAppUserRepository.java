@@ -7,6 +7,9 @@ import com.example.s_balneare.domain.user.CustomerUser;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public abstract class JdbcAppUserRepository<T extends AppUser> implements AppUserRepository<T> {
 
@@ -19,6 +22,7 @@ public abstract class JdbcAppUserRepository<T extends AppUser> implements AppUse
     protected abstract void saveSpecificData(Connection conn, Integer newId, T user) throws SQLException;
     protected abstract void deleteSpecificData(Connection conn, Integer newId) throws SQLException;
     protected abstract void updateSpecificData(Connection conn, T user) throws SQLException;
+    protected abstract T mapToEntity(ResultSet rs) throws SQLException;
 
     // METIODO HELPER: utilizzato per la gestione della connession
     protected Connection getConnection(TransactionContext context) {
@@ -109,4 +113,33 @@ public abstract class JdbcAppUserRepository<T extends AppUser> implements AppUse
         }
     }
 
+    protected List<T> executeFindAll(String sql){
+        List<T> list = new ArrayList<>();
+        try (Connection conn = dataSource.getConnection();
+            PreparedStatement statement = conn.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapToEntity(rs)); // Usa il tuo metodo astratto per mappare ogni riga
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to fetch all user", e);
+        }
+        return list;
+    }
+
+    protected Optional<T> executeFindQuery(String sql, Object parameter){
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setObject(1, parameter);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapToEntity(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find user", e);
+        }
+        return Optional.empty();
+    }
 }

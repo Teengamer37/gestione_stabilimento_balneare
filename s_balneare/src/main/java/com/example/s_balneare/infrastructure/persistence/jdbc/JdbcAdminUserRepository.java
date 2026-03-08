@@ -5,6 +5,7 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AdminUser;
 import com.example.s_balneare.domain.user.AppUser;
 
+import java.util.List;
 import java.util.Optional;
 
 //TODO: continuare l'implementazione
@@ -48,7 +49,7 @@ public class JdbcAdminUserRepository implements AdminUserRepository {
     }
 
     @Override
-    public Optional<AdminUser> findAll() {
+    public List<AdminUser> findAll() {
         return Optional.empty();
     }
 }

@@ -2,8 +2,8 @@ package com.example.s_balneare.application.port.out;
 
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
-import com.example.s_balneare.domain.user.CustomerUser;
 
+import java.util.List;
 import java.util.Optional;
 
 //interfacce per manipolazione oggetti di tipo AppUser
@@ -15,5 +15,5 @@ public interface AppUserRepository <T extends AppUser>{
     Optional<T> findById(Integer id);
     Optional<T> findByUsername(String username);
     Optional<T> findByEmail(String email);
-    Optional<T> findAll();
+    List<T> findAll();
 }
