@@ -5,33 +5,40 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.OwnerUser;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 //FIXME: un macello qui pt2
 
-public class JdbcOwnerUserRepository implements OwnerUserRepository {
+public class JdbcOwnerUserRepository
+        extends JdbcAppUserRepository<OwnerUser>
+        implements OwnerUserRepository {
 
-    @Override
-    public Integer save(OwnerUser user, String password, TransactionContext context) {
-        return 0;
+
+    protected JdbcOwnerUserRepository(DataSource dataSource) {
+        super(dataSource);
     }
 
     @Override
-    public void delete(Integer id, TransactionContext context) {
-
+    protected void saveSpecificData(Connection conn, Integer newId, OwnerUser user) throws SQLException {
+        //Scrivere qui il salvataggio di attributi aggiuntivi di Admin
     }
 
     @Override
-    public void update(OwnerUser user, TransactionContext context) {
-
+    protected void deleteSpecificData(Connection conn, Integer newId) throws SQLException {
+        //Scrivere qui l'eliminazione di attributi aggiuntivi di Admin
     }
 
     @Override
-    public void updatePassword(AppUser user, String password, TransactionContext context) {
-
+    protected void updateSpecificData(Connection conn, OwnerUser user) throws SQLException {
+        //Scrivere qui l'aggiornamento di attributi aggiuntivi di Admin
     }
 
+    //TODO: scrivere query e controlli metodo find
     @Override
     public Optional<OwnerUser> findById(Integer id) {
         return Optional.empty();
@@ -49,6 +56,13 @@ public class JdbcOwnerUserRepository implements OwnerUserRepository {
 
     @Override
     public List<OwnerUser> findAll() {
-        return Optional.empty();
+        return List.of();
     }
+
+    //TODO: uniformità costruzione user
+    @Override
+    protected OwnerUser mapToEntity(ResultSet rs) throws SQLException {
+        return null;
+    }
+
 }
