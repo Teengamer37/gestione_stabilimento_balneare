@@ -12,6 +12,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Beach tramite
+ * libreria JDBC.
+ * Detiene anche riferimenti alle varie DAO del package attuale per dividere ancora meglio le operazioni.
+ * Nella maggior parte dei casi, questa Repository orchestra le DAO per l'interazione tra oggetti e Database.
+ * @see com.example.s_balneare.application.port.out.BeachRepository BeachRepository
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachInventoryDao JdbcBeachInventoryDao
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachServicesDao JdbcBeachServicesDao
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcParkingDao JdbcParkingDao
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao JdbcZoneDao
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSeasonDao JdbcSeasonDao
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSpotDao JdbcSpotDao
+ */
 public class JdbcBeachRepository implements BeachRepository {
     private final DataSource dataSource;
 
@@ -33,9 +46,14 @@ public class JdbcBeachRepository implements BeachRepository {
         this.spotDao = new JdbcSpotDao(zoneDao);
     }
 
-    //---- METODO HELPER ----
-    //prende il token vuoto (TransactionContext)
-    //lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+    /**
+     * METODO HELPER:
+     * prende il token vuoto (TransactionContext)
+     * e lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     * @param context Token vuoto
+     * @return oggetto java.sql.Connection implementato in JDBC
+     * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
+     */
     private Connection getConnection(TransactionContext context) {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
@@ -43,9 +61,14 @@ public class JdbcBeachRepository implements BeachRepository {
         return jdbcContext.getConnection();
     }
 
-    //inserimento nuova spiaggia nel DB
-    //DA USARE SE E SOLO SE SI HA UN'ISTANZA LIBERA E NON ASSOCIATA DI ADDRESS
-    //SE USATA A CASO -> EXCEPTION 100%
+    /**
+     * Inserimento nuova spiaggia nel DB.
+     * DA USARE SE E SOLO SE SI HA UN'ISTANZA LIBERA E NON ASSOCIATA DI ADDRESS!
+     * SE USATA A CASO -> EXCEPTION 100%
+     * @param beach Nuova spiaggia da aggiungere
+     * @return ID generato dal Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public Integer save(Beach beach) {
         //apro connessione
@@ -77,7 +100,15 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //inserimento nuova spiaggia nel DB
+    /**
+     * Inserimento nuova spiaggia nel DB
+     * @param beach Nuova spiaggia da aggiungere
+     * @param context Connessione JDBC
+     * @return ID generato dal Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se il beach non ha parametri corretti
+     * @throws SQLException se ci sono problemi col Database
+     */
     @Override
     public Integer save(Beach beach, TransactionContext context) {
         //estraggo la connection JDBC
@@ -137,7 +168,12 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //aggiorno spiaggia presente nel DB
+    /**
+     * Aggiorno spiaggia presente nel DB
+     * @param beach oggetto da aggiornare (stesso ID, attributi diversi)
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se il beach non ha parametri corretti
+     */
     @Override
     public void update(Beach beach) {
         //check validità ID
@@ -225,8 +261,12 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //TODO: controlla necessità TransactionContext
-    //permette di eliminare una spiaggia
+    /**
+     * Permette di eliminare una spiaggia
+     * @param id ID della spiaggia da eliminare
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se l'ID non è valido
+     */
     @Override
     public void delete(Integer id) {
         //check validità ID
@@ -271,7 +311,11 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //stampa TUTTE le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse)
+    /**
+     * Stampa TUTTE le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse)
+     * @return Lista di spiagge trovate nel Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     public List<Beach> findAll() {
         String sql = "SELECT b.*, " +
                 "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
@@ -343,7 +387,13 @@ public class JdbcBeachRepository implements BeachRepository {
         return beaches;
     }
 
-    //cerca una spiaggia per ID e la restituisce
+    /**
+     * Cerca una spiaggia per ID e la restituisce
+     * @param id ID della spiaggia da cercare
+     * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se l'ID inserito non è valido
+     */
     @Override
     public Optional<Beach> findById(Integer id) {
         //check validità ID
@@ -439,6 +489,13 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
+    /**
+     * Cerca tutte le stagioni associate ad una spiaggia
+     * @param beachId ID della spiaggia da cercare per le stagioni
+     * @return una lista di stagioni che si riferiscono alla spiaggia
+     * @throws IllegalArgumentException se l'ID passato non è valido
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public List<Season> findBeachSeasons(Integer beachId) {
         if (beachId == null || beachId <= 0) {
@@ -453,6 +510,13 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
+    /**
+     * Cerca spiaggia per ID del proprietario
+     * @param ownerId ID del proprietario
+     * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se l'ID inserito non è valido
+     */
     @Override
     public Optional<Beach> findByOwnerId(Integer ownerId) {
         if (ownerId == null || ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
@@ -483,6 +547,13 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
+    /**
+     * Aggiorna la colonna active di una spiaggia specifica
+     * @param beachId ID della spiaggia
+     * @param active Nuovo stato della spiaggia
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se l'ID non è valido
+     */
     @Override
     public void updateStatus(Integer beachId, boolean active) {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");

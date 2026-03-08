@@ -5,7 +5,9 @@ import com.example.s_balneare.domain.booking.Booking;
 
 import java.util.List;
 
-//contiene metodi per gestire la collezione di bookings salvati nel database
+/**
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
+ */
 public class BookingService {
     private final BookingRepository bookingRepository;
 
@@ -13,7 +15,11 @@ public class BookingService {
         this.bookingRepository = bookingRepository;
     }
 
-    //aggiunta booking nel DB
+    /**
+     * Aggiunta booking nel DB
+     * @param booking Nuovo booking da aggiungere
+     * @return ID del booking aggiunto generato dal Database
+     */
     public int addBooking(Booking booking) {
         //check spot occupati
         List<Integer> occupiedSpots = bookingRepository.findOccupiedSpots(booking.getBeachId(), booking.getDate());
@@ -27,7 +33,10 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    //ricerca, aggiorna stato in CONFIRMED e salva booking nel DB
+    /**
+     * Ricerca, aggiorna stato in CONFIRMED e salva booking nel DB
+     * @param id Identificatore booking da manipolare nel DB
+     */
     public void confirmBooking(Integer id) {
         Booking booking = getBookingOrThrow(id);
 
@@ -36,7 +45,10 @@ public class BookingService {
         bookingRepository.update(booking);
     }
 
-    //ricerca, aggiorna stato in REJECTED e salva booking nel DB
+    /**
+     * Ricerca, aggiorna stato in REJECTED e salva booking nel DB
+     * @param id Identificatore booking da manipolare nel DB
+     */
     public void rejectBooking(Integer id) {
         Booking booking = getBookingOrThrow(id);
 
@@ -45,7 +57,10 @@ public class BookingService {
         bookingRepository.update(booking);
     }
 
-    //ricerca, aggiorna stato in CANCELLED e salva booking nel DB
+    /**
+     * Ricerca, aggiorna stato in CANCELLED e salva booking nel DB
+     * @param id Identificatore booking da manipolare nel DB
+     */
     public void cancelBooking(Integer id) {
         Booking booking = getBookingOrThrow(id);
 
@@ -54,7 +69,18 @@ public class BookingService {
         bookingRepository.update(booking);
     }
 
-    //ricerca, aggiorna gli extra e salva booking nel DB
+    /**
+     * Ricerca, aggiorna gli extra e salva booking nel DB
+     * @param id Identificatore booking da manipolare nel DB
+     * @param extraSdraio Numero di sdraio extra da aggiungere alla prenotazione
+     * @param extraLettini Numero di lettini extra da aggiungere alla prenotazione
+     * @param extraCamerini Numero di camerini da aggiungere alla prenotazione
+     * @param extraSedie Numero di sedie extra da aggiungere alla prenotazione
+     * @param availableSdraio Numero di sdraio prenotabili nella spiaggia in quel giorno
+     * @param availableLettini Numero di lettini prenotabili nella spiaggia in quel giorno
+     * @param availableCamerini Numero di camerini prenotabili nella spiaggia in quel giorno
+     * @param availableSedie Numero di sedie prenotabili nella spiaggia in quel giorno
+     */
     public void addExtras (Integer id,
                            int extraSdraio, int extraLettini,
                            int extraCamerini, int extraSedie,
@@ -70,8 +96,13 @@ public class BookingService {
         bookingRepository.update(booking);
     }
 
-    //metodo privato che serve nelle operazioni sensibili (in questo caso negli update)
-    //cerca in DB -> se restituisce NULL, allora interrompo tutto
+    /**
+     * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
+     * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     * @param id Identificativo booking da cercare
+     * @return oggetto Booking con quell'ID
+     * @throws IllegalArgumentException se il booking non è stato trovato nel DB
+     */
     private Booking getBookingOrThrow(Integer id) {
         return bookingRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Booking not found with id: " + id));

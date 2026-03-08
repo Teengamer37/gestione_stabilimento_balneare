@@ -1,5 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
+import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.layout.Spot;
 import com.example.s_balneare.domain.layout.SpotType;
 import com.example.s_balneare.domain.layout.Zone;
@@ -13,6 +14,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * DAO che permette la manipolazione facilitata della tabella spots nel Database attraverso JDBC.
+ * Essa è in stretta collaborazione con JdbcBeachRepository e JdbcZoneDao.
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao JdbcZoneDao
+ */
 class JdbcSpotDao {
     private final JdbcZoneDao zoneDao;
 
@@ -20,12 +27,20 @@ class JdbcSpotDao {
         this.zoneDao = zoneDao;
     }
 
-    //sincronizzo tutto il grafo di una lista di spot
-    //creazione zone -> spots
+    /**
+     * Sincronizzo tutto il grafo di una lista di spot:
+     * creazione zone -> spots
+     * @param beachId ID della spiaggia
+     * @param zones Lista di zone da sincronizzare
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     */
     void syncZones(Integer beachId, List<Zone> zones, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
         if (zones == null || zones.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set");
 
+        //passo 1: eliminazione zone non incluse nella lista passata, ma presenti nel Database
         //trovo i nomi delle Zone salvate nel DB
         List<String> dbZoneNames = zoneDao.findZoneNamesByBeachId(beachId, connection);
 
@@ -45,7 +60,7 @@ class JdbcSpotDao {
         if (zones.isEmpty()) return;
 
 
-        //creazione zone (se non già inserite)
+        //passo 2: creazione zone (se non già inserite)
         zoneDao.ensureZonesExist(beachId, zoneNames, connection);
 
         for (Zone zone : zones) {
@@ -57,7 +72,14 @@ class JdbcSpotDao {
         }
     }
 
-    //sincronizzo (aggiungo/aggiorno) una singola Zone
+    /**
+     * Sincronizzo (aggiungo/aggiorno) una singola Zone
+     * @param beachId ID della spiaggia
+     * @param zone Zona da sincronizzare
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     */
     void syncZone(Integer beachId, Zone zone, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
         if (zone == null) throw new IllegalArgumentException("ERROR: zone not valid");
@@ -69,8 +91,16 @@ class JdbcSpotDao {
         upsertSpotsForZone(beachId, zone.name(), zone.spots(), connection);
     }
 
-    //elimina il layout fisico di tutte le Zone connesse ad una Beach
-    //le Zone verranno eliminate più tardi con JdbcZoneDao.deleteOrphanedZones()
+    /**
+     * Elimina il layout fisico di tutte le Zone connesse ad una Beach.
+     * Le Zone verranno eliminate più tardi con JdbcZoneDao.deleteOrphanedZones()
+     * @param beachId ID della spiaggia
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao#deleteOrphanedZones(Integer, Connection) JdbcZoneDao.deleteOrphanedZones()
+     * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository#update(Beach) JdbcBeachRepository.update()
+     */
     void deleteAllZones(Integer beachId, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) {
             throw new IllegalArgumentException("ERROR: beachId not valid");
@@ -84,7 +114,13 @@ class JdbcSpotDao {
         }
     }
 
-    //trova tutte le Zone di una Beach
+    /**
+     * Trova tutte le Zone di una Beach
+     * @param beachId ID della spiaggia
+     * @param conn Connessione JDBC
+     * @return Lista di Zone trovate di quella spiaggia
+     * @throws SQLException se ci sono problemi col Database
+     */
     List<Zone> findZonesByBeachId(Integer beachId, Connection conn) throws SQLException {
         //uso una Map<nome + lista di Spot> per raggruppare gli Spot per ogni Zone
         Map<String, List<Spot>> zoneMap = new HashMap<>();
@@ -130,7 +166,15 @@ class JdbcSpotDao {
 
 
     //HELPERS
-    //inserisce vari Spot per una determinata Zone
+    /**
+     * Inserisce vari Spot per una determinata Zone
+     * @param beachId ID della spiaggia
+     * @param zoneName Nome della zona
+     * @param spots Lista di Spot da inserire
+     * @param conn Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     */
     private void upsertSpotsForZone(Integer beachId, String zoneName, List<Spot> spots, Connection conn) throws SQLException {
         if (spots == null || spots.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be set for zone");
 
@@ -159,7 +203,14 @@ class JdbcSpotDao {
         }
     }
 
-    //cancella tutti gli Spot di una specifica Zone
+    /**
+     * Cancella tutti gli Spot di una specifica Zone
+     * @param beachId ID della spiaggia
+     * @param zoneName Nome della zona
+     * @param conn Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     */
     private void deleteSpotsForZone(Integer beachId, String zoneName, Connection conn) throws SQLException {
         String sql = "DELETE FROM spots WHERE beachId = ? AND zoneName = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -169,7 +220,14 @@ class JdbcSpotDao {
         }
     }
 
-    //cancella i singoli Spot che non esistono più nell'oggetto Java (quelli non associati a nessuna Zone)
+    /**
+     * Cancella i singoli Spot che non esistono più nell'oggetto Java (quelli non associati a nessuna Zone)
+     * @param beachId ID della spiaggia
+     * @param zoneName Nome della zona
+     * @param javaSpots Lista di Spot da controllare
+     * @param conn Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     private void deleteMissingSpots(Integer beachId, String zoneName, List<Spot> javaSpots, Connection conn) throws SQLException {
         if (javaSpots == null) javaSpots = new ArrayList<>();
 

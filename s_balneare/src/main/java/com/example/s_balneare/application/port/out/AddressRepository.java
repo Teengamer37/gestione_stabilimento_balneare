@@ -3,11 +3,14 @@ package com.example.s_balneare.application.port.out;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
-//interfacce per manipolazione oggetti di tipo Address
+/**
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare oggetti di tipo Address.
+ * Implementata in:
+ * @see com.example.s_balneare.application.service.AddressService AddressService
+ */
 public interface AddressRepository {
     Integer save(Address address);
     Integer save(Address address, TransactionContext context);

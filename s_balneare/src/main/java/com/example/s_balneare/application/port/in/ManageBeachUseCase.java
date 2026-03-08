@@ -6,6 +6,11 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach
+ * Implementata in:
+ * @see com.example.s_balneare.application.service.beach.BeachService BeachService
+ */
 public interface ManageBeachUseCase {
     //updates a Beach
     void updateGeneralInfo(Integer id, BeachGeneral newGeneral);
@@ -14,7 +19,7 @@ public interface ManageBeachUseCase {
     void updateParking(Integer id, Parking newParking);
     void updateExtraInfo(Integer id, String extraInfo);
 
-    //update active di Beach
+    //update attributo active di Beach
     void setBeachActive(Integer id, boolean active);
 
     //elementi Season (solo con add, business logic)

@@ -11,6 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Booking tramite
+ * libreria JDBC.
+ * @see com.example.s_balneare.application.port.out.BookingRepository BookingRepository
+ */
 public class JdbcBookingRepository implements BookingRepository {
     private final DataSource dataSource;
 
@@ -18,7 +23,13 @@ public class JdbcBookingRepository implements BookingRepository {
         this.dataSource = dataSource;
     }
 
-    //salva nuovo booking nel DB
+    /**
+     * Salva nuovo booking nel DB
+     * @param booking Oggetto Booking da salvare
+     * @return ID generato dal Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws SQLException se ci sono problemi col Database
+     */
     @Override
     public Integer save(Booking booking) {
         //query
@@ -87,7 +98,12 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
-    //cancella booking dal DB
+    /**
+     * Cancella booking dal DB
+     * @param id ID del booking da cancellare
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public void delete(Integer id) {
         //check validità ID
@@ -109,7 +125,12 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
-    //aggiornamento booking nel DB
+    /**
+     * Aggiornamento booking nel DB
+     * @param booking oggetto Booking da aggiornare nel DB
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public void update(Booking booking) {
         //check validità ID
@@ -137,7 +158,13 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
-    //trova booking dal DB da ID
+    /**
+     * Trova booking dal DB da ID
+     * @param id ID del Booking da cercare nel DB
+     * @return oggetto Optional dal quale, se trovato lil booking, può essere estratto l'oggetto Booking; altri metodi altrimenti
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public Optional<Booking> findById(Integer id) {
         //check validità ID
@@ -195,7 +222,15 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
-    //trova spot occupati per una data specifica
+    //FIXME: probabile metodo da mettere in un successivo Use Case
+    /**
+     * Trova spot occupati per una data specifica
+     * @param beachId ID della spiaggia
+     * @param date Data da cercare
+     * @return Una lista di ID di Spots occupati di quella spiaggia in quel giorno
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public List<Integer> findOccupiedSpots(Integer beachId, LocalDate date) {
         //check validità parametri

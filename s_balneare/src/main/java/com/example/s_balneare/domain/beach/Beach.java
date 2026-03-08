@@ -5,30 +5,6 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * BUSINESS LOGIC: una spiaggia, appena creata, deve avere:
- * - id (uguale a zero, se deve essere salvato nel DB, poi messo uguale all'ID assegnato dal DB),
- * - ownerId (obbligatorio averlo a creazione, può essere modificato),
- * - addressId (obbligatorio avere PRIMA un oggetto Address prima di creare Beach, non modificabile se non tramite metodi
- * messi a disposizione da Address),
- * - beachGeneral (obbligatorio averlo, creare prima un oggetto BeachGeneral prima di creare Beach, modificabile tramite
- * metodi BeachGeneral),
- * - beachInventory (non obbligatorio alla creazione, aggiunta tramite metodo updateInventory(), modificabile solo
- * tramite metodi di BeachInventory),
- * - beachServices (non obbligatorio alla creazione, aggiunta tramite metodo updateServices(), modificabile solo
- * tramite metodi di BeachServices),
- * - parking (non obbligatorio alla creazione, aggiunta tramite metodo updateParking(), modificabile solo tramite metodi
- * di Parking),
- * - seasons (se inserito null, viene sostituita da una lista vuota; le Season possono essere aggiunte e modificate, ma
- * NON ELIMINATE),
- * - zones (se inserito null, viene sostituita da una lista vuota; le zones possono essere aggiunte, modificate ed
- * eliminate SOLO SE NON APPARTENGONO A NESSUNA SEASON),
- * - extraInfo (informazioni aggiuntive che non possono essere espresse tramite gli attributi presenti),
- * - active (inizialmente disattivata: una spiaggia può essere attivata SE E SOLO SE ha beachInventory, beachServices e
- * parking implementate e abbia almeno una stagione e una zona; se negli update successivi viene eliminato qualcosa, la
- * spiaggia viene automaticamente disattivata).
- */
-
 public class Beach {
     //attributi
     private final Integer id;

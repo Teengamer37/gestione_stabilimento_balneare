@@ -6,7 +6,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * DAO che permette la manipolazione facilitata della tabella beach_services nel Database attraverso JDBC.
+ * Essa è in stretta collaborazione con JdbcBeachRepository.
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ */
 class JdbcBeachServicesDao {
+    /**
+     * Update/Insert di un oggetto BeachServices nel DB
+     * @param beachId ID della spiaggia
+     * @param srv oggetto BeachServices
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void upsert(Integer beachId, BeachServices srv, Connection connection) throws SQLException {
         //UPDATE se nel caso abbiamo già un beach_services istanziato nel DB
         String updateSql = "UPDATE beach_services " +
@@ -32,6 +44,13 @@ class JdbcBeachServicesDao {
         }
     }
 
+    /**
+     * Inserimento di un oggetto BeachServices nel DB
+     * @param beachId ID della spiaggia
+     * @param srv oggetto BeachServices
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void insert(Integer beachId, BeachServices srv, Connection connection) throws SQLException {
         //INSERT nuovo elemento beach_services
         String insertSql = "INSERT INTO beach_services (beachId, bathrooms, showers, pool, bar, restaurant, wifi, volleyballField) " +
@@ -50,6 +69,12 @@ class JdbcBeachServicesDao {
         }
     }
 
+    /**
+     * Eliminazione di un oggetto BeachServices dal DB
+     * @param beachId ID della spiaggia
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void delete(Integer beachId, Connection connection) throws SQLException {
         //DELETE un elemento dentro beach_services dato l'ID
         String sql = "DELETE FROM beach_services WHERE beachId = ?";

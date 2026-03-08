@@ -10,6 +10,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Address tramite
+ * libreria JDBC.
+ * @see com.example.s_balneare.application.port.out.AddressRepository AddressRepository
+ */
 public class JdbcAddressRepository implements AddressRepository {
     private final DataSource dataSource;
 
@@ -17,9 +22,14 @@ public class JdbcAddressRepository implements AddressRepository {
         this.dataSource = dataSource;
     }
 
-    //---- METODO HELPER ----
-    //prende il token vuoto (TransactionContext)
-    //lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+    /**
+     * METODO HELPER:
+     * prende il token vuoto (TransactionContext) e
+     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+     * @param context Token vuoto
+     * @return oggetto java.sql.Connection implementato in JDBC
+     * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
+     */
     private Connection getConnection(TransactionContext context) {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
@@ -27,8 +37,13 @@ public class JdbcAddressRepository implements AddressRepository {
         return jdbcContext.getConnection();
     }
 
-    //salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User
-    //DA USARE SOLO SE SI HA INTENZIONE IN UN FUTURO VICINO DI ESEGUIRE MANUALMENTE UN SALVATAGGIO DI BEACH O USER
+    /**
+     * Salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User.
+     * DA USARE SOLO SE SI HA INTENZIONE IN UN FUTURO VICINO DI ESEGUIRE MANUALMENTE UN SALVATAGGIO DI BEACH O USER
+     * @param address Indirizzo da salvare nel Database
+     * @return ID generato dal Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public Integer save(Address address) {
         try (Connection connection = dataSource.getConnection()) {
@@ -39,8 +54,15 @@ public class JdbcAddressRepository implements AddressRepository {
         }
     }
 
-    //salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User
-    //usato direttamente dagli use cases di Beach e User, nessun rischio di avere address non associati
+    /**
+     * Salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User.
+     * Usato direttamente dagli use cases di Beach e User, nessun rischio di avere address non associati
+     * @param address Indirizzo da salvare nel Database
+     * @param context Connessione JDBC
+     * @return ID generato dal Database
+     * @throws SQLException se ci sono problemi col Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public Integer save(Address address, TransactionContext context) {
         //estraggo la connection JDBC
@@ -68,7 +90,12 @@ public class JdbcAddressRepository implements AddressRepository {
         }
     }
 
-    //aggiorna indirizzo nel DB
+    /**
+     * Aggiorna indirizzo nel DB
+     * @param address Indirizzo da aggiornare
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public void update(Address address) {
         //check validità ID
@@ -94,7 +121,13 @@ public class JdbcAddressRepository implements AddressRepository {
         }
     }
 
-    //cerca indirizzo nel DB per ID
+    /**
+     * Cerca indirizzo nel DB per ID
+     * @param id ID dell'indirizzo
+     * @return oggetto Optional dal quale, se trovato l'indirizzo, può essere estratto l'oggetto Address; altri metodi altrimenti
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public Optional<Address> findById(Integer id) {
         //check validità ID
@@ -127,7 +160,13 @@ public class JdbcAddressRepository implements AddressRepository {
         return Optional.empty();
     }
 
-    //cerca indirizzi nel DB per città
+    /**
+     * Cerca indirizzi nel DB per città
+     * @param city Città da cercare
+     * @return una lista di indirizzi che hanno la stessa città passata come parametro
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public List<Address> findByCity(String city) {
         //check validità stringa
@@ -157,7 +196,13 @@ public class JdbcAddressRepository implements AddressRepository {
         return addresses;
     }
 
-    //cerca indirizzi nel DB per paese
+    /**
+     * Cerca indirizzi nel DB per paese
+     * @param country Paese da cercare
+     * @return una lista di indirizzi che hanno lo stesso paese passato come parametro
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public List<Address> findByCountry(String country) {
         //check validità stringa
@@ -186,8 +231,11 @@ public class JdbcAddressRepository implements AddressRepository {
         return addresses;
     }
 
-    //ritorna tutti gli indirizzi presenti nel DB
-    //(solo scopo di filtraggio e manipolazione in-app + eventuali esperimenti)
+    /**
+     * Ritorna tutti gli indirizzi presenti nel DB
+     * (solo scopo di filtraggio e manipolazione in-app + eventuali esperimenti)
+     * @return una lista di tutti gli indirizzi salvati nel Database
+     */
     @Override
     public List<Address> findAll() {
         String sql = "SELECT id, street, streetNumber, city, zipCode, country FROM addresses";
@@ -211,7 +259,10 @@ public class JdbcAddressRepository implements AddressRepository {
         return addresses;
     }
 
-    //elimina un indirizzo dal DB
+    /**
+     * Elimina un indirizzo dal DB
+     * @param id ID dell'indirizzo da eliminare
+     */
     @Override
     public void delete(Integer id) {
         //check validità ID

@@ -6,7 +6,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * DAO che permette la manipolazione facilitata della tabella parkings nel Database attraverso JDBC.
+ * Essa è in stretta collaborazione con JdbcBeachRepository.
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ */
 class JdbcParkingDao {
+    /**
+     * Update/Insert di un oggetto Parking nel DB
+     * @param beachId ID della spiaggia
+     * @param parking oggetto Parking
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void upsert(Integer beachId, Parking parking, Connection connection) throws SQLException {
         //UPDATE se nel caso abbiamo già un parking istanziato nel DB
         String updateSql = "UPDATE parkings " +
@@ -30,6 +42,13 @@ class JdbcParkingDao {
         }
     }
 
+    /**
+     * Inserimento di un oggetto Parking nel DB
+     * @param beachId ID della spiaggia
+     * @param parking oggetto Parking
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void insert(Integer beachId, Parking parking, Connection connection) throws SQLException {
         //INSERT nuovo elemento parkings
         String insertSql = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) " +
@@ -46,6 +65,12 @@ class JdbcParkingDao {
         }
     }
 
+    /**
+     * Eliminazione di un oggetto Parking dal DB
+     * @param beachId ID della spiaggia
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void delete(Integer beachId, Connection connection) throws SQLException {
         //DELETE un elemento dentro parkings dato l'ID
         String sql = "DELETE FROM parkings WHERE beachId = ?";

@@ -5,11 +5,12 @@ import com.example.s_balneare.application.port.out.BeachRepository;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.layout.Zone;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
-//contiene metodi per gestire la collezione di beaches salvati nel database
+/**
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Beach tra l'app Java e il Database.
+ */
 public class BeachService implements ManageBeachUseCase {
     private final BeachRepository beachRepository;
 
@@ -17,8 +18,12 @@ public class BeachService implements ManageBeachUseCase {
         this.beachRepository = beachRepository;
     }
 
-    //aggiornamento info generali spiaggia
-    //prendo spiaggia da DB -> modifico parametro -> update nel DB
+    /**
+     * Aggiornamento info generali spiaggia:
+     * Prendo spiaggia da DB -> modifico parametro -> update nel DB
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param newGeneral Nuovo oggetto BeachGeneral da salvare
+     */
     @Override
     public void updateGeneralInfo(Integer id, BeachGeneral newGeneral) {
         Beach beach = getBeachOrThrow(id);
@@ -26,7 +31,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiornamento inventario spiaggia
+    /**
+     * Aggiornamento inventario spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param newInventory Nuovo oggetto BeachInventory da salvare
+     */
     @Override
     public void updateInventory(Integer id, BeachInventory newInventory) {
         Beach beach = getBeachOrThrow(id);
@@ -34,7 +43,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiornamento servizi spiaggia
+    /**
+     * Aggiornamento servizi spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param newServices Nuovo oggetto BeachServices da salvare
+     */
     @Override
     public void updateServices(Integer id, BeachServices newServices) {
         Beach beach = getBeachOrThrow(id);
@@ -42,7 +55,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiornamento parcheggio spiaggia
+    /**
+     * Aggiornamento parcheggio spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param newParking Nuovo oggetto Parking da salvare
+     */
     @Override
     public void updateParking(Integer id, Parking newParking) {
         Beach beach = getBeachOrThrow(id);
@@ -50,7 +67,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiornamento info extra spiaggia
+    /**
+     * Aggiornamento info extra spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param extraInfo Stringa da sostituire ad extraInfo
+     */
     @Override
     public void updateExtraInfo(Integer id, String extraInfo) {
         Beach beach = getBeachOrThrow(id);
@@ -58,7 +79,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //manipolazione stato attività spiaggia
+    /**
+     * Manipolazione stato attività spiaggia: i metodi chiamati applicheranno le Business Rules definite
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param active Booleana che specifica il nuovo stato della spiaggia
+     */
     @Override
     public void setBeachActive(Integer id, boolean active) {
         //se voglio attivare la spiaggia, controllo se possibile
@@ -76,7 +101,11 @@ public class BeachService implements ManageBeachUseCase {
         }
     }
 
-    //aggiunta stagione in una determinata spiaggia
+    /**
+     * Aggiunta stagione in una determinata spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param season Nuova stagione da aggiungere
+     */
     @Override
     public void addSeason(Integer id, Season season) {
         Beach beach = getBeachOrThrow(id);
@@ -84,7 +113,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiunta lista di stagioni in una determinata spiaggia
+    /**
+     * Aggiunta lista di stagioni in una determinata spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param seasons Lista di stagioni da aggiungere (Business Rules sul parametro applicati nei metodi di Beach)
+     */
     @Override
     public void addSeasons(Integer id, List<Season> seasons) {
         Beach beach = getBeachOrThrow(id);
@@ -92,7 +125,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiunta zona in una determinata spiaggia
+    /**
+     * Aggiunta zona in una determinata spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param zone Nuova zona da aggiungere
+     */
     @Override
     public void addZone(Integer id, Zone zone) {
         Beach beach = getBeachOrThrow(id);
@@ -100,7 +137,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //aggiunta lista di zone in una determinata spiaggia
+    /**
+     * Aggiunta lista di zone in una determinata spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param zones Lista di zone da aggiungere (Business Rules sul parametro applicati nei metodi di Beach)
+     */
     @Override
     public void addZones(Integer id, List<Zone> zones) {
         Beach beach = getBeachOrThrow(id);
@@ -108,6 +149,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
+    /**
+     * Rimozione zona da una determinata spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param zone Zona da rimuovere
+     */
     @Override
     public void removeZone(Integer id, Zone zone) {
         Beach beach = getBeachOrThrow(id);
@@ -115,6 +161,11 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
+    /**
+     * Rimozione lista di zone da una determinata spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @param zones Lista di zone da rimuovere (Business Rules sul parametro applicati nei metodi di Beach)
+     */
     @Override
     public void removeZones(Integer id, List<Zone> zones) {
         Beach beach = getBeachOrThrow(id);
@@ -122,19 +173,35 @@ public class BeachService implements ManageBeachUseCase {
         beachRepository.update(beach);
     }
 
-    //ricerca spiaggia
+    /**
+     * Ricerca spiaggia
+     * @param id Identificatore spiaggia da cercare nel DB
+     * @return oggetto Beach o eccezione in caso di errore
+     * @see #getBeachOrThrow(Integer) getBeachOrThrow
+     */
     @Override
     public Beach getBeach(Integer id) {
         return getBeachOrThrow(id);
     }
 
+    /**
+     * Ricerca spiaggia tramite ID del proprietario
+     * @param ownerId Identificatore proprietario
+     * @return oggetto Optional che restituisce Beach se trovato; se non trovato, possono essere usati metodi come
+     * Optional.isEmpty() per non rischiare manipolazioni con oggetti null
+     */
     @Override
     public Optional<Beach> getOwnerBeach(Integer ownerId) {
         return beachRepository.findByOwnerId(ownerId);
     }
 
-    //metodo privato che serve nelle operazioni sensibili (in questo caso negli update)
-    //cerca in DB -> se restituisce NULL, allora interrompo tutto
+    /**
+     * Metodo privato che serve nelle operazioni sensibili (in questo caso negli update):
+     * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     * @param id Identificativo spiaggia da cercare
+     * @return oggetto Beach con quell'ID
+     * @throws IllegalArgumentException se la spiaggia non è stata trovata nel DB
+     */
     private Beach getBeachOrThrow(Integer id) {
         return beachRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Beach not found with id: " + id));

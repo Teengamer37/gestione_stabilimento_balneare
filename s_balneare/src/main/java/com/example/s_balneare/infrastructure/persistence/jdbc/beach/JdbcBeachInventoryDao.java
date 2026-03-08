@@ -6,7 +6,19 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * DAO che permette la manipolazione facilitata della tabella beach_inventories nel Database attraverso JDBC.
+ * Essa è in stretta collaborazione con JdbcBeachRepository.
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ */
 class JdbcBeachInventoryDao {
+    /**
+     * Update/Insert di un oggetto BeachInventory nel DB
+     * @param beachId ID della spiaggia
+     * @param inv oggetto BeachInventory
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void upsert(Integer beachId, BeachInventory inv, Connection connection) throws SQLException {
         //UPDATE se nel caso abbiamo già un beach_inventories istanziato nel DB
         String updateSql = "UPDATE beach_inventories " +
@@ -31,6 +43,13 @@ class JdbcBeachInventoryDao {
         }
     }
 
+    /**
+     * Inserimento di un oggetto BeachInventory nel DB
+     * @param beachId ID della spiaggia
+     * @param inv oggetto BeachInventory
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void insert(Integer beachId, BeachInventory inv, Connection connection) throws SQLException {
         //INSERT nuovo elemento beach_inventories
         String insertSql = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) " +
@@ -48,6 +67,12 @@ class JdbcBeachInventoryDao {
         }
     }
 
+    /**
+     * Eliminazione di un oggetto BeachInventory dal DB
+     * @param beachId ID della spiaggia
+     * @param connection Connessione JDBC
+     * @throws SQLException se ci sono problemi col Database
+     */
     void delete(Integer beachId, Connection connection) throws SQLException {
         //DELETE un elemento dentro beach_inventories dato l'ID
         String sql = "DELETE FROM beach_inventories WHERE beachId = ?";

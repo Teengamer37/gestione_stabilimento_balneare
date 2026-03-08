@@ -3,13 +3,15 @@ package com.example.s_balneare.application.port.out;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.beach.Season;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.domain.layout.Spot;
 
-import java.sql.Connection;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Beach.
+ * Implementata in:
+ * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ */
 //interfacce per manipolazione oggetti di tipo Beach
 public interface BeachRepository {
     Integer save(Beach beach);

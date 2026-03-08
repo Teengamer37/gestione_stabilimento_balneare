@@ -7,6 +7,12 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+
+/**
+ * Repository che implementa tutti i metodi che permettono di semplificare l'interazione tra i Service e il DB.
+ * Permette di avviare una SQL Transaction con la libreria JDBC.
+ * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager
+ */
 public class JdbcTransactionManager implements TransactionManager {
     private final DataSource dataSource;
 

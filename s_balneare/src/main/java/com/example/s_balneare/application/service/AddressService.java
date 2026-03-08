@@ -5,7 +5,9 @@ import com.example.s_balneare.domain.common.Address;
 
 import java.util.List;
 
-//contiene metodi per gestire la collezione di addresses salvati nel database
+/**
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
+ */
 public class AddressService {
     private final AddressRepository addressRepository;
 
@@ -13,12 +15,20 @@ public class AddressService {
         this.addressRepository = addressRepository;
     }
 
-    //aggiunta nuovo indirizzo associato a utente/spiaggia nel DB
+    /**
+     * Aggiunta nuovo indirizzo associato a utente/spiaggia nel DB
+     * @param address Indirizzo da aggiungere
+     * @return ID univoco generato dal Database
+     */
     public int createAddress(Address address) {
         return addressRepository.save(address);
     }
 
-    //aggiornamento indirizzo presente nel DB
+    /**
+     * Aggiornamento indirizzo presente nel DB
+     * @param id Identificatore indirizzo da cercare nel DB
+     * @param address Parametri da aggiornare
+     */
     public void updateAddress(Integer id, Address address) {
         Address a = getAddressOrThrow(id);
 
@@ -33,28 +43,48 @@ public class AddressService {
         addressRepository.update(updated);
     }
 
-    //ricerca indirizzo nel DB
+    /**
+     * Ricerca indirizzo nel DB
+     * @param id Identificatore indirizzo da cercare nel DB
+     * @return oggetto Address con quell'ID
+     */
     public Address getAddress(Integer id) {
         return getAddressOrThrow(id);
     }
 
-    //ricerca indirizzi nel DB data la città
+    /**
+     * Ricerca indirizzi nel DB data la città
+     * @param city Nome della città
+     * @return Lista di indirizzi che hanno come città quella passata come parametro
+     */
     public List<Address> getAddressesByCity(String city) {
         return addressRepository.findByCity(city);
     }
 
-    //ricerca indirizzi nel DB dato il paese
+    /**
+     * Ricerca indirizzi nel DB dato il paese
+     * @param country Nome del paese
+     * @return Lista di indirizzi che hanno come paese quello passato come parametro
+     */
     public List<Address> getAddressesByCountry(String country) {
         return addressRepository.findByCountry(country);
     }
 
-    //eliminazione indirizzo dal DB
+    /**
+     * Eliminazione indirizzo dal DB
+     * @param id Identificatore indirizzo da eliminare
+     */
     public void deleteAddress(Integer id) {
         addressRepository.delete(id);
     }
 
-    //metodo privato che serve nelle operazioni sensibili (in questo caso in update)
-    //cerca in DB -> se restituisce NULL, allora interrompo tutto
+    /**
+     * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
+     * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     * @param id Identificativo indirizzo da cercare
+     * @return oggetto Address con quell'ID
+     * @throws IllegalArgumentException se l'indirizzo non è stato trovato nel DB
+     */
     private Address getAddressOrThrow(Integer id) {
         return addressRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Address not found with id: " + id));

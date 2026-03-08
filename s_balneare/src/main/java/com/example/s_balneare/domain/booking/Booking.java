@@ -94,34 +94,50 @@ public class Booking {
 
 
     //---- METODI DI BUSINESS ----
-    //conferma booking solo se status == PENDING
+
+    /**
+     * Conferma booking solo se status == PENDING
+     */
     public void confirmBooking() {
         checkStatusIsPending("be confirmed");
         status = BookingStatus.CONFIRMED;
     }
 
-    //rifiuta booking solo se status == PENDING
+    /**
+     * Rifiuta booking solo se status == PENDING
+     */
     public void rejectBooking() {
         checkStatusIsPending("be rejected");
         status = BookingStatus.REJECTED;
     }
 
-    //cancella booking solo se status == PENDING || CONFIRMED
+    /**
+     * Cancella booking solo se status == PENDING || CONFIRMED
+     */
     public void cancelBooking() {
         checkStatusPendingOrConfirmed("be cancelled");
         status = BookingStatus.CANCELLED;
     }
 
-    //aggiungi extra sdraio con controlli
+    /**
+     * Aggiungi extra sdraio con controlli
+     * @param quantity Numero di sdraio da aggiungere
+     * @param availableSdraio Numero di sdraio disponibili
+     */
     public void addExtraSdraio(int quantity, int availableSdraio) {
         checkStatusPendingOrConfirmed("add extra quantity");
         checkAddedQuantity(quantity, availableSdraio);
 
         extraSdraio += quantity;
+        //controllo stato booking (se CONFIRMED, ritorna a PENDING)
         revertToPendingIfConfirmed();
     }
 
-    //aggiungi extra lettini con controlli
+    /**
+     * Aggiungi extra lettini con controlli
+     * @param quantity Numero di lettini da aggiungere
+     * @param availableLettini Numero di lettini disponibili
+     */
     public void addExtraLettini(int quantity, int availableLettini) {
         checkStatusPendingOrConfirmed("add extra quantity");
         checkAddedQuantity(quantity, availableLettini);
@@ -130,7 +146,11 @@ public class Booking {
         revertToPendingIfConfirmed();
     }
 
-    //aggiungi extra sedie con controlli
+    /**
+     * Aggiungi extra sedie con controlli
+     * @param quantity Numero di sedie da aggiungere
+     * @param availableSedie Numero di sedie disponibili
+     */
     public void addExtraSedie(int quantity, int availableSedie) {
         checkStatusPendingOrConfirmed("add extra quantity");
         checkAddedQuantity(quantity, availableSedie);
@@ -139,7 +159,11 @@ public class Booking {
         revertToPendingIfConfirmed();
     }
 
-    //aggiungi camerini con controlli
+    /**
+     * Aggiungi camerini con controlli
+     * @param quantity Numero di camerini da aggiungere
+     * @param availableCamerini Numero di camerini disponibili
+     */
     public void addCamerini(int quantity, int availableCamerini) {
         checkStatusPendingOrConfirmed("add extra quantity");
         checkAddedQuantity(quantity, availableCamerini);

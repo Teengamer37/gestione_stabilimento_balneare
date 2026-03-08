@@ -5,6 +5,11 @@ import com.example.s_balneare.domain.layout.Zone;
 
 import java.util.List;
 
+/**
+ * Record che prende come parametri tutti gli attributi di Beach e Address.
+ * Usato in:
+ * @see com.example.s_balneare.application.port.in.CreateBeachUseCase CreateBeachUseCase
+ */
 public record CreateBeachCommand(
         //attributi beach
         Integer ownerId,
