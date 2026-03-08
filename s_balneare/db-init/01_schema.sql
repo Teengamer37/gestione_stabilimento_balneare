@@ -133,7 +133,7 @@ CREATE TABLE zone_tariffs (
     priceTenda INT NOT NULL,
     PRIMARY KEY (seasonName,beachId,zoneName),
     FOREIGN KEY (beachId,seasonName) REFERENCES seasons(beachId,name),
-    FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId)
+    FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId) ON UPDATE CASCADE
 );
 
 CREATE TABLE spots (
@@ -144,7 +144,7 @@ CREATE TABLE spots (
     zoneName VARCHAR(50) NOT NULL,
     beachId INT NOT NULL,
     UNIQUE (`row`,`column`,zoneName, beachId),
-    FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId)
+    FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId) ON UPDATE CASCADE
 );
 
 -- GESTIONE APP

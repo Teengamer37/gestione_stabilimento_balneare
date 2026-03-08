@@ -5,6 +5,30 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * BUSINESS LOGIC: una spiaggia, appena creata, deve avere:
+ * - id (uguale a zero, se deve essere salvato nel DB, poi messo uguale all'ID assegnato dal DB),
+ * - ownerId (obbligatorio averlo a creazione, può essere modificato),
+ * - addressId (obbligatorio avere PRIMA un oggetto Address prima di creare Beach, non modificabile se non tramite metodi
+ * messi a disposizione da Address),
+ * - beachGeneral (obbligatorio averlo, creare prima un oggetto BeachGeneral prima di creare Beach, modificabile tramite
+ * metodi BeachGeneral),
+ * - beachInventory (non obbligatorio alla creazione, aggiunta tramite metodo updateInventory(), modificabile solo
+ * tramite metodi di BeachInventory),
+ * - beachServices (non obbligatorio alla creazione, aggiunta tramite metodo updateServices(), modificabile solo
+ * tramite metodi di BeachServices),
+ * - parking (non obbligatorio alla creazione, aggiunta tramite metodo updateParking(), modificabile solo tramite metodi
+ * di Parking),
+ * - seasons (se inserito null, viene sostituita da una lista vuota; le Season possono essere aggiunte e modificate, ma
+ * NON ELIMINATE),
+ * - zones (se inserito null, viene sostituita da una lista vuota; le zones possono essere aggiunte, modificate ed
+ * eliminate SOLO SE NON APPARTENGONO A NESSUNA SEASON),
+ * - extraInfo (informazioni aggiuntive che non possono essere espresse tramite gli attributi presenti),
+ * - active (inizialmente disattivata: una spiaggia può essere attivata SE E SOLO SE ha beachInventory, beachServices e
+ * parking implementate e abbia almeno una stagione e una zona; se negli update successivi viene eliminato qualcosa, la
+ * spiaggia viene automaticamente disattivata).
+ */
+
 public class Beach {
     //attributi
     private final Integer id;
@@ -29,6 +53,7 @@ public class Beach {
         updateOwnerId(ownerId);
         if (addressId == null) throw new IllegalArgumentException("ERROR: addressId cannot be null");
         this.addressId = addressId;
+        if (beachGeneral == null) throw new IllegalArgumentException("ERROR: beachGeneral cannot be null");
         this.beachGeneral = beachGeneral;
         this.beachInventory = beachInventory;
         this.beachServices = beachServices;
@@ -81,7 +106,10 @@ public class Beach {
 
 
     //---- METODI DI BUSINESS ----
-    //permette di modificare la sezione di info extra
+    /**
+     * Permette di modificare la sezione di info extra
+     * @param info nuova sezione di extraInfo
+     */
     public void updateExtraInfo(String info) {
         if (info == null) extraInfo = "";
         else {
@@ -90,13 +118,19 @@ public class Beach {
         }
     }
 
-    //permette di aggiungere/rimuovere un owner alla/dalla spiaggia
+    /**
+     * Permette di aggiungere/rimuovere un owner alla/dalla spiaggia
+     * @param ownerId nuovo proprietario
+     */
     public void updateOwnerId(Integer ownerId) {
         checkOwnerId(ownerId);
         this.ownerId = ownerId;
     }
 
-    //aggiunge una stagione
+    /**
+     * Aggiunge una stagione
+     * @param season nuova stagione
+     */
     public void addSeason(Season season) {
         checkSeason(season);
         seasons.add(season);
@@ -114,7 +148,10 @@ public class Beach {
         }
     }
 
-    //aggiunge una lista di stagioni
+    /**
+     * Aggiunge una lista di stagioni
+     * @param seasons nuove stagioni
+     */
     public void addSeasons(List<Season> seasons) {
         checkSeasons(seasons);
         this.seasons.addAll(seasons);
@@ -134,7 +171,10 @@ public class Beach {
         }
     }
 
-    //rimuove una stagione
+    /**
+     * Rimuove una stagione
+     * @param season stagione da rimuovere
+     */
     public void removeSeason(Season season) {
         checkSeason(season);
         //tentativo eliminazione
@@ -142,7 +182,10 @@ public class Beach {
         else throw new IllegalArgumentException("ERROR: seasonId not found in seasons");
     }
 
-    //rimuove una lista di stagioni
+    /**
+     * Rimuove una lista di stagioni
+     * @param seasons stagioni da rimuovere
+     */
     public void removeSeasons(List<Season> seasons) {
         checkSeasons(seasons);
         //mi assicuro che TUTTE le stagioni nella lista siano presenti nella spiaggia
@@ -152,7 +195,10 @@ public class Beach {
         this.seasons.removeAll(seasons);
     }
 
-    //aggiunge o aggiorna una zona
+    /**
+     * Aggiunge o aggiorna una zona
+     * @param zone zona da aggiungere/aggiornare
+     */
     public void addZone(Zone zone) {
         checkZone(zone);
         //rimuove la zona esistente se presente, per poi aggiungerla (aggiornamento)
@@ -160,7 +206,10 @@ public class Beach {
         zones.add(zone);
     }
 
-    //aggiunge o aggiorna una lista di zone
+    /**
+     * Aggiunge o aggiorna una lista di zone
+     * @param newZones zone da aggiungere/aggiornare
+     */
     public void addZones(List<Zone> newZones) {
         checkZones(newZones);
         for (Zone newZone : newZones) {
@@ -170,29 +219,56 @@ public class Beach {
         }
     }
 
-    //rimuove una stagione
+    /**
+     * Rimuove una zona
+     * @param zone zona da rimuovere
+     */
     public void removeZone(Zone zone) {
         checkZone(zone);
-        //tentativo eliminazione
-        if (zones.contains(zone)) zones.remove(zone);
-        else throw new IllegalArgumentException("ERROR: zoneId not found in zone");
-    }
-
-    //rimuove una lista di stagioni
-    public void removeZones(List<Zone> zones) {
-        checkZones(zones);
-        //mi assicuro che TUTTE le zone nella lista siano riferiti alla spiaggia
-        for (Zone zone : zones) {
-            if (!this.zones.contains(zone)) throw new IllegalArgumentException("ERROR: at least one zoneId in the list is not found in zone");
+        //controlla se la zona è presente in una qualsiasi stagione
+        boolean isZoneInSeason = seasons.stream()
+                .anyMatch(s -> s.zoneTariffs().stream()
+                        .anyMatch(zt -> zt.zoneName().equals(zone.name())));
+        if (isZoneInSeason) {
+            throw new IllegalStateException("ERROR: cannot remove a zZone that is part of a Season");
         }
-        this.zones.removeAll(zones);
+        if (!zones.remove(zone)) {
+            throw new IllegalArgumentException("ERROR: Zone not found in Zones");
+        }
     }
 
-    //gestisce lo stato di attività della spiaggia nella piattaforma
-    //(verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati)
+    /**
+     * Rimuove una lista di zone
+     * @param zonesToRemove zone da rimuovere
+     */
+    public void removeZones(List<Zone> zonesToRemove) {
+        checkZones(zonesToRemove);
+        for (Zone zone : zonesToRemove) {
+            //controlla se la zona è presente in una qualsiasi stagione
+            boolean isZoneInSeason = seasons.stream()
+                    .anyMatch(s -> s.zoneTariffs().stream()
+                            .anyMatch(zt -> zt.zoneName().equals(zone.name())));
+            if (isZoneInSeason) {
+                throw new IllegalStateException("ERROR: cannot remove a Zone that is part of a Season");
+            }
+        }
+        //mi assicuro che tutte le Zone siano riferiti alla Beach
+        for (Zone zone : zonesToRemove) {
+            if (!this.zones.contains(zone)) {
+                throw new IllegalArgumentException("ERROR: at least one Zone in the list is not found in zones");
+            }
+        }
+        this.zones.removeAll(zonesToRemove);
+    }
+
+    /**
+     * Gestisce lo stato di attività della spiaggia nella piattaforma
+     * (verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati)
+     * @param active nuovo stato di attività
+     */
     public void setActive(boolean active) {
         if (active) {
-            if (beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasons == null || seasons.isEmpty()) {
+            if (beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasons == null || seasons.isEmpty() || zones == null || zones.isEmpty()) {
                 throw new IllegalStateException("ERROR: beach can be set to active only if owner, general, inventory, services, parking and season(s) are set");
             }
         }
@@ -244,7 +320,6 @@ public class Beach {
     }
     private void checkZone(Zone zone) {
         if (zone == null) throw new IllegalArgumentException("ERROR: zone cannot be null");
-        // Removed the check that required the zone to be present in a season
     }
     private void checkZones(List<Zone> zones) {
         //controllo lista se vuota

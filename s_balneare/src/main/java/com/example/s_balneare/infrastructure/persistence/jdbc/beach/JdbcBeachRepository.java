@@ -190,13 +190,20 @@ public class JdbcBeachRepository implements BeachRepository {
                     parkingDao.delete(beach.getId(), connection);
                 }
 
-                //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff (o elimino dati)
-                if (beach.getSeasons() != null) {
+                //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff
+                if (!beach.getSeasons().isEmpty()) {
                     seasonDao.syncSeasons(beach.getId(), beach.getSeasons(), connection);
-                } else {
-                    seasonDao.delete(beach.getId(), connection);
                 }
 
+                //passo 6: aggiorno/inserisco dati nuovi dei vari Spot sulle Zone
+                if (!beach.getZones().isEmpty()) {
+                    spotDao.syncZones(beach.getId(), beach.getZones(), connection);
+                } else {
+                    spotDao.deleteAllZones(beach.getId(), connection);
+                }
+
+                //passo 7: cancello le Zone che non hanno né Spot né ZoneTariff connesse
+                zoneDao.deleteOrphanedZones(beach.getId(), connection);
 
                 connection.commit();
             } catch (SQLException e) {
@@ -409,18 +416,18 @@ public class JdbcBeachRepository implements BeachRepository {
                         );
                     }
 
-                    //passo 5: salvo gli altri parametri
+                    //passo 5: recupero le Zone e le Season associate alla Beach
+                    List<Zone> zones = spotDao.findZonesByBeachId(id, connection);
+                    List<Season> seasons = seasonDao.findSeasonsByBeachId(id, connection);
+
+                    //passo 6: salvo gli altri parametri
                     int ownerId = rs.getInt("ownerId");
                     int addressId = rs.getInt("addressId");
                     if (rs.wasNull()) ownerId = 0;
                     String extraInfo = rs.getString("extraInfo");
                     boolean active = rs.getBoolean("active");
 
-                    //FIXME: attenzione qui!!!
-                    //passo 6: salvo le stagioni
-                    List<Season> seasons = findBeachSeasons(id);
-                    List<Zone> zones = new ArrayList<>();
-
+                    //passo 7: creo oggetto Beach e faccio il return
                     Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, zones, active);
                     return Optional.of(beach);
                 }
@@ -432,33 +439,65 @@ public class JdbcBeachRepository implements BeachRepository {
         }
     }
 
-    //FIXME: modificare funzione!
-    //cerca le stagioni di una spiaggia
     @Override
     public List<Season> findBeachSeasons(Integer beachId) {
-        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+        if (beachId == null || beachId <= 0) {
+            throw new IllegalArgumentException("ERROR: beachId not valid");
+        }
 
-        /*
-        List<Integer> ids = new ArrayList<>();
-        String sql = "SELECT pricingsId FROM seasons WHERE beachId = ?";
-
-        //apro connessione
         try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, beachId);
-                try (ResultSet rs = statement.executeQuery()) {
-                    while (rs.next()) {
-                        ids.add(rs.getInt("pricingsId"));
-                    }
+            //delegato alla funzione presente in JdbcSeasonDao
+            return seasonDao.findSeasonsByBeachId(beachId, connection);
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find seasons for beach " + beachId, e);
+        }
+    }
+
+    @Override
+    public Optional<Beach> findByOwnerId(Integer ownerId) {
+        if (ownerId == null || ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
+
+        //prendo l'ID della Beach associata all'Owner
+        String sql = "SELECT id FROM beaches WHERE ownerId = ?";
+        Integer beachId = null;
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, ownerId);
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    beachId = rs.getInt("id");
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException("ERROR: unable to find seasons", e);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to get connection", e);
+            throw new RuntimeException("ERROR: unable to find beach id by owner", e);
         }
-         */
 
-        return new ArrayList<>();
+        //se trovato, allora uso findById per ricavare completamente la Beach
+        if (beachId != null) {
+            return findById(beachId);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void updateStatus(Integer beachId, boolean active) {
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+
+        String sql = "UPDATE beaches SET active = ? WHERE id = ?";
+
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setBoolean(1, active);
+            ps.setInt(2, beachId);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to update beach status", e);
+        }
     }
 }

@@ -1,13 +1,17 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
 import com.example.s_balneare.domain.layout.Spot;
+import com.example.s_balneare.domain.layout.SpotType;
 import com.example.s_balneare.domain.layout.Zone;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class JdbcSpotDao {
     private final JdbcZoneDao zoneDao;
@@ -22,11 +26,24 @@ class JdbcSpotDao {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
         if (zones == null || zones.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set");
 
+        //trovo i nomi delle Zone salvate nel DB
+        List<String> dbZoneNames = zoneDao.findZoneNamesByBeachId(beachId, connection);
+
         //raccolgo i nomi delle zone
         List<String> zoneNames = new ArrayList<>();
         for (Zone z : zones) {
             zoneNames.add(z.name());
         }
+
+        //elimino dal DB gli Spot delle Zone rimosse in Java
+        for (String dbZone : dbZoneNames) {
+            if (!zoneNames.contains(dbZone)) {
+                deleteSpotsForZone(beachId, dbZone, connection);
+            }
+        }
+
+        if (zones.isEmpty()) return;
+
 
         //creazione zone (se non già inserite)
         zoneDao.ensureZonesExist(beachId, zoneNames, connection);
@@ -34,6 +51,9 @@ class JdbcSpotDao {
         for (Zone zone : zones) {
             //aggiungo/aggiorno gli Spot per ogni Zone
             upsertSpotsForZone(beachId, zone.name(), zone.spots(), connection);
+
+            //elimina singoli Spot che sono stati tolti dalla Zone
+            deleteMissingSpots(beachId, zone.name(), zone.spots(), connection);
         }
     }
 
@@ -49,8 +69,68 @@ class JdbcSpotDao {
         upsertSpotsForZone(beachId, zone.name(), zone.spots(), connection);
     }
 
+    //elimina il layout fisico di tutte le Zone connesse ad una Beach
+    //le Zone verranno eliminate più tardi con JdbcZoneDao.deleteOrphanedZones()
+    void deleteAllZones(Integer beachId, Connection connection) throws SQLException {
+        if (beachId == null || beachId <= 0) {
+            throw new IllegalArgumentException("ERROR: beachId not valid");
+        }
+
+        String sql = "DELETE FROM spots WHERE beachId = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.executeUpdate();
+        }
+    }
+
+    //trova tutte le Zone di una Beach
+    List<Zone> findZonesByBeachId(Integer beachId, Connection conn) throws SQLException {
+        //uso una Map<nome + lista di Spot> per raggruppare gli Spot per ogni Zone
+        Map<String, List<Spot>> zoneMap = new HashMap<>();
+
+        //cerco tutte le zone (anche quelle vuote)
+        String sqlZones = "SELECT name FROM zones WHERE beachId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlZones)) {
+            ps.setInt(1, beachId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    zoneMap.put(rs.getString("name"), new ArrayList<>());
+                }
+            }
+        }
+
+        //trovo tutti gli Spot e li inserisco assieme alle Zone rispettive
+        String sqlSpots = "SELECT id, zoneName, `row`, `column`, type FROM spots WHERE beachId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sqlSpots)) {
+            ps.setInt(1, beachId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String zoneName = rs.getString("zoneName");
+                    Spot spot = new Spot(
+                            rs.getInt("id"),
+                            SpotType.valueOf(rs.getString("type")),
+                            rs.getInt("row"),
+                            rs.getInt("column")
+                    );
+
+                    //aggiungo lo Spot alla Map
+                    zoneMap.computeIfPresent(zoneName, (k, list) -> { list.add(spot); return list; });
+                }
+            }
+        }
+
+        //converto la Map in List<Zone>
+        List<Zone> zones = new ArrayList<>();
+        for (Map.Entry<String, List<Spot>> entry : zoneMap.entrySet()) {
+            zones.add(new Zone(entry.getKey(), entry.getValue()));
+        }
+        return zones;
+    }
+
 
     //HELPERS
+    //inserisce vari Spot per una determinata Zone
     private void upsertSpotsForZone(Integer beachId, String zoneName, List<Spot> spots, Connection conn) throws SQLException {
         if (spots == null || spots.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be set for zone");
 
@@ -76,6 +156,50 @@ class JdbcSpotDao {
             }
             //...alla fine eseguo tutto
             ps.executeBatch();
+        }
+    }
+
+    //cancella tutti gli Spot di una specifica Zone
+    private void deleteSpotsForZone(Integer beachId, String zoneName, Connection conn) throws SQLException {
+        String sql = "DELETE FROM spots WHERE beachId = ? AND zoneName = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setString(2, zoneName);
+            ps.executeUpdate();
+        }
+    }
+
+    //cancella i singoli Spot che non esistono più nell'oggetto Java (quelli non associati a nessuna Zone)
+    private void deleteMissingSpots(Integer beachId, String zoneName, List<Spot> javaSpots, Connection conn) throws SQLException {
+        if (javaSpots == null) javaSpots = new ArrayList<>();
+
+        //costruisco una lista delle coordinate (row_col) presenti in javaSpots
+        List<String> javaCoordinates = new ArrayList<>();
+        for(Spot s : javaSpots) javaCoordinates.add(s.row() + "_" + s.column());
+
+        String selectSql = "SELECT id, `row`, `column` FROM spots WHERE beachId = ? AND zoneName = ?";
+        String deleteSql = "DELETE FROM spots WHERE id = ?";
+
+        try (PreparedStatement selectPs = conn.prepareStatement(selectSql);
+             PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+
+            selectPs.setInt(1, beachId);
+            selectPs.setString(2, zoneName);
+
+            try (ResultSet rs = selectPs.executeQuery()) {
+                while (rs.next()) {
+                    //ricavo ID e coordinate spot
+                    int dbId = rs.getInt("id");
+                    String dbCoord = rs.getInt("row") + "_" + rs.getInt("column");
+
+                    //se dbCoord non esiste in javaCoordinates, elimino l'ID dal DB
+                    if (!javaCoordinates.contains(dbCoord)) {
+                        deletePs.setInt(1, dbId);
+                        deletePs.addBatch();
+                    }
+                }
+            }
+            deletePs.executeBatch();
         }
     }
 }

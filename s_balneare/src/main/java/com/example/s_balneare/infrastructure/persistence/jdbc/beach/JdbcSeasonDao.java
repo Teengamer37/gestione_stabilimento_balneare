@@ -6,7 +6,9 @@ import com.example.s_balneare.domain.beach.ZoneTariff;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class JdbcSeasonDao {
     private final JdbcZoneDao zoneDao;
@@ -295,5 +297,84 @@ class JdbcSeasonDao {
             }
             ps.executeBatch();
         }
+    }
+
+
+    //cerca le stagioni di una determinata Beach
+    public List<Season> findSeasonsByBeachId(Integer beachId, Connection conn) throws SQLException {
+        Map<String, Season.Builder> seasonBuilders = new HashMap<>();
+
+        //leggo Season e Pricing
+        String sqlSeasons = "SELECT s.name AS seasonName, s.startDate, s.endDate, " +
+                "p.id AS pricingId, p.priceLettino, p.priceSdraio, p.priceSedia, p.priceParking, p.priceCamerino " +
+                "FROM seasons s " +
+                "JOIN pricings p ON s.pricingsId = p.id " +
+                "WHERE s.beachId = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sqlSeasons)) {
+            ps.setInt(1, beachId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String seasonName = rs.getString("seasonName");
+
+                    //creo oggetto Pricing
+                    Pricing pricing = new Pricing(
+                            rs.getInt("pricingId"),
+                            rs.getDouble("priceLettino"),
+                            rs.getDouble("priceSdraio"),
+                            rs.getDouble("priceSedia"),
+                            rs.getDouble("priceParking"),
+                            rs.getDouble("priceCamerino")
+                    );
+
+                    //creo oggetto Season
+                    Season.Builder builder = Season.builder()
+                            .name(seasonName)
+                            .startDate(rs.getDate("startDate").toLocalDate())
+                            .endDate(rs.getDate("endDate").toLocalDate())
+                            .pricing(pricing)
+                            //inizializzo zoneTariffs
+                            .zoneTariffs(new ArrayList<>());
+
+                    seasonBuilders.put(seasonName, builder);
+                }
+            }
+        }
+
+        //leggo le ZoneTariffs e le aggiungo ai rispettivi Builder
+        String sqlTariffs = "SELECT seasonName, zoneName, priceOmbrellone, priceTenda FROM zone_tariffs WHERE beachId = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sqlTariffs)) {
+            ps.setInt(1, beachId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    String seasonName = rs.getString("seasonName");
+                    //creo oggetto ZoneTariff
+                    ZoneTariff tariff = new ZoneTariff(
+                            rs.getString("zoneName"),
+                            rs.getDouble("priceOmbrellone"),
+                            rs.getDouble("priceTenda")
+                    );
+
+                    //cerco il builder corrispondente alla Season
+                    Season.Builder builder = seasonBuilders.get(seasonName);
+                    if (builder != null) {
+                        //aggiungo la ZoneTariff
+                        //prendo la List di zoneTariff, lo copio in un oggetto, aggiungo la nuova ZoneTariff, salvo dentro il builder
+                        List<ZoneTariff> currentTariffs = builder.build().zoneTariffs();
+                        List<ZoneTariff> newTariffs = new ArrayList<>(currentTariffs);
+                        newTariffs.add(tariff);
+                        builder.zoneTariffs(newTariffs);
+                    }
+                }
+            }
+        }
+
+        //converto la Map in List<Season>
+        List<Season> finalSeasons = new ArrayList<>();
+        for (Season.Builder builder : seasonBuilders.values()) {
+            finalSeasons.add(builder.build());
+        }
+        return finalSeasons;
     }
 }
