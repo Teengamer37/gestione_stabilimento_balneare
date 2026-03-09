@@ -20,7 +20,6 @@ public abstract class JdbcAppUserRepository<T extends AppUser> implements AppUse
     }
     //METODI ASTRATTI: mattoncini da utilizzare per la logica comune:
     protected abstract void saveSpecificData(Connection conn, Integer newId, T user) throws SQLException;
-    protected abstract void deleteSpecificData(Connection conn, Integer newId) throws SQLException;
     protected abstract void updateSpecificData(Connection conn, T user) throws SQLException;
     protected abstract T mapToEntity(ResultSet rs) throws SQLException;
 
@@ -74,21 +73,6 @@ public abstract class JdbcAppUserRepository<T extends AppUser> implements AppUse
             return newId;
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to save user", e);
-        }
-    }
-    @Override
-    public void delete(Integer id, TransactionContext context) {
-        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
-        Connection conn = getConnection(context);
-        try {
-            String sqlUser = "DELETE FROM app_users WHERE id = ?";
-            deleteSpecificData(conn, id);
-            try (PreparedStatement statement = conn.prepareStatement(sqlUser)) {
-                statement.setInt(1, id);
-                statement.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to delete user", e);
         }
     }
 

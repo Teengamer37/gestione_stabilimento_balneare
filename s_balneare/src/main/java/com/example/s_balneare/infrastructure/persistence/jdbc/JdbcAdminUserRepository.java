@@ -14,8 +14,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-//TODO: continuare l'implementazione
-
 public class JdbcAdminUserRepository
         extends JdbcAppUserRepository<AdminUser>
         implements AdminUserRepository {
@@ -28,11 +26,11 @@ public class JdbcAdminUserRepository
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, AdminUser user) throws SQLException {
         //Scrivere qui il salvataggio di attributi aggiuntivi di Admin
-    }
-
-    @Override
-    protected void deleteSpecificData(Connection conn, Integer newId) throws SQLException {
-        //Scrivere qui l'eliminazione di attributi aggiuntivi di Admin
+        String sql = "INSERT INTO admins(id) VALUES(?)";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, newId);
+            statement.executeUpdate();
+        }
     }
 
     @Override
@@ -40,31 +38,49 @@ public class JdbcAdminUserRepository
         //Scrivere qui l'aggiornamento di attributi aggiuntivi di Admin
     }
 
-    //TODO: scrivere query e controlli nei find
     @Override
     public Optional<AdminUser> findById(Integer id) {
-        return Optional.empty();
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM app_users u " +
+                "INNER JOIN admins a ON u.id = a.id " +
+                "WHERE u.id = ?";
+        return executeFindQuery(sql, id);
     }
 
     @Override
     public Optional<AdminUser> findByUsername(String username) {
-        return Optional.empty();
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM app_users u " +
+                "INNER JOIN admins a ON u.id = a.id " +
+                "WHERE u.username = ?";
+        return executeFindQuery(sql, username);
     }
 
     @Override
     public Optional<AdminUser> findByEmail(String email) {
-        return Optional.empty();
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM app_users u " +
+                "INNER JOIN admins a ON u.id = a.id " +
+                "WHERE u.email = ?";
+        return executeFindQuery(sql, email);
     }
 
     @Override
     public List<AdminUser> findAll() {
-        return List.of();
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM app_users u " +
+                "INNER JOIN admins a ON u.id = a.id ";
+        return executeFindAll(sql);
     }
 
-    //TODO: uniformità costruzione user
     @Override
     protected AdminUser mapToEntity(ResultSet rs) throws SQLException {
         //Scrivere qui il codice per mappare gli attributi aggiuntivi di Admin
-        return null;
+        return new AdminUser(rs.getInt("id"),
+                rs.getString("email"),
+                rs.getString("username"),
+                rs.getString("name"),
+                rs.getString("surname")
+        );
     }
 }

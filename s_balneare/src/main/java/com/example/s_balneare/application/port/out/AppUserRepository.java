@@ -9,7 +9,6 @@ import java.util.Optional;
 //interfacce per manipolazione oggetti di tipo AppUser
 public interface AppUserRepository <T extends AppUser>{
     Integer save(T user, String password, TransactionContext context);
-    void delete(Integer id, TransactionContext context);
     void update(T user, TransactionContext context);
     void updatePassword(AppUser user, String password, TransactionContext context);
     Optional<T> findById(Integer id);

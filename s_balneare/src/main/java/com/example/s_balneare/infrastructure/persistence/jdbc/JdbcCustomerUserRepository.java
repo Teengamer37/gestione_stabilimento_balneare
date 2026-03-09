@@ -8,8 +8,6 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-//FIXME: un macello qui
-
 public class JdbcCustomerUserRepository
         extends JdbcAppUserRepository<CustomerUser>
         implements CustomerUserRepository {
@@ -20,21 +18,12 @@ public class JdbcCustomerUserRepository
 
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, CustomerUser user) throws SQLException{
-        String sqlCustomer = "INSERT INTO customers(id,phoneNumber, addressId, active) VALUES(?,?,?,?)";
-        try (PreparedStatement statement = conn.prepareStatement(sqlCustomer)) {
+        String sql = "INSERT INTO customers(id,phoneNumber, addressId, active) VALUES(?,?,?,?)";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, newId);
             statement.setString(2, user.getPhoneNumber());
             statement.setInt(3, user.getAddressId());
             statement.setBoolean(4, user.isActive());
-            statement.executeUpdate();
-        }
-    }
-
-    @Override
-    protected void deleteSpecificData(Connection conn, Integer id) throws SQLException{
-        String sqlCustomer = "DELETE FROM customers WHERE id = ?";
-        try (PreparedStatement statement = conn.prepareStatement(sqlCustomer)) {
-            statement.setInt(1, id);
             statement.executeUpdate();
         }
     }
