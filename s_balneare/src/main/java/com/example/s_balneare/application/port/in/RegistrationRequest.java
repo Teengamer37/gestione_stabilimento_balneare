@@ -13,8 +13,14 @@ public class RegistrationRequest {
 
     //attributi esclusivi del customer
     private final String phoneNumber;
-    private final Integer addressId;
     private final boolean active;
+
+    //attributi address
+    String street;
+    String streetNumber;
+    String city;
+    String zipCode;
+    String country;
 
     //costruttore privato: l'oggetto può essere creato solo tramite il Builder
     private RegistrationRequest(Builder builder) {
@@ -24,9 +30,13 @@ public class RegistrationRequest {
         this.name = builder.name;
         this.surname = builder.surname;
         this.phoneNumber = builder.phoneNumber;
-        this.addressId = builder.addressId;
         this.active = builder.active;
         this.id = builder.id;
+        this.street = builder.street;
+        this.streetNumber = builder.streetNumber;
+        this.city = builder.city;
+        this.zipCode = builder.zipCode;
+        this.country = builder.country;
     }
 
     //getters (sola lettura per garantire l'immutabilità)
@@ -36,9 +46,13 @@ public class RegistrationRequest {
     public String getName() { return name; }
     public String getSurname() { return surname; }
     public String getPhoneNumber() { return phoneNumber; }
-    public Integer getAddressId() { return addressId; }
     public boolean isActive(){return active;}
     public Integer getId() { return id; }
+    public String getStreet() { return street; }
+    public String getStreetNumber() { return streetNumber; }
+    public String getCity() { return city; }
+    public String getZipCode() { return zipCode; }
+    public String getCountry() { return country; }
 
     // --- INNER CLASS BUILDER ---
     public static class Builder {
@@ -52,6 +66,12 @@ public class RegistrationRequest {
         private String phoneNumber;
         private Integer addressId ;
         private boolean active;
+
+        private String street;
+        private String streetNumber;
+        private String city;
+        private String zipCode;
+        private String country;
 
         //il costruttore del Builder richiede i parametri minimi obbligatori per OGNI utente
         public Builder(Role type, String email, String username) {
@@ -77,6 +97,17 @@ public class RegistrationRequest {
             this.phoneNumber = phoneNumber;
             this.addressId = addressId;
             this.active= active;
+            return this;
+        }
+
+        public Builder withAddress(String street, String streetNumber, String city, String zipCode, String country) {
+            if (street == null || streetNumber == null || city == null || zipCode == null || country == null) {
+                this.street = street;
+                this.streetNumber = streetNumber;
+                this.city = city;
+                this.zipCode = zipCode;
+                this.country = country;
+            }
             return this;
         }
 
