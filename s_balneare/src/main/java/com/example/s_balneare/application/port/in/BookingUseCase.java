@@ -2,6 +2,8 @@ package com.example.s_balneare.application.port.in;
 
 import com.example.s_balneare.domain.booking.Booking;
 
+//TODO: aggiungere implementazione parcheggi
+//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Booking
  * Implementata in:
