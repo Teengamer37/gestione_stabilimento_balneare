@@ -1,8 +1,8 @@
 package com.example.s_balneare.domain.user;
 
 
-public final class AdminUser extends AppUser {
-    public AdminUser(Integer id, String email, String username, String name, String surname) {
+public final class Admin extends User {
+    public Admin(Integer id, String email, String username, String name, String surname) {
         super(id, email, username, name, surname);
     }
 

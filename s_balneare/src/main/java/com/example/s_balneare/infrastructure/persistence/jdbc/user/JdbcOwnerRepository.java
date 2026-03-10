@@ -1,7 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
-import com.example.s_balneare.application.port.out.user.OwnerUserRepository;
-import com.example.s_balneare.domain.user.OwnerUser;
+import com.example.s_balneare.application.port.out.user.OwnerRepository;
+import com.example.s_balneare.domain.user.Owner;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -11,17 +11,17 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class JdbcOwnerUserRepository
-        extends JdbcAppUserRepository<OwnerUser>
-        implements OwnerUserRepository {
+public class JdbcOwnerRepository
+        extends JdbcUserRepository<Owner>
+        implements OwnerRepository {
 
 
-    protected JdbcOwnerUserRepository(DataSource dataSource) {
+    protected JdbcOwnerRepository(DataSource dataSource) {
         super(dataSource);
     }
 
     @Override
-    protected void saveSpecificData(Connection conn, Integer newId, OwnerUser user) throws SQLException {
+    protected void saveSpecificData(Connection conn, Integer newId, Owner user) throws SQLException {
         //Scrivere qui il salvataggio di attributi aggiuntivi di Admin
         String sql = "INSERT INTO owners(id) VALUES(?)";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -31,12 +31,12 @@ public class JdbcOwnerUserRepository
     }
 
     @Override
-    protected void updateSpecificData(Connection conn, OwnerUser user) throws SQLException {
+    protected void updateSpecificData(Connection conn, Owner user) throws SQLException {
         //Scrivere qui l'aggiornamento di attributi aggiuntivi di Admin
     }
 
     @Override
-    public Optional<OwnerUser> findById(Integer id) {
+    public Optional<Owner> findById(Integer id) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
@@ -45,7 +45,7 @@ public class JdbcOwnerUserRepository
     }
 
     @Override
-    public Optional<OwnerUser> findByUsername(String username) {
+    public Optional<Owner> findByUsername(String username) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
@@ -54,7 +54,7 @@ public class JdbcOwnerUserRepository
     }
 
     @Override
-    public Optional<OwnerUser> findByEmail(String email) {
+    public Optional<Owner> findByEmail(String email) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
@@ -63,7 +63,7 @@ public class JdbcOwnerUserRepository
     }
 
     @Override
-    public List<OwnerUser> findAll() {
+    public List<Owner> findAll() {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
                 "INNER JOIN owners o ON u.id = o.id ";
@@ -71,8 +71,8 @@ public class JdbcOwnerUserRepository
     }
 
     @Override
-    protected OwnerUser mapToEntity(ResultSet rs) throws SQLException {
-        return new OwnerUser(rs.getInt("id"),
+    protected Owner mapToEntity(ResultSet rs) throws SQLException {
+        return new Owner(rs.getInt("id"),
                 rs.getString("email"),
                 rs.getString("username"),
                 rs.getString("name"),

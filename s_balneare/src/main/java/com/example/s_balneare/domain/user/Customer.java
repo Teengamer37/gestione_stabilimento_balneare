@@ -1,13 +1,13 @@
 package com.example.s_balneare.domain.user;
 
-public final class CustomerUser extends AppUser {
+public final class Customer extends User {
     private String phoneNumber;
     private final Integer addressId;
     private boolean active;
 
     //costruttore
-    public CustomerUser(Integer id, String email, String username, String name, String surname,
-                        String phoneNumber, Integer addressId, boolean active) {
+    public Customer(Integer id, String email, String username, String name, String surname,
+                    String phoneNumber, Integer addressId, boolean active) {
         super(id, email, username, name, surname);
         this.phoneNumber = validatePhoneNumber(phoneNumber);
         this.addressId = addressId;

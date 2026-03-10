@@ -1,12 +1,12 @@
 package com.example.s_balneare.application.port.in.user;
 
-public abstract class AppUserRequest {
+public abstract class CreateUserRequest {
     private final String email;
     private final String username;
     private final String name;
     private final String surname;
 
-    public AppUserRequest(String email, String username, String name, String surname, String phoneNumber, boolean active) {
+    public CreateUserRequest(String email, String username, String name, String surname, String phoneNumber, boolean active) {
         this.email = email;
         this.username = username;
         this.name = name;

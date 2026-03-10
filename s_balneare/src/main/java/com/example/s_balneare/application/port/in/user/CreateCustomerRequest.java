@@ -1,17 +1,19 @@
 package com.example.s_balneare.application.port.in.user;
 
-public class CustomerUserRequest extends AppUserRequest{
+public class CreateCustomerRequest extends CreateUserRequest {
 
     private final String phoneNumber;
+    private final Boolean active;
     private final String street;
     private final String streetNumber;
     private final String city;
     private final String zipCode;
     private final String country;
 
-    public CustomerUserRequest(String email, String username, String name, String surname, String phoneNumber, boolean active, String phoneNumber1, String street, String streetNumber, String city, String zipCode, String country) {
+    public CreateCustomerRequest(String email, String username, String name, String surname, String phoneNumber, boolean active, String phoneNumber1, Boolean active1, String street, String streetNumber, String city, String zipCode, String country) {
         super(email, username, name, surname, phoneNumber, active);
         this.phoneNumber = phoneNumber1;
+        this.active = active1;
         this.street = street;
         this.streetNumber = streetNumber;
         this.city = city;
@@ -30,4 +32,6 @@ public class CustomerUserRequest extends AppUserRequest{
     public String getZipCode() {return zipCode;}
 
     public String getCountry() {return country;}
+
+    public boolean isActive() {return active;}
 }

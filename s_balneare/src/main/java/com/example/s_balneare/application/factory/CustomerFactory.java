@@ -1,13 +1,12 @@
 package com.example.s_balneare.application.factory;
 
 import com.example.s_balneare.application.port.in.RegistrationRequest;
-import com.example.s_balneare.domain.user.AppUser;
-import com.example.s_balneare.domain.user.CustomerUser;
+import com.example.s_balneare.domain.user.Customer;
 
 public class CustomerFactory extends UserFactory {
     @Override
-    public CustomerUser createUser(RegistrationRequest request) {
-        return new CustomerUser(
+    public Customer createUser(RegistrationRequest request) {
+        return new Customer(
                 request.getId(),
                 request.getEmail(),
                 request.getUsername(),

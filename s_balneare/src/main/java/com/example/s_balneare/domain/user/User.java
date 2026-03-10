@@ -1,13 +1,13 @@
 package com.example.s_balneare.domain.user;
 
-public abstract class AppUser {
+public abstract class User {
     private final Integer id;
     private String email;
     private String username;
     private String name;
     private String surname;
 
-    protected AppUser(Integer id, String email, String username, String name, String surname) {
+    protected User(Integer id, String email, String username, String name, String surname) {
         checkEmail(email);
         checkName(name);
         checkSurname(surname);
