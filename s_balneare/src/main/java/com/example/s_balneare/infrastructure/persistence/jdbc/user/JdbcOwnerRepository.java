@@ -38,7 +38,7 @@ public class JdbcOwnerRepository
     @Override
     public Optional<Owner> findById(Integer id) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.id = ?";
         return executeFindQuery(sql, id);
@@ -47,7 +47,7 @@ public class JdbcOwnerRepository
     @Override
     public Optional<Owner> findByUsername(String username) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.username = ?";
         return executeFindQuery(sql, username);
@@ -56,7 +56,7 @@ public class JdbcOwnerRepository
     @Override
     public Optional<Owner> findByEmail(String email) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.email = ?";
         return executeFindQuery(sql, email);
@@ -65,7 +65,7 @@ public class JdbcOwnerRepository
     @Override
     public List<Owner> findAll() {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id ";
         return executeFindAll(sql);
     }

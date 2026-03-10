@@ -38,7 +38,7 @@ public class JdbcAdminRepository
     @Override
     public Optional<Admin> findById(Integer id) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
         return executeFindQuery(sql, id);
@@ -47,7 +47,7 @@ public class JdbcAdminRepository
     @Override
     public Optional<Admin> findByUsername(String username) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.username = ?";
         return executeFindQuery(sql, username);
@@ -56,7 +56,7 @@ public class JdbcAdminRepository
     @Override
     public Optional<Admin> findByEmail(String email) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.email = ?";
         return executeFindQuery(sql, email);
@@ -65,7 +65,7 @@ public class JdbcAdminRepository
     @Override
     public List<Admin> findAll() {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id ";
         return executeFindAll(sql);
     }

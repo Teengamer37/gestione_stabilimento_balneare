@@ -46,7 +46,7 @@ public class JdbcCustomerRepository
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
                 "c.phoneNumber, c.addressId, c.active " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.id = ?";
         return executeFindQuery(sql, id);
@@ -58,7 +58,7 @@ public class JdbcCustomerRepository
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
                 "c.phoneNumber, c.addressId, c.active " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.username = ?";
 
@@ -71,7 +71,7 @@ public class JdbcCustomerRepository
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
                 "c.phoneNumber, c.addressId, c.active " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.email = ?";
 
@@ -82,7 +82,7 @@ public class JdbcCustomerRepository
     public List<Customer> findAll() {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
                 "c.phoneNumber, c.addressId, c.active " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id ";
         return executeFindAll(sql);
     }
@@ -93,7 +93,7 @@ public class JdbcCustomerRepository
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
                 "c.phoneNumber, c.addressId, c.active " +
-                "FROM app_users u " +
+                "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE c.phoneNumber = ?";
 

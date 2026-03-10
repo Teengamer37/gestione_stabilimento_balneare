@@ -20,7 +20,7 @@ CREATE TABLE addresses (
 
 -- UTENTI
 
-CREATE TABLE app_users (
+CREATE TABLE users (
     id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100) NOT NULL,
     surname VARCHAR(50) NOT NULL,
@@ -35,17 +35,17 @@ CREATE TABLE customers (
     addressId INT NOT NULL,
     active BOOLEAN NOT NULL,
     FOREIGN KEY (addressId) REFERENCES addresses(id),
-    FOREIGN KEY (id) REFERENCES app_users(id)
+    FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE owners (
     id INT PRIMARY KEY,
-    FOREIGN KEY (id) REFERENCES app_users(id)
+    FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE admins (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    FOREIGN KEY (id) REFERENCES app_users(id)
+    FOREIGN KEY (id) REFERENCES users(id)
 );
 
 -- SPIAGGIA E SERVIZI
@@ -207,8 +207,8 @@ CREATE TABLE reports (
     description VARCHAR(512) NOT NULL,
     createdAt DATETIME NOT NULL,
     status ENUM('PENDING', 'RESOLVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
-    FOREIGN KEY (reportedId) REFERENCES app_users(id),
-    FOREIGN KEY (reporterId) REFERENCES app_users(id)
+    FOREIGN KEY (reportedId) REFERENCES users(id),
+    FOREIGN KEY (reporterId) REFERENCES users(id)
 );
 
 -- Controlli
