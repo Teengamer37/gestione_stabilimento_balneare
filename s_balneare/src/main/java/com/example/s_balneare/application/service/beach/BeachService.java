@@ -8,6 +8,7 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.util.List;
 import java.util.Optional;
 
+//TODO: usare TransactionManager (vedi AppUserService)
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Beach tra l'app Java e il Database.
  */

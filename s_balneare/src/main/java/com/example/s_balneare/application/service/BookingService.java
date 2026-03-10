@@ -5,6 +5,7 @@ import com.example.s_balneare.domain.booking.Booking;
 
 import java.util.List;
 
+//TODO: usare TransactionManager (vedi AppUserService)
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
  */

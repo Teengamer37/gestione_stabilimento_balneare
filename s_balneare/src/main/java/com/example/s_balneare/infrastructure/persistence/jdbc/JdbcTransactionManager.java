@@ -55,4 +55,27 @@ public class JdbcTransactionManager implements TransactionManager {
             throw new RuntimeException("ERROR: database connection error", e);
         }
     }
+
+    @Override
+    public void executeInTransaction(TransactionRunnable runnable) {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+
+            //impacchetto la connessione nel token
+            JdbcTransactionContext context = new JdbcTransactionContext(connection);
+
+            try {
+                //eseguo la logica passata come parametro
+                runnable.execute(context);
+                connection.commit();
+            } catch (Exception e) {
+                connection.rollback();
+                throw new RuntimeException("ERROR: transaction failed, rolled back", e);
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: database connection error", e);
+        }
+    }
 }

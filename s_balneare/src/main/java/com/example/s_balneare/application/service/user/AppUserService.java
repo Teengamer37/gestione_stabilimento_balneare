@@ -8,9 +8,6 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
-//TODO: Se ti garba  la mia implementazione cerchiamo di uniformarla il più possibile,
-// mi ci posso mettere anche io a fare questa task almeno imparo e leggo il tuo codice (NARCIS)
-
 public abstract class AppUserService<T extends AppUser> {
     protected final AppUserRepository<T> appUserRepository;
     protected final AddressRepository addressRepository;
@@ -44,7 +41,6 @@ public abstract class AppUserService<T extends AppUser> {
             T appUser = getUserOrThrow(id);
             appUser.updateName(name);
             appUserRepository.update(appUser, context);
-            return appUser;//TODO: scegli va bene anche null, serve solo se in futuro uno vuole fare ritornare un utente (NARCIS)
         });
     }
     public void updateSurname(Integer id, String surname) {
@@ -52,7 +48,6 @@ public abstract class AppUserService<T extends AppUser> {
             T appUser = getUserOrThrow(id);
             appUser.updateSurname(surname);
             appUserRepository.update(appUser, context);
-            return appUser;
         });
     }
     public void updateUsername(Integer id, String username) {
@@ -60,7 +55,6 @@ public abstract class AppUserService<T extends AppUser> {
             T appUser = getUserOrThrow(id);
             appUser.updateUsername(username);
             appUserRepository.update(appUser, context);
-            return appUser;
         });
     }
     public void updateEmail(Integer id, String email) {
@@ -68,7 +62,6 @@ public abstract class AppUserService<T extends AppUser> {
             T appUser = getUserOrThrow(id);
             appUser.updateEmail(email);
             appUserRepository.update(appUser, context);
-            return appUser;
         });
     }
 
@@ -77,7 +70,6 @@ public abstract class AppUserService<T extends AppUser> {
         transactionManager.executeInTransaction( context -> {
             T appUser = getUserOrThrow(id);
             appUserRepository.updatePassword(appUser, hashedPassword, context);
-            return appUser;
         });
     }
 
