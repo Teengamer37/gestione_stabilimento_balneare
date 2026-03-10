@@ -42,7 +42,7 @@ public class JdbcAdminRepository
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
-        return executeFindQuery(sql, id, context);
+        return executeFindQuery(sql, context, id).stream().findFirst();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class JdbcAdminRepository
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.username = ?";
-        return executeFindQuery(sql, username, context);
+        return executeFindQuery(sql, context, username).stream().findFirst();
     }
 
     @Override
@@ -60,7 +60,7 @@ public class JdbcAdminRepository
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.email = ?";
-        return executeFindQuery(sql, email, context);
+        return executeFindQuery(sql, context, email).stream().findFirst();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class JdbcAdminRepository
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id ";
-        return executeFindAll(sql, context);
+        return executeFindQuery(sql, context);
     }
 
     @Override

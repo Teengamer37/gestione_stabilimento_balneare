@@ -50,7 +50,7 @@ public class JdbcCustomerRepository
                 "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.id = ?";
-        return executeFindQuery(sql, id, context);
+        return executeFindQuery(sql, context, id).stream().findFirst();
     }
 
     @Override
@@ -63,7 +63,7 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.username = ?";
 
-        return executeFindQuery(sql, username, context);
+        return executeFindQuery(sql, context, username).stream().findFirst();
     }
 
     @Override
@@ -76,7 +76,7 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.email = ?";
 
-        return executeFindQuery(sql, email, context);
+        return executeFindQuery(sql, context, email).stream().findFirst();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class JdbcCustomerRepository
                 "c.phoneNumber, c.addressId, c.active " +
                 "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id ";
-        return executeFindAll(sql,context);
+        return executeFindQuery(sql,context);
     }
 
     @Override
@@ -98,7 +98,7 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE c.phoneNumber = ?";
 
-        return executeFindQuery(sql, phoneNumber, context);
+        return executeFindQuery(sql, context, phoneNumber).stream().findFirst();
     }
 
     protected Customer mapToEntity(ResultSet rs) throws SQLException {

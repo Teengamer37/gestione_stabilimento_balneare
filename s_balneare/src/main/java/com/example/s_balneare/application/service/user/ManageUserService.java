@@ -17,7 +17,7 @@ public class ManageUserService<T extends User> {
         this.transactionManager = transactionManager;
     }
 
-    //L'utente può volersi loggare sia con Username che con Email che telefono tutti identificativi
+    //L'utente può volersi loggare sia con Username che con Email entrambi identificativi, il numero di ti telefono è un attributo accessorio
     public void checkPassword(String idString, String password, TransactionContext context) {
 
     }

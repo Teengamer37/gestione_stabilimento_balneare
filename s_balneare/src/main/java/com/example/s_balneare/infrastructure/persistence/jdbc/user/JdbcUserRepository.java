@@ -35,7 +35,9 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
     @Override
     public void updatePassword(User user, String hashedPassword, TransactionContext context) {
         Connection conn = getConnection(context);
-        String sql = "UPDATE users SET hashPassword = ? WHERE id = ?";
+        String sql = "SELECT u.hashPassword FROM users u " +
+                "INNER JOIN admins a ON u.id = a.id " +
+                "WHERE u.username = ? OR u.email = ?";
         try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, hashedPassword);
             st.setInt(2, user.getId());
@@ -98,33 +100,26 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         }
     }
 
-    protected List<T> executeFindAll(String sql, TransactionContext context){
+    // UNICO METODO PER TUTTE LE QUERY (FindAll e FindBy)
+    protected List<T> executeFindQuery(String sql, TransactionContext context, Object... parameters) {
         List<T> list = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-            PreparedStatement statement = conn.prepareStatement(sql)) {
+        Connection conn = getConnection(context);
+
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+
+            // Inserisce i parametri (se ce ne sono)
+            for (int i = 0; i < parameters.length; i++) {
+                statement.setObject(i + 1, parameters[i]);
+            }
+
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    list.add(mapToEntity(rs)); // Usa il tuo metodo astratto per mappare ogni riga
+                    list.add(mapToEntity(rs));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to fetch all user", e);
+            throw new RuntimeException("ERROR: unable to execute query", e);
         }
         return list;
-    }
-
-    protected Optional<T> executeFindQuery(String sql, Object parameter, TransactionContext context){
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setObject(1, parameter);
-            try (ResultSet rs = statement.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapToEntity(rs));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find user", e);
-        }
-        return Optional.empty();
     }
 }
