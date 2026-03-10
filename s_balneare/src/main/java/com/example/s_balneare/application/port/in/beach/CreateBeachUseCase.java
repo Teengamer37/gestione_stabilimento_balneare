@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.port.in;
+package com.example.s_balneare.application.port.in.beach;
 
 /**
  * Interfaccia che definisce le funzioni utili per implementare lo Use Case di creare una spiaggia.

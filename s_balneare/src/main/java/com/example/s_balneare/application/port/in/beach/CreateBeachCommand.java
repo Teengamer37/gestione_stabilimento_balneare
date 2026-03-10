@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.port.in;
+package com.example.s_balneare.application.port.in.beach;
 
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.layout.Zone;
@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Record che prende come parametri tutti gli attributi di Beach e Address.
  * Usato in:
- * @see com.example.s_balneare.application.port.in.CreateBeachUseCase CreateBeachUseCase
+ * @see CreateBeachUseCase CreateBeachUseCase
  */
 public record CreateBeachCommand(
         //attributi beach

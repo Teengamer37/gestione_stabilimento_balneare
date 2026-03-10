@@ -1,7 +1,7 @@
 package com.example.s_balneare.application.service.beach;
 
-import com.example.s_balneare.application.port.in.CreateBeachCommand;
-import com.example.s_balneare.application.port.in.CreateBeachUseCase;
+import com.example.s_balneare.application.port.in.beach.CreateBeachCommand;
+import com.example.s_balneare.application.port.in.beach.CreateBeachUseCase;
 import com.example.s_balneare.application.port.out.AddressRepository;
 import com.example.s_balneare.application.port.out.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
@@ -13,7 +13,8 @@ import com.example.s_balneare.domain.common.Address;
  * Interagisce con AddressRepository per salvare l'indirizzo della nuova spiaggia;
  * Successivamente con BeachRepository per salvare la nuova spiaggia con riferimento alla nuova Address.
  * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata
- * @see com.example.s_balneare.application.port.in.CreateBeachUseCase CreateBeachUseCase
+ *
+ * @see CreateBeachUseCase CreateBeachUseCase
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager
  * @see com.example.s_balneare.application.port.out.AddressRepository AddressRepository
  * @see com.example.s_balneare.application.port.out.BeachRepository BeachRepository

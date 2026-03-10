@@ -1,19 +1,25 @@
 package com.example.s_balneare.application.service;
 
+import com.example.s_balneare.application.port.in.AddressUseCase;
 import com.example.s_balneare.application.port.out.AddressRepository;
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.Address;
+import com.example.s_balneare.domain.common.TransactionContext;
 
 import java.util.List;
 
-//TODO: usare TransactionManager (vedi AppUserService)
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
+ * @see com.example.s_balneare.application.port.in.AddressUseCase AddressUseCase
+ * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
-public class AddressService {
+public class AddressService implements AddressUseCase {
     private final AddressRepository addressRepository;
+    private final TransactionManager transactionManager;
 
-    public AddressService(AddressRepository addressRepository) {
+    public AddressService(AddressRepository addressRepository, TransactionManager transactionManager) {
         this.addressRepository = addressRepository;
+        this.transactionManager = transactionManager;
     }
 
     /**
@@ -21,8 +27,11 @@ public class AddressService {
      * @param address Indirizzo da aggiungere
      * @return ID univoco generato dal Database
      */
-    public int createAddress(Address address) {
-        return addressRepository.save(address);
+    @Override
+    public Integer createAddress(Address address) {
+        return transactionManager.executeInTransaction(context -> {
+            return addressRepository.save(address, context);
+        });
     }
 
     /**
@@ -30,18 +39,21 @@ public class AddressService {
      * @param id Identificatore indirizzo da cercare nel DB
      * @param address Parametri da aggiornare
      */
+    @Override
     public void updateAddress(Integer id, Address address) {
-        Address a = getAddressOrThrow(id);
+        transactionManager.executeInTransaction(context -> {
+            Address a = getAddressOrThrow(id, context);
 
-        Address updated = a
-                .withId(id)
-                .withStreet(address.street())
-                .withStreetNumber(address.streetNumber())
-                .withCity(address.city())
-                .withZipCode(address.zipCode())
-                .withCountry(address.country());
+            Address updated = a
+                    .withId(id)
+                    .withStreet(address.street())
+                    .withStreetNumber(address.streetNumber())
+                    .withCity(address.city())
+                    .withZipCode(address.zipCode())
+                    .withCountry(address.country());
 
-        addressRepository.update(updated);
+            addressRepository.update(updated, context);
+        });
     }
 
     /**
@@ -49,8 +61,11 @@ public class AddressService {
      * @param id Identificatore indirizzo da cercare nel DB
      * @return oggetto Address con quell'ID
      */
+    @Override
     public Address getAddress(Integer id) {
-        return getAddressOrThrow(id);
+        return transactionManager.executeInTransaction(context -> {
+            return getAddressOrThrow(id, context);
+        });
     }
 
     /**
@@ -58,8 +73,11 @@ public class AddressService {
      * @param city Nome della città
      * @return Lista di indirizzi che hanno come città quella passata come parametro
      */
+    @Override
     public List<Address> getAddressesByCity(String city) {
-        return addressRepository.findByCity(city);
+        return transactionManager.executeInTransaction(context -> {
+            return addressRepository.findByCity(city, context);
+        });
     }
 
     /**
@@ -67,27 +85,34 @@ public class AddressService {
      * @param country Nome del paese
      * @return Lista di indirizzi che hanno come paese quello passato come parametro
      */
+    @Override
     public List<Address> getAddressesByCountry(String country) {
-        return addressRepository.findByCountry(country);
+        return transactionManager.executeInTransaction(context -> {
+            return addressRepository.findByCountry(country, context);
+        });
     }
 
     /**
      * Eliminazione indirizzo dal DB
      * @param id Identificatore indirizzo da eliminare
      */
+    @Override
     public void deleteAddress(Integer id) {
-        addressRepository.delete(id);
+        transactionManager.executeInTransaction(context -> {
+            addressRepository.delete(id, context);
+        });
     }
 
     /**
      * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
      * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
      * @param id Identificativo indirizzo da cercare
+     * @param context Connessione JDBC
      * @return oggetto Address con quell'ID
      * @throws IllegalArgumentException se l'indirizzo non è stato trovato nel DB
      */
-    private Address getAddressOrThrow(Integer id) {
-        return addressRepository.findById(id)
+    private Address getAddressOrThrow(Integer id, TransactionContext context) {
+        return addressRepository.findById(id, context)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Address not found with id: " + id));
     }
 }

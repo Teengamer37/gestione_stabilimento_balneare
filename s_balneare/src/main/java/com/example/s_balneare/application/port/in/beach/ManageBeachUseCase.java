@@ -1,5 +1,6 @@
-package com.example.s_balneare.application.port.in;
+package com.example.s_balneare.application.port.in.beach;
 
+import com.example.s_balneare.application.service.beach.ManageBeachService;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.layout.Zone;
 
@@ -9,7 +10,7 @@ import java.util.Optional;
 /**
  * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach
  * Implementata in:
- * @see com.example.s_balneare.application.service.beach.BeachService BeachService
+ * @see ManageBeachService ManageBeachService
  */
 public interface ManageBeachUseCase {
     //updates a Beach

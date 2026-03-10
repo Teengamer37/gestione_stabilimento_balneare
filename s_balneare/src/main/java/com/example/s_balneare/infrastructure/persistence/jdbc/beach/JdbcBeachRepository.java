@@ -24,6 +24,7 @@ import java.util.Optional;
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao JdbcZoneDao
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSeasonDao JdbcSeasonDao
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSpotDao JdbcSpotDao
+ * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcBeachRepository implements BeachRepository {
     private final DataSource dataSource;
@@ -50,7 +51,7 @@ public class JdbcBeachRepository implements BeachRepository {
      * METODO HELPER:
      * prende il token vuoto (TransactionContext)
      * e lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
-     * @param context Token vuoto
+     * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
      */
@@ -59,45 +60,6 @@ public class JdbcBeachRepository implements BeachRepository {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
         return jdbcContext.getConnection();
-    }
-
-    /**
-     * Inserimento nuova spiaggia nel DB.
-     * DA USARE SE E SOLO SE SI HA UN'ISTANZA LIBERA E NON ASSOCIATA DI ADDRESS!
-     * SE USATA A CASO -> EXCEPTION 100%
-     * @param beach Nuova spiaggia da aggiungere
-     * @return ID generato dal Database
-     * @throws RuntimeException se ci sono problemi di connessione col Database
-     */
-    @Override
-    public Integer save(Beach beach) {
-        //apro connessione
-        try (Connection connection = dataSource.getConnection()) {
-            try {
-                connection.setAutoCommit(false);
-                TransactionContext context = new JdbcTransactionManager.JdbcTransactionContext(connection);
-                Integer beachId = save(beach, context);
-                connection.commit();
-                return beachId;
-            } catch (SQLException e) {
-                try {
-                    //andata male -> ripristino allo stato iniziale
-                    connection.rollback();
-                } catch (SQLException e2) {
-                    e.addSuppressed(e2);
-                }
-                throw new RuntimeException("ERROR: unable to save beach", e);
-            } finally {
-                try {
-                    //in qualsiasi caso, rimetto autocommit a true
-                    if (connection != null) connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    System.out.println("WARNING: unable to set autocommit to true");
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to get connection", e);
-        }
     }
 
     /**
@@ -111,7 +73,7 @@ public class JdbcBeachRepository implements BeachRepository {
      */
     @Override
     public Integer save(Beach beach, TransactionContext context) {
-        //estraggo la connection JDBC
+        //estraggo la connessione JDBC
         Connection connection = getConnection(context);
 
         String sqlBeach = "INSERT INTO beaches (name, description, phoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -144,7 +106,7 @@ public class JdbcBeachRepository implements BeachRepository {
                 inventoryDao.upsert(newId, beach.getBeachInventory(), connection);
             }
 
-            //passo 3: inserisco in beach_services l'oggetto BeachService (se presente)
+            //passo 3: inserisco in beach_services l'oggetto ManageBeachService (se presente)
             if (beach.getBeachServices() != null) {
                 servicesDao.upsert(newId, beach.getBeachServices(), connection);
             }
@@ -171,152 +133,128 @@ public class JdbcBeachRepository implements BeachRepository {
     /**
      * Aggiorno spiaggia presente nel DB
      * @param beach oggetto da aggiornare (stesso ID, attributi diversi)
+     * @param context Connessione JDBC
      * @throws RuntimeException se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se il beach non ha parametri corretti
      */
     @Override
-    public void update(Beach beach) {
+    public void update(Beach beach, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         //check validità ID
-        if (beach.getId() == null || beach.getId() <= 0) throw new IllegalArgumentException("ERROR: beach must have a valid ID");
+        if (beach.getId() == null || beach.getId() <= 0)
+            throw new IllegalArgumentException("ERROR: beach must have a valid ID");
 
         String sqlBeach = "UPDATE beaches SET name = ?, description = ?, phoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, ownerId = ? WHERE id = ?";
 
-        //apro connessione
-        try (Connection connection = dataSource.getConnection()) {
-            try {
-                connection.setAutoCommit(false);
+        try {
+            //passo 1: aggiorno dati generali da Beach e BeachGeneral
+            try (PreparedStatement statement = connection.prepareStatement(sqlBeach)) {
+                BeachGeneral general = beach.getBeachGeneral();
+                if (general == null)
+                    throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when updating a beach.");
 
-                //passo 1: aggiorno dati generali da Beach e BeachGeneral
-                try (PreparedStatement statement = connection.prepareStatement(sqlBeach)) {
-                    BeachGeneral general = beach.getBeachGeneral();
-                    if (general == null) throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when updating a beach.");
-
-                    statement.setString(1, general.getName());
-                    statement.setString(2, general.getDescription());
-                    statement.setString(3, general.getPhoneNumber());
-                    statement.setInt(4, beach.getAddressId());
-                    statement.setString(5, beach.getExtraInfo());
-                    statement.setBoolean(6, beach.isActive());
-                    statement.setInt(7, beach.getOwnerId());
-                    statement.setInt(8, beach.getId());
-                    statement.executeUpdate();
-                }
-
-                //passo 2: aggiorno/inserisco dati nuovi su BeachInventory (o elimino dati)
-                //dalla tabella beach_inventories
-                if (beach.getBeachInventory() != null) {
-                    inventoryDao.upsert(beach.getId(), beach.getBeachInventory(), connection);
-                } else {
-                    inventoryDao.delete(beach.getId(), connection);
-                }
-
-                //passo 3: aggiorno/inserisco dati nuovi su BeachService (o elimino dati)
-                //dalla tabella beach_services
-                if (beach.getBeachServices() != null) {
-                    servicesDao.upsert(beach.getId(), beach.getBeachServices(), connection);
-                } else {
-                    servicesDao.delete(beach.getId(), connection);
-                }
-
-                //passo 4: aggiorno/inserisco dati nuovi su Parking (o elimino dati)
-                //dalla tabella parkings
-                if (beach.getParking() != null) {
-                    parkingDao.upsert(beach.getId(), beach.getParking(), connection);
-                } else {
-                    parkingDao.delete(beach.getId(), connection);
-                }
-
-                //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff
-                if (!beach.getSeasons().isEmpty()) {
-                    seasonDao.syncSeasons(beach.getId(), beach.getSeasons(), connection);
-                }
-
-                //passo 6: aggiorno/inserisco dati nuovi dei vari Spot sulle Zone
-                if (!beach.getZones().isEmpty()) {
-                    spotDao.syncZones(beach.getId(), beach.getZones(), connection);
-                } else {
-                    spotDao.deleteAllZones(beach.getId(), connection);
-                }
-
-                //passo 7: cancello le Zone che non hanno né Spot né ZoneTariff connesse
-                zoneDao.deleteOrphanedZones(beach.getId(), connection);
-
-                connection.commit();
-            } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException e2) {
-                    e.addSuppressed(e2);
-                }
-                throw new RuntimeException("ERROR: unable to update beach", e);
-            } finally {
-                try {
-                    if (connection != null) connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    System.out.println("WARNING: unable to set autocommit to true");
-                }
+                statement.setString(1, general.getName());
+                statement.setString(2, general.getDescription());
+                statement.setString(3, general.getPhoneNumber());
+                statement.setInt(4, beach.getAddressId());
+                statement.setString(5, beach.getExtraInfo());
+                statement.setBoolean(6, beach.isActive());
+                statement.setInt(7, beach.getOwnerId());
+                statement.setInt(8, beach.getId());
+                statement.executeUpdate();
             }
+
+            //passo 2: aggiorno/inserisco dati nuovi su BeachInventory (o elimino dati)
+            //dalla tabella beach_inventories
+            if (beach.getBeachInventory() != null) {
+                inventoryDao.upsert(beach.getId(), beach.getBeachInventory(), connection);
+            } else {
+                inventoryDao.delete(beach.getId(), connection);
+            }
+
+            //passo 3: aggiorno/inserisco dati nuovi su ManageBeachService (o elimino dati)
+            //dalla tabella beach_services
+            if (beach.getBeachServices() != null) {
+                servicesDao.upsert(beach.getId(), beach.getBeachServices(), connection);
+            } else {
+                servicesDao.delete(beach.getId(), connection);
+            }
+
+            //passo 4: aggiorno/inserisco dati nuovi su Parking (o elimino dati)
+            //dalla tabella parkings
+            if (beach.getParking() != null) {
+                parkingDao.upsert(beach.getId(), beach.getParking(), connection);
+            } else {
+                parkingDao.delete(beach.getId(), connection);
+            }
+
+            //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff
+            if (!beach.getSeasons().isEmpty()) {
+                seasonDao.syncSeasons(beach.getId(), beach.getSeasons(), connection);
+            }
+
+            //passo 6: aggiorno/inserisco dati nuovi dei vari Spot sulle Zone
+            if (!beach.getZones().isEmpty()) {
+                spotDao.syncZones(beach.getId(), beach.getZones(), connection);
+            } else {
+                spotDao.deleteAllZones(beach.getId(), connection);
+            }
+
+            //passo 7: cancello le Zone che non hanno né Spot né ZoneTariff connesse
+            zoneDao.deleteOrphanedZones(beach.getId(), connection);
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to get connection", e);
+            throw new RuntimeException("ERROR: unable to update beach", e);
         }
     }
 
     /**
      * Permette di eliminare una spiaggia
      * @param id ID della spiaggia da eliminare
+     * @param context Connessione JDBC
      * @throws RuntimeException se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID non è valido
      */
     @Override
-    public void delete(Integer id) {
+    public void delete(Integer id, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         //check validità ID
         if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
         String sqlBeach = "DELETE FROM beaches WHERE id = ?";
 
         //apro connessione
-        try (Connection connection = dataSource.getConnection()) {
-            try {
-                connection.setAutoCommit(false);
-
-                //cancello riga da beach_services
-                servicesDao.delete(id, connection);
-                //cancello riga da beach_inventories
-                inventoryDao.delete(id, connection);
-                //cancello riga da parkings
-                parkingDao.delete(id, connection);
-                //elimino la spiaggia
-                try (PreparedStatement st = connection.prepareStatement(sqlBeach)) {
-                    st.setInt(1, id);
-                    st.executeUpdate();
-                }
-
-                connection.commit();
-            } catch (SQLException e) {
-                try {
-                    connection.rollback();
-                } catch (SQLException e2) {
-                    e.addSuppressed(e2);
-                }
-                throw new RuntimeException("ERROR: unable to delete beach", e);
-            } finally {
-                try {
-                    if (connection != null) connection.setAutoCommit(true);
-                } catch (SQLException e) {
-                    System.out.println("WARNING: unable to set autocommit to true");
-                }
+        try {
+            //cancello riga da beach_services
+            servicesDao.delete(id, connection);
+            //cancello riga da beach_inventories
+            inventoryDao.delete(id, connection);
+            //cancello riga da parkings
+            parkingDao.delete(id, connection);
+            //elimino la spiaggia
+            try (PreparedStatement st = connection.prepareStatement(sqlBeach)) {
+                st.setInt(1, id);
+                st.executeUpdate();
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to get connection", e);
+            throw new RuntimeException("ERROR: unable to delete beach", e);
         }
     }
 
     /**
      * Stampa TUTTE le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse)
+     * @param context Connessione JDBC
      * @return Lista di spiagge trovate nel Database
      * @throws RuntimeException se ci sono problemi di connessione col Database
      */
-    public List<Beach> findAll() {
+    @Override
+    public List<Beach> findAll(TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         String sql = "SELECT b.*, " +
                 "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
                 "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
@@ -326,119 +264,18 @@ public class JdbcBeachRepository implements BeachRepository {
                 "WHERE b.active = TRUE";
         List<Beach> beaches = new ArrayList<>();
 
-        //apro connessione
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                try (ResultSet rs = statement.executeQuery()) {
-                    while (rs.next()) {
-                        //passo 1: ricostruisco BeachGeneral
-                        int id = rs.getInt("id");
-                        String name = rs.getString("name");
-                        String description = rs.getString("description");
-                        String telephoneNumber = rs.getString("phoneNumber");
-
-                        BeachGeneral general = new BeachGeneral(name, description, telephoneNumber);
-
-                        //passo 2: ricostruisco BeachService
-                        BeachServices services = null;
-                        Boolean bathrooms = (Boolean) rs.getObject("bathrooms");
-                        if (bathrooms != null) {
-                            services = new BeachServices(
-                                    bathrooms,
-                                    rs.getBoolean("showers"),
-                                    rs.getBoolean("pool"),
-                                    rs.getBoolean("bar"),
-                                    rs.getBoolean("restaurant"),
-                                    rs.getBoolean("wifi"),
-                                    rs.getBoolean("volleyballField")
-                            );
-                        }
-
-                        //passo 3: ricostruisco Parking
-                        Parking parking = null;
-                        Integer nAutoPark = (Integer) rs.getObject("nAutoPark");
-                        if (nAutoPark != null) {
-                            parking = new Parking(
-                                    nAutoPark,
-                                    rs.getInt("nMotoPark"),
-                                    rs.getInt("nBikePark"),
-                                    rs.getInt("nElectricPark"),
-                                    rs.getBoolean("CCTV")
-                            );
-                        }
-
-                        //passo 4: salvo gli altri parametri
-                        int ownerId = rs.getInt("ownerId");
-                        int addressId = rs.getInt("addressId");
-                        if (rs.wasNull()) ownerId = 0;
-                        String extraInfo = rs.getString("extraInfo");
-                        boolean active = rs.getBoolean("active");
-
-                        //passo 5: aggiungo alla lista
-                        beaches.add(new Beach(id, ownerId, addressId, general, null, services, parking, extraInfo, null, null, active));
-                    }
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException("ERROR: unable to find beaches", e);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to get connection", e);
-        }
-        return beaches;
-    }
-
-    /**
-     * Cerca una spiaggia per ID e la restituisce
-     * @param id ID della spiaggia da cercare
-     * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
-     * @throws RuntimeException se ci sono problemi di connessione col Database
-     * @throws IllegalArgumentException se l'ID inserito non è valido
-     */
-    @Override
-    public Optional<Beach> findById(Integer id) {
-        //check validità ID
-        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
-
-        String sql = "SELECT b.*, " +
-                     "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
-                     "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
-                     "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
-                     "FROM beaches b " +
-                     "LEFT JOIN beach_inventories bi ON b.id = bi.beachId " +
-                     "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
-                     "LEFT JOIN parkings p ON b.id = p.beachId " +
-                     "WHERE b.id = ?";
-
-        //apro connessione
-        try (Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setInt(1, id);
-                try (ResultSet rs = statement.executeQuery()) {
-                    //no ID = fine funzione
-                    if (!rs.next()) return Optional.empty();
-
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
                     //passo 1: ricostruisco BeachGeneral
+                    int id = rs.getInt("id");
                     String name = rs.getString("name");
                     String description = rs.getString("description");
                     String telephoneNumber = rs.getString("phoneNumber");
 
                     BeachGeneral general = new BeachGeneral(name, description, telephoneNumber);
 
-                    //passo 2: ricostruisco BeachInventory (gestisco anche se non inizializzato)
-                    BeachInventory inventory = null;
-                    Integer countOmbrelloni = (Integer) rs.getObject("countOmbrelloni");
-                    if (countOmbrelloni != null) {
-                        inventory = new BeachInventory(
-                                countOmbrelloni,
-                                rs.getInt("countTende"),
-                                rs.getInt("countExtraSdraio"),
-                                rs.getInt("countExtraLettini"),
-                                rs.getInt("countExtraSedie"),
-                                rs.getInt("countCamerini")
-                        );
-                    }
-
-                    //passo 3: ricostruisco BeachService (gestisco anche se non inizializzato)
+                    //passo 2: ricostruisco ManageBeachService
                     BeachServices services = null;
                     Boolean bathrooms = (Boolean) rs.getObject("bathrooms");
                     if (bathrooms != null) {
@@ -453,7 +290,7 @@ public class JdbcBeachRepository implements BeachRepository {
                         );
                     }
 
-                    //passo 4: ricostruisco Parking (gestisco anche se non inizializzato)
+                    //passo 3: ricostruisco Parking
                     Parking parking = null;
                     Integer nAutoPark = (Integer) rs.getObject("nAutoPark");
                     if (nAutoPark != null) {
@@ -466,43 +303,142 @@ public class JdbcBeachRepository implements BeachRepository {
                         );
                     }
 
-                    //passo 5: recupero le Zone e le Season associate alla Beach
-                    List<Zone> zones = spotDao.findZonesByBeachId(id, connection);
-                    List<Season> seasons = seasonDao.findSeasonsByBeachId(id, connection);
-
-                    //passo 6: salvo gli altri parametri
+                    //passo 4: salvo gli altri parametri
                     int ownerId = rs.getInt("ownerId");
                     int addressId = rs.getInt("addressId");
                     if (rs.wasNull()) ownerId = 0;
                     String extraInfo = rs.getString("extraInfo");
                     boolean active = rs.getBoolean("active");
 
-                    //passo 7: creo oggetto Beach e faccio il return
-                    Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, zones, active);
-                    return Optional.of(beach);
+                    //passo 5: aggiungo alla lista
+                    beaches.add(new Beach(id, ownerId, addressId, general, null, services, parking, extraInfo, null, null, active));
                 }
-            } catch (SQLException e) {
-                throw new RuntimeException("ERROR: unable to find beach", e);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to get connection", e);
+            throw new RuntimeException("ERROR: unable to find beaches", e);
+        }
+        return beaches;
+    }
+
+    /**
+     * Cerca una spiaggia per ID e la restituisce
+     * @param id ID della spiaggia da cercare
+     * @param context Connessione JDBC
+     * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se l'ID inserito non è valido
+     */
+    @Override
+    public Optional<Beach> findById(Integer id, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
+        //check validità ID
+        if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+
+        String sql = "SELECT b.*, " +
+                     "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
+                     "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
+                     "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
+                     "FROM beaches b " +
+                     "LEFT JOIN beach_inventories bi ON b.id = bi.beachId " +
+                     "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
+                     "LEFT JOIN parkings p ON b.id = p.beachId " +
+                     "WHERE b.id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet rs = statement.executeQuery()) {
+                //no ID = fine funzione
+                if (!rs.next()) return Optional.empty();
+
+                //passo 1: ricostruisco BeachGeneral
+                String name = rs.getString("name");
+                String description = rs.getString("description");
+                String telephoneNumber = rs.getString("phoneNumber");
+
+                BeachGeneral general = new BeachGeneral(name, description, telephoneNumber);
+
+                //passo 2: ricostruisco BeachInventory (gestisco anche se non inizializzato)
+                BeachInventory inventory = null;
+                Integer countOmbrelloni = (Integer) rs.getObject("countOmbrelloni");
+                if (countOmbrelloni != null) {
+                    inventory = new BeachInventory(
+                            countOmbrelloni,
+                            rs.getInt("countTende"),
+                            rs.getInt("countExtraSdraio"),
+                            rs.getInt("countExtraLettini"),
+                            rs.getInt("countExtraSedie"),
+                            rs.getInt("countCamerini")
+                    );
+                }
+
+                //passo 3: ricostruisco ManageBeachService (gestisco anche se non inizializzato)
+                BeachServices services = null;
+                Boolean bathrooms = (Boolean) rs.getObject("bathrooms");
+                if (bathrooms != null) {
+                    services = new BeachServices(
+                            bathrooms,
+                            rs.getBoolean("showers"),
+                            rs.getBoolean("pool"),
+                            rs.getBoolean("bar"),
+                            rs.getBoolean("restaurant"),
+                            rs.getBoolean("wifi"),
+                            rs.getBoolean("volleyballField")
+                    );
+                }
+
+                //passo 4: ricostruisco Parking (gestisco anche se non inizializzato)
+                Parking parking = null;
+                Integer nAutoPark = (Integer) rs.getObject("nAutoPark");
+                if (nAutoPark != null) {
+                    parking = new Parking(
+                            nAutoPark,
+                            rs.getInt("nMotoPark"),
+                            rs.getInt("nBikePark"),
+                            rs.getInt("nElectricPark"),
+                            rs.getBoolean("CCTV")
+                    );
+                }
+
+                //passo 5: recupero le Zone e le Season associate alla Beach
+                List<Zone> zones = spotDao.findZonesByBeachId(id, connection);
+                List<Season> seasons = seasonDao.findSeasonsByBeachId(id, connection);
+
+                //passo 6: salvo gli altri parametri
+                int ownerId = rs.getInt("ownerId");
+                int addressId = rs.getInt("addressId");
+                if (rs.wasNull()) ownerId = 0;
+                String extraInfo = rs.getString("extraInfo");
+                boolean active = rs.getBoolean("active");
+
+                //passo 7: creo oggetto Beach e faccio il return
+                Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, zones, active);
+                return Optional.of(beach);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find beach", e);
         }
     }
 
     /**
      * Cerca tutte le stagioni associate ad una spiaggia
      * @param beachId ID della spiaggia da cercare per le stagioni
+     * @param context Connessione JDBC
      * @return una lista di stagioni che si riferiscono alla spiaggia
      * @throws IllegalArgumentException se l'ID passato non è valido
      * @throws RuntimeException se ci sono problemi di connessione col Database
      */
     @Override
-    public List<Season> findBeachSeasons(Integer beachId) {
+    public List<Season> findBeachSeasons(Integer beachId, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         if (beachId == null || beachId <= 0) {
             throw new IllegalArgumentException("ERROR: beachId not valid");
         }
 
-        try (Connection connection = dataSource.getConnection()) {
+        try {
             //delegato alla funzione presente in JdbcSeasonDao
             return seasonDao.findSeasonsByBeachId(beachId, connection);
         } catch (SQLException e) {
@@ -513,20 +449,23 @@ public class JdbcBeachRepository implements BeachRepository {
     /**
      * Cerca spiaggia per ID del proprietario
      * @param ownerId ID del proprietario
+     * @param context Connessione JDBC
      * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
      * @throws RuntimeException se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID inserito non è valido
      */
     @Override
-    public Optional<Beach> findByOwnerId(Integer ownerId) {
+    public Optional<Beach> findByOwnerId(Integer ownerId, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         if (ownerId == null || ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
 
         //prendo l'ID della Beach associata all'Owner
         String sql = "SELECT id FROM beaches WHERE ownerId = ?";
         Integer beachId = null;
 
-        try (Connection connection = dataSource.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setInt(1, ownerId);
 
@@ -541,7 +480,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
         //se trovato, allora uso findById per ricavare completamente la Beach
         if (beachId != null) {
-            return findById(beachId);
+            return findById(beachId, context);
         } else {
             return Optional.empty();
         }
@@ -550,18 +489,21 @@ public class JdbcBeachRepository implements BeachRepository {
     /**
      * Aggiorna la colonna active di una spiaggia specifica
      * @param beachId ID della spiaggia
+     * @param context Connessione JDBC
      * @param active Nuovo stato della spiaggia
      * @throws RuntimeException se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID non è valido
      */
     @Override
-    public void updateStatus(Integer beachId, boolean active) {
+    public void updateStatus(Integer beachId, boolean active, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
 
         String sql = "UPDATE beaches SET active = ? WHERE id = ?";
 
-        try (Connection connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setBoolean(1, active);
             ps.setInt(2, beachId);

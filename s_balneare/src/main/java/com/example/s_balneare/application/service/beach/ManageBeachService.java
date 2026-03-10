@@ -1,22 +1,27 @@
 package com.example.s_balneare.application.service.beach;
 
-import com.example.s_balneare.application.port.in.ManageBeachUseCase;
+import com.example.s_balneare.application.port.in.beach.ManageBeachUseCase;
 import com.example.s_balneare.application.port.out.BeachRepository;
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.beach.*;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.layout.Zone;
 
 import java.util.List;
 import java.util.Optional;
 
-//TODO: usare TransactionManager (vedi AppUserService)
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Beach tra l'app Java e il Database.
+ * @see ManageBeachUseCase ManageBeachUseCase
+ * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
-public class BeachService implements ManageBeachUseCase {
+public class ManageBeachService implements ManageBeachUseCase {
     private final BeachRepository beachRepository;
+    private final TransactionManager transactionManager;
 
-    public BeachService(BeachRepository beachRepository) {
+    public ManageBeachService(BeachRepository beachRepository, TransactionManager transactionManager) {
         this.beachRepository = beachRepository;
+        this.transactionManager = transactionManager;
     }
 
     /**
@@ -27,9 +32,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void updateGeneralInfo(Integer id, BeachGeneral newGeneral) {
-        Beach beach = getBeachOrThrow(id);
-        beach.updateGeneralInfo(newGeneral);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.updateGeneralInfo(newGeneral);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -39,9 +46,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void updateInventory(Integer id, BeachInventory newInventory) {
-        Beach beach = getBeachOrThrow(id);
-        beach.updateInventory(newInventory);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.updateInventory(newInventory);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -51,9 +60,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void updateServices(Integer id, BeachServices newServices) {
-        Beach beach = getBeachOrThrow(id);
-        beach.updateServices(newServices);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.updateServices(newServices);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -63,9 +74,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void updateParking(Integer id, Parking newParking) {
-        Beach beach = getBeachOrThrow(id);
-        beach.updateParking(newParking);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.updateParking(newParking);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -75,9 +88,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void updateExtraInfo(Integer id, String extraInfo) {
-        Beach beach = getBeachOrThrow(id);
-        beach.updateExtraInfo(extraInfo);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.updateExtraInfo(extraInfo);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -87,19 +102,21 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void setBeachActive(Integer id, boolean active) {
-        //se voglio attivare la spiaggia, controllo se possibile
-        if (active) {
-            Beach beach = getBeachOrThrow(id);
-            beach.setActive(true);
-            beachRepository.updateStatus(id, true);
-        } else {
-            // se devo disattivarla, non vado a controllare altro e uso il metodo veloce per disattivarla
-            if (beachRepository.findById(id).isPresent()) {
-                beachRepository.updateStatus(id, false);
+        transactionManager.executeInTransaction(context -> {
+            //se voglio attivare la spiaggia, controllo se possibile
+            if (active) {
+                Beach beach = getBeachOrThrow(id, context);
+                beach.setActive(true);
+                beachRepository.updateStatus(id, true, context);
             } else {
-                throw new IllegalArgumentException("ERROR: Beach not found with id " + id);
+                // se devo disattivarla, non vado a controllare altro e uso il metodo veloce per disattivarla
+                if (beachRepository.findById(id, context).isPresent()) {
+                    beachRepository.updateStatus(id, false, context);
+                } else {
+                    throw new IllegalArgumentException("ERROR: Beach not found with id " + id);
+                }
             }
-        }
+        });
     }
 
     /**
@@ -109,9 +126,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void addSeason(Integer id, Season season) {
-        Beach beach = getBeachOrThrow(id);
-        beach.addSeason(season);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.addSeason(season);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -121,9 +140,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void addSeasons(Integer id, List<Season> seasons) {
-        Beach beach = getBeachOrThrow(id);
-        beach.addSeasons(seasons);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.addSeasons(seasons);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -133,9 +154,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void addZone(Integer id, Zone zone) {
-        Beach beach = getBeachOrThrow(id);
-        beach.addZone(zone);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.addZone(zone);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -145,9 +168,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void addZones(Integer id, List<Zone> zones) {
-        Beach beach = getBeachOrThrow(id);
-        beach.addZones(zones);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.addZones(zones);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -157,9 +182,11 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void removeZone(Integer id, Zone zone) {
-        Beach beach = getBeachOrThrow(id);
-        beach.removeZone(zone);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.removeZone(zone);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
@@ -169,20 +196,24 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public void removeZones(Integer id, List<Zone> zones) {
-        Beach beach = getBeachOrThrow(id);
-        beach.removeZones(zones);
-        beachRepository.update(beach);
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(id, context);
+            beach.removeZones(zones);
+            beachRepository.update(beach, context);
+        });
     }
 
     /**
      * Ricerca spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
      * @return oggetto Beach o eccezione in caso di errore
-     * @see #getBeachOrThrow(Integer) getBeachOrThrow
+     * @see #getBeachOrThrow(Integer, TransactionContext) getBeachOrThrow
      */
     @Override
     public Beach getBeach(Integer id) {
-        return getBeachOrThrow(id);
+        return transactionManager.executeInTransaction(context -> {
+            return getBeachOrThrow(id, context);
+        });
     }
 
     /**
@@ -193,7 +224,9 @@ public class BeachService implements ManageBeachUseCase {
      */
     @Override
     public Optional<Beach> getOwnerBeach(Integer ownerId) {
-        return beachRepository.findByOwnerId(ownerId);
+        return transactionManager.executeInTransaction(context -> {
+            return beachRepository.findByOwnerId(ownerId, context);
+        });
     }
 
     /**
@@ -203,8 +236,8 @@ public class BeachService implements ManageBeachUseCase {
      * @return oggetto Beach con quell'ID
      * @throws IllegalArgumentException se la spiaggia non è stata trovata nel DB
      */
-    private Beach getBeachOrThrow(Integer id) {
-        return beachRepository.findById(id)
+    private Beach getBeachOrThrow(Integer id, TransactionContext context) {
+        return beachRepository.findById(id, context)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Beach not found with id: " + id));
     }
 }
