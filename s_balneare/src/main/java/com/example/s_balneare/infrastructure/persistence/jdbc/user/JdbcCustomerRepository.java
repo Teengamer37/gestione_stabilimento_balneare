@@ -1,6 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
 import com.example.s_balneare.application.port.out.user.CustomerRepository;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.*;
 
 import javax.sql.DataSource;
@@ -41,7 +42,7 @@ public class JdbcCustomerRepository
     }
 
     @Override
-    public Optional<Customer> findById(Integer id) {
+    public Optional<Customer> findById(Integer id, TransactionContext context) {
         if (id == null || id <= 0) return Optional.empty();
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
@@ -49,11 +50,11 @@ public class JdbcCustomerRepository
                 "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.id = ?";
-        return executeFindQuery(sql, id);
+        return executeFindQuery(sql, id, context);
     }
 
     @Override
-    public Optional<Customer> findByUsername(String username) {
+    public Optional<Customer> findByUsername(String username, TransactionContext context) {
         if (username == null || username.isBlank()) return Optional.empty();
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
@@ -62,11 +63,11 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.username = ?";
 
-        return executeFindQuery(sql, username);
+        return executeFindQuery(sql, username, context);
     }
 
     @Override
-    public Optional<Customer> findByEmail(String email) {
+    public Optional<Customer> findByEmail(String email, TransactionContext context) {
         if (email == null || email.isBlank()) return Optional.empty();
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
@@ -75,20 +76,20 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.email = ?";
 
-        return executeFindQuery(sql, email);
+        return executeFindQuery(sql, email, context);
     }
 
     @Override
-    public List<Customer> findAll() {
+    public List<Customer> findAll(TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
                 "c.phoneNumber, c.addressId, c.active " +
                 "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id ";
-        return executeFindAll(sql);
+        return executeFindAll(sql,context);
     }
 
     @Override
-    public Optional<Customer> findByPhoneNumber(String phoneNumber) {
+    public Optional<Customer> findByPhoneNumber(String phoneNumber, TransactionContext context) {
         if (phoneNumber == null || phoneNumber.isBlank()) return Optional.empty();
 
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
@@ -97,7 +98,7 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE c.phoneNumber = ?";
 
-        return executeFindQuery(sql, phoneNumber);
+        return executeFindQuery(sql, phoneNumber, context);
     }
 
     protected Customer mapToEntity(ResultSet rs) throws SQLException {

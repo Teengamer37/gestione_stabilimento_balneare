@@ -10,8 +10,8 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public abstract class CreateUserService<T extends User, R extends CreateUserRequest>
     implements UserRegistrationCase<R> {
-    protected final UserRepository<T> userRepository;
-    protected final TransactionManager transactionManager;
+    private final UserRepository<T> userRepository;
+    private final TransactionManager transactionManager;
 
     public CreateUserService(UserRepository<T> userRepository, TransactionManager transactionManager) {
         this.userRepository = userRepository;
@@ -36,10 +36,4 @@ public abstract class CreateUserService<T extends User, R extends CreateUserRequ
         });
     }
 
-
-    //TODO:controlla passaggio context in find ERRORE: creazione due connessioni (SOLDI) probabilemente eliminabile o spostabile
-    protected T getUserOrThrow(Integer id){
-        return userRepository.findById(id)
-                .orElseThrow(()->new IllegalArgumentException("ERROR: User not found with id: " + id));
-    }
 }

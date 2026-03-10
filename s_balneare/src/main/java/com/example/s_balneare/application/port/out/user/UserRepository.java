@@ -11,8 +11,8 @@ public interface UserRepository<T extends User>{
     Integer save(T user, String password, TransactionContext context);
     void update(T user, TransactionContext context);
     void updatePassword(User user, String password, TransactionContext context);
-    Optional<T> findById(Integer id);
-    Optional<T> findByUsername(String username);
-    Optional<T> findByEmail(String email);
-    List<T> findAll();
+    Optional<T> findById(Integer id, TransactionContext context);
+    Optional<T> findByUsername(String username, TransactionContext context);
+    Optional<T> findByEmail(String email, TransactionContext context);
+    List<T> findAll(TransactionContext context);
 }

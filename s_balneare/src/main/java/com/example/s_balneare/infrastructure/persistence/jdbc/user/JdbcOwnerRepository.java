@@ -1,6 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
 import com.example.s_balneare.application.port.out.user.OwnerRepository;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Owner;
 
 import javax.sql.DataSource;
@@ -36,38 +37,38 @@ public class JdbcOwnerRepository
     }
 
     @Override
-    public Optional<Owner> findById(Integer id) {
+    public Optional<Owner> findById(Integer id, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.id = ?";
-        return executeFindQuery(sql, id);
+        return executeFindQuery(sql, id, context);
     }
 
     @Override
-    public Optional<Owner> findByUsername(String username) {
+    public Optional<Owner> findByUsername(String username, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.username = ?";
-        return executeFindQuery(sql, username);
+        return executeFindQuery(sql, username, context );
     }
 
     @Override
-    public Optional<Owner> findByEmail(String email) {
+    public Optional<Owner> findByEmail(String email, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.email = ?";
-        return executeFindQuery(sql, email);
+        return executeFindQuery(sql, email, context);
     }
 
     @Override
-    public List<Owner> findAll() {
+    public List<Owner> findAll(TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id ";
-        return executeFindAll(sql);
+        return executeFindAll(sql, context);
     }
 
     @Override

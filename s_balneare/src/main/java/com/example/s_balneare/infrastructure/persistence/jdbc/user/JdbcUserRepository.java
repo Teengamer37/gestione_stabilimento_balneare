@@ -30,11 +30,12 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         }
         return jdbcContext.getConnection();
     }
+
     //Implementazione comune di UpdatePassword
     @Override
     public void updatePassword(User user, String hashedPassword, TransactionContext context) {
         Connection conn = getConnection(context);
-        String sql = "UPDATE app_users SET hashPassword = ? WHERE id = ?";
+        String sql = "UPDATE users SET hashPassword = ? WHERE id = ?";
         try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, hashedPassword);
             st.setInt(2, user.getId());
@@ -52,7 +53,7 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
             throw new IllegalArgumentException("ERROR: password must not be null");
 
         try {
-            String sqlUser = "INSERT INTO app_users(name, surname, username, email, hashPassword) " +
+            String sqlUser = "INSERT INTO users(name, surname, username, email, hashPassword) " +
                     "VALUES(?, ?, ?, ?, ?)";
             int newId;
             //Inserisco prima il record in app_users
@@ -82,7 +83,7 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
             throw new IllegalArgumentException("ERROR: the parameter is not valid");
         Connection conn = getConnection(context);
         try {
-            String sqlUser = "UPDATE app_users SET name = ?, surname = ?, username = ?, email = ? WHERE id = ?";
+            String sqlUser = "UPDATE users SET name = ?, surname = ?, username = ?, email = ? WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(sqlUser)) {
                 statement.setString(1, user.getName());
                 statement.setString(2, user.getSurname());
@@ -97,7 +98,7 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         }
     }
 
-    protected List<T> executeFindAll(String sql){
+    protected List<T> executeFindAll(String sql, TransactionContext context){
         List<T> list = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
             PreparedStatement statement = conn.prepareStatement(sql)) {
@@ -112,7 +113,7 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         return list;
     }
 
-    protected Optional<T> executeFindQuery(String sql, Object parameter){
+    protected Optional<T> executeFindQuery(String sql, Object parameter, TransactionContext context){
         try (Connection conn = dataSource.getConnection();
              PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setObject(1, parameter);

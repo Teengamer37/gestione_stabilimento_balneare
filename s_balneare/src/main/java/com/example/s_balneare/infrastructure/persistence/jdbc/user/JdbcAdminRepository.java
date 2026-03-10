@@ -1,6 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
 import com.example.s_balneare.application.port.out.user.AdminRepository;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Admin;
 
 import javax.sql.DataSource;
@@ -36,38 +37,38 @@ public class JdbcAdminRepository
     }
 
     @Override
-    public Optional<Admin> findById(Integer id) {
+    public Optional<Admin> findById(Integer id, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
-        return executeFindQuery(sql, id);
+        return executeFindQuery(sql, id, context);
     }
 
     @Override
-    public Optional<Admin> findByUsername(String username) {
+    public Optional<Admin> findByUsername(String username, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.username = ?";
-        return executeFindQuery(sql, username);
+        return executeFindQuery(sql, username, context);
     }
 
     @Override
-    public Optional<Admin> findByEmail(String email) {
+    public Optional<Admin> findByEmail(String email, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.email = ?";
-        return executeFindQuery(sql, email);
+        return executeFindQuery(sql, email, context);
     }
 
     @Override
-    public List<Admin> findAll() {
+    public List<Admin> findAll(TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM users u " +
                 "INNER JOIN admins a ON u.id = a.id ";
-        return executeFindAll(sql);
+        return executeFindAll(sql, context);
     }
 
     @Override
