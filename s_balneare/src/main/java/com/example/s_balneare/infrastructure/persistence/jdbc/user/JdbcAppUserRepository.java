@@ -1,9 +1,9 @@
-package com.example.s_balneare.infrastructure.persistence.jdbc;
+package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
-import com.example.s_balneare.application.port.out.AppUserRepository;
+import com.example.s_balneare.application.port.out.user.AppUserRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
-import com.example.s_balneare.domain.user.CustomerUser;
+import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.*;

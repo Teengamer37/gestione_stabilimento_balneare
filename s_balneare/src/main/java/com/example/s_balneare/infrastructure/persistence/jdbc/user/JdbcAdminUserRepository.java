@@ -1,9 +1,7 @@
-package com.example.s_balneare.infrastructure.persistence.jdbc;
+package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
-import com.example.s_balneare.application.port.out.OwnerUserRepository;
-import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.domain.user.AppUser;
-import com.example.s_balneare.domain.user.OwnerUser;
+import com.example.s_balneare.application.port.out.user.AdminUserRepository;
+import com.example.s_balneare.domain.user.AdminUser;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -13,19 +11,19 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class JdbcOwnerUserRepository
-        extends JdbcAppUserRepository<OwnerUser>
-        implements OwnerUserRepository {
+public class JdbcAdminUserRepository
+        extends JdbcAppUserRepository<AdminUser>
+        implements AdminUserRepository {
 
 
-    protected JdbcOwnerUserRepository(DataSource dataSource) {
+    protected JdbcAdminUserRepository(DataSource dataSource) {
         super(dataSource);
     }
 
     @Override
-    protected void saveSpecificData(Connection conn, Integer newId, OwnerUser user) throws SQLException {
+    protected void saveSpecificData(Connection conn, Integer newId, AdminUser user) throws SQLException {
         //Scrivere qui il salvataggio di attributi aggiuntivi di Admin
-        String sql = "INSERT INTO owners(id) VALUES(?)";
+        String sql = "INSERT INTO admins(id) VALUES(?)";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, newId);
             statement.executeUpdate();
@@ -33,53 +31,53 @@ public class JdbcOwnerUserRepository
     }
 
     @Override
-    protected void updateSpecificData(Connection conn, OwnerUser user) throws SQLException {
+    protected void updateSpecificData(Connection conn, AdminUser user) throws SQLException {
         //Scrivere qui l'aggiornamento di attributi aggiuntivi di Admin
     }
 
     @Override
-    public Optional<OwnerUser> findById(Integer id) {
+    public Optional<AdminUser> findById(Integer id) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
-                "INNER JOIN owners o ON u.id = o.id " +
+                "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
         return executeFindQuery(sql, id);
     }
 
     @Override
-    public Optional<OwnerUser> findByUsername(String username) {
+    public Optional<AdminUser> findByUsername(String username) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
-                "INNER JOIN owners o ON u.id = o.id " +
+                "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.username = ?";
         return executeFindQuery(sql, username);
     }
 
     @Override
-    public Optional<OwnerUser> findByEmail(String email) {
+    public Optional<AdminUser> findByEmail(String email) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
-                "INNER JOIN owners o ON u.id = o.id " +
+                "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.email = ?";
         return executeFindQuery(sql, email);
     }
 
     @Override
-    public List<OwnerUser> findAll() {
+    public List<AdminUser> findAll() {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
                 "FROM app_users u " +
-                "INNER JOIN owners o ON u.id = o.id ";
+                "INNER JOIN admins a ON u.id = a.id ";
         return executeFindAll(sql);
     }
 
     @Override
-    protected OwnerUser mapToEntity(ResultSet rs) throws SQLException {
-        return new OwnerUser(rs.getInt("id"),
+    protected AdminUser mapToEntity(ResultSet rs) throws SQLException {
+        //Scrivere qui il codice per mappare gli attributi aggiuntivi di Admin
+        return new AdminUser(rs.getInt("id"),
                 rs.getString("email"),
                 rs.getString("username"),
                 rs.getString("name"),
                 rs.getString("surname")
         );
     }
-
 }

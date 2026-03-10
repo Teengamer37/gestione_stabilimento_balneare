@@ -18,4 +18,6 @@ module com.example.s_balneare {
     exports com.example.s_balneare.application.factory;
     exports com.example.s_balneare.application.port.in;
     exports com.example.s_balneare.application.port.out;
+    exports com.example.s_balneare.application.port.in.user;
+    exports com.example.s_balneare.application.port.out.user;
 }

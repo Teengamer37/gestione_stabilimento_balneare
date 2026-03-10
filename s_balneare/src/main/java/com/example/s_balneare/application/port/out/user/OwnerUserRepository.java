@@ -1,6 +1,5 @@
-package com.example.s_balneare.application.port.out;
+package com.example.s_balneare.application.port.out.user;
 
-import com.example.s_balneare.domain.user.AppUser;
 import com.example.s_balneare.domain.user.OwnerUser;
 
 //Per future implementazioni

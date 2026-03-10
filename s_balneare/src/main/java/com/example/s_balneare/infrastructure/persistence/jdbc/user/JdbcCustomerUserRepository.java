@@ -1,6 +1,6 @@
-package com.example.s_balneare.infrastructure.persistence.jdbc;
+package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
-import com.example.s_balneare.application.port.out.CustomerUserRepository;
+import com.example.s_balneare.application.port.out.user.CustomerUserRepository;
 import com.example.s_balneare.domain.user.*;
 
 import javax.sql.DataSource;
