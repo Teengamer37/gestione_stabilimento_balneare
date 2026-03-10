@@ -6,6 +6,7 @@ import com.example.s_balneare.application.port.out.AppUserRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.AppUser;
+import at.favre.lib.crypto.bcrypt.BCrypt;
 
 //TODO: Se ti garba  la mia implementazione cerchiamo di uniformarla il più possibile,
 // mi ci posso mettere anche io a fare questa task almeno imparo e leggo il tuo codice (NARCIS)
@@ -14,6 +15,7 @@ public abstract class AppUserService<T extends AppUser> {
     protected final AppUserRepository<T> appUserRepository;
     protected final AddressRepository addressRepository;
     protected final TransactionManager transactionManager;
+
 
     protected abstract T registerUser(RegistrationRequest request, TransactionContext context);
 
@@ -29,10 +31,11 @@ public abstract class AppUserService<T extends AppUser> {
     // Nomi classi e organizzazione codice stasera non ho avuto tempo di pensarci dimmi come lo vuoi dividere che opero
     // (NARCIS)
     public int createUser(RegistrationRequest request, String password){
+        String hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         return transactionManager.executeInTransaction( context -> {
             //Creazione utente, il customer in caso si occuperà di chiamare save di address
             T user = registerUser(request, context);
-            return appUserRepository.save(user, password, context);
+            return appUserRepository.save(user, hashedPassword, context);
             });
     }
 
@@ -69,11 +72,11 @@ public abstract class AppUserService<T extends AppUser> {
         });
     }
 
-    //TODO: controllo hash (SOLDI)
     public void updatePassword(Integer id, String password){
+        String hashedPassword = BCrypt.withDefaults().hashToString(12, password.toCharArray());
         transactionManager.executeInTransaction( context -> {
             T appUser = getUserOrThrow(id);
-            appUserRepository.updatePassword(appUser, password, context);
+            appUserRepository.updatePassword(appUser, hashedPassword, context);
             return appUser;
         });
     }

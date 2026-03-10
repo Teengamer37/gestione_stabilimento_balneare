@@ -3,6 +3,7 @@ module com.example.s_balneare {
     requires java.desktop;
     requires org.postgresql.jdbc;
     requires java.xml.crypto;
+    requires bcrypt;
 
     exports com.example.s_balneare;
     exports com.example.s_balneare.domain.user;
