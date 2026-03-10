@@ -1,0 +1,181 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{booktabs} % For better looking horizontal lines
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+
+% Define a custom command for the table style to save time
+\newcommand{\usecasetable}[9]{
+	\begin{table}[h!]
+		\centering
+		\footnotesize
+		\renewcommand{\arraystretch}{1.4}
+		\begin{tabularx}{\textwidth}{|l|X|}
+			\hline
+			\textbf{ID Use Case} & #1 \\ \hline
+			\textbf{Nome Use Case} & #2 \\ \hline
+			\textbf{Attori} & #3 \\ \hline
+			\textbf{Descrizione} & #4 \\ \hline
+			\textbf{Precondizioni} & #5 \\ \hline
+			\textbf{Postcondizioni} & #6 \\ \hline
+			\textbf{Flusso Principale} & #7 \\ \hline
+			\textbf{Flussi alternativi} & #8 \\ \hline
+			\textbf{Business Rules} & #9 \\ \hline
+		\end{tabularx}
+	\end{table}
+}
+
+\begin{document}
+	\usecasetable
+	{UC-01}
+	{Login to Account}
+	{User (Admin, Customer, Owner)}
+	{Permette ad un utente registrato di accedere all'account.}
+	{L'utente deve avere un account valido registrato.}
+	{L'utente viene reindirizzato alla sua dashboard.}
+	{1. L'utente inserisce username/email e password; \newline
+	 2. Il sistema convalida le credenziali; \newline
+	 3. Viene autorizzato l'accesso.}
+	{2a. Credenziali non valide: il sistema avvisa l'utente e invita a ritentare.}
+	{N/A}
+	
+	\usecasetable
+	{UC-02}
+	{Manage Account}
+	{User (Admin, Customer, Owner)}
+	{Permette all'utente di modificare i suoi dati legati all'account (username, email, numero di telefono, indirizzo ecc.).}
+	{L'utente in questione deve aver fatto login inizialmente all'account.}
+	{I dati modificati vengono aggiornati nel database e viene mostrato all'utente un messaggio di conferma dei cambiamenti.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[1.] L'utente naviga dentro la pagina "Impostazioni Account/Modifica infornazioni";
+			\item[2.] Il sistema recupera i dati e mostra i dati attuali dell'account (nome, cognome);
+			\item[3.] L'utente modifica i dati che preferisce;
+			\item[4.] L'utente clicca su "Salva modifiche";
+			\item[5.] Il sistema convalida e salva i nuovi dati;
+			\item[6.] Viene mosrato all'utente un messaggio di conferma.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[2a.] (L'utente è un Customer) Il sistema mostra anche l'indirizzo;
+			\item[3a.] (L'utente è un Customer) L'utente può modificare anche l'indirizzo; 
+			\item[1a.] Cambio email (da passo 1):
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'utente naviga su "Cambia Email"; 
+				\item[ii.] Il sistema mostra una pagina dedicata per il cambio email;
+				\item[iii.] L'utente inserisce la nuova email e la password attuale; 
+				\item[iv.] Il sistema verifica l'unicità della email nel database e manda una mail di conferma cambiamento sulla nuova email; 
+				\item[v.] L'utente clicca sul link di conferma inviato tramite mail; 
+				\item[vi.] Il sistema aggiorna la nuova email nel database.
+			\end{enumerate}
+			\item[1b-e.] Email già usata per un altro account/non valida: Il sistema segnala l'errore all'utente e invita a ricontrollare.
+			\item[1b-e.] Password non valida: Il sistema segnala l'errore all'utente e invita a reinserire la password.
+			\item[1c.] Cambio numero di telefono (L'utente è un Customer, da passo 1): 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'utente naviga su "Cambia numero di telefono";
+				\item[ii.] Il sistema mostra una pagina dedicata per il cambio numero di telefono;
+				\item[iii.] L'utente inserisce il nuovo numero di telefono e la password attuale;
+				\item[iv.] Il sistema verifica l'unicità del numero nel database e manda un SMS di conferma cambiamento sul nuovo numero;
+				\item[v.] L'utente clicca sul link di conferma inviato tramite SMS; 
+				\item[vi.] Il sistema aggiorna il nuovo numero nel database.
+			\end{enumerate}
+			\item[1c-e.] Numero di telefono già usato per un altro account/non valido: Il sistema segnala l'errore all'utente e invita a ricontrollare.
+			\item[1c-e.] Password non valida: Il sistema segnala l'errore all'utente e invita a reinserire la password.
+			\item[1d.] Cambio password (da passo 1):
+			\begin{enumerate}[nosep, leftmargin=1px]
+				\item[i.] L'utente naviga su "Cambia password"; 
+				\item[ii.] Il sistema mostra una pagina dedicata per il cambio password;
+				\item[iii.] L'utente inserisce la nuova e la vecchia password;
+				\item[iv.] Il sistema verifica la password vecchia;
+				\item[v.] Il sistema aggiorna la password nel database e mostra un messaggio di conferma all'utente.
+			\end{enumerate}
+			\item[1d-e.] Password vecchia non valida: Il sistema segnala l'errore all'utente e invita a reinserire la vecchia password.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Ogni utente deve inserire dati validi. I dati non possono essere nulli.
+			\item[•] Solo Customer possiede indirizzo e numero di telefono;
+			\item[•] Username, nome, cognome (per i Customers: indirizzo) possono essere cambiati allo stesso momento. Email, Password (per i Customers: numero di telefono) invece devono essere cambiati singolarmente attraversando dei check di sicurezza.
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-03}
+	{Create Customer Account}
+	{Guest}
+	{Permette a un utente non registrato di creare un nuovo profilo Customer inserendo i dati anagrafici e verificando i propri recapiti (Email e Telefono).}
+	{L'utente non deve essere autenticato nel sistema (stato Guest).}
+	{Viene creato un nuovo record nel database per l'account Customer; l'account diventa attivo solo dopo le verifiche.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'utente accede alla pagina di registrazione;
+			\item Il sistema mostra il modulo di inserimento dati (Username, Nome, Cognome, Indirizzo, Numero di Telefono, Email, Password);
+			\item L'utente inserisce tutti i dati richiesti e preme "Registrati";
+			\item Il sistema verifica che lo Username non sia già presente nel database;
+			\item Il sistema verifica la validità di Email e Numero di Telefono;
+			\item Il sistema invia simultaneamente un link di verifica all'Email e un codice OTP via SMS al numero fornito;
+			\item L'utente clicca sul link di verifica e inserisce il codice OTP nel sistema;
+			\item Il sistema attiva l'account e mostra un messaggio di successo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[4a.] Username già esistente: Il sistema segnala che lo username è già utilizzato e invita a sceglierne uno nuovo.
+			\item[5a.] Numero di telefono/Email già esistente: Se l'email o il telefono sono già associati ad un account, il sistema evidenzia i campi errati.
+			\item[7a.] Mancata verifica: Se l'utente non completa le verifiche entro un tempo limite, l'account viene rimosso.
+			\item[7b.] Errore codice OTP: Se l'utente inserisce un codice errato, il sistema permette di richiederne uno nuovo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Tutti i campi sono obbligatori (non null).
+			\item[•] Lo Username deve essere univoco a livello globale.
+			\item[•] L'account non deve permettere il login finché sia l'Email che il Telefono non sono stati verificati.
+		\end{enumerate}
+	}
+
+	\usecasetable
+	{UC-04}
+	{Browse Active Beaches}
+	{Guest, Customer}
+	{Permette agli utenti di visualizzare l'elenco delle spiagge operative, effettuare ricerche mirate per nome o città e consultare i dettagli di ogni stabilimento.}
+	{Nessuna (Accessibile sia ad utenti Guest che Customer).}
+	{L'utente ha visualizzato le informazioni di una spiaggia; il Customer, oltre a ciò, ha anche la possibilità di avviare una prenotazione.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'utente accede alla sezione "Esplora Spiagge" dell'applicazione;
+			\item Il sistema recupera dal database e mostra l'elenco completo di tutte le spiagge con stato "Attivo";
+			\item L'utente seleziona una spiaggia dalla lista;
+			\item Il sistema mostra la pagina di dettaglio della spiaggia (Descrizione, Servizi, Posizione).
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[2a.] Ricerca per Nome o Città: 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'utente inserisce il nome dello stabilimento o il nome della città nella barra di ricerca;
+				\item[ii.] Il sistema filtra i risultati e mostra solo le spiagge corrispondenti ai criteri;
+				\item[iii.] Se non ci sono risultati, il sistema mostra il messaggio "Nessuna spiaggia trovata".
+			\end{enumerate}
+			\item[4a.] Interazione Customer (Prenotazione): 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] Se l'utente è autenticato come Customer, il sistema mostra il pulsante "Prenota!";
+				\item[ii.] Cliccando, il sistema reindirizza l'utente a UC-05 (Create Booking).
+			\end{enumerate}
+			\item[4b.] Interazione Guest: 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] Se l'utente è Guest, il sistema mostra, oltre alle informazioni della spiaggia, un messaggio informativo: "Accedi o Registrati per poter effettuare una prenotazione".
+			\end{enumerate}
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Vengono mostrate esclusivamente le spiagge il cui stato è "Attivo" (impostato dall'Owner).
+			\item[•] I risultati della ricerca per città devono includere anche spiagge limitrofe se configurato nel sistema.
+			\item[•] La visualizzazione dei dettagli non impegna alcuna risorsa (non blocca posti spiaggia).
+		\end{enumerate}
+	}
+\end{document}

@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: aggiungere implementazione parcheggi
+//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 public class Booking {
     //dati booking
     private final Integer id;

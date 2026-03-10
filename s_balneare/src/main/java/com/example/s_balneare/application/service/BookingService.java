@@ -8,6 +8,8 @@ import com.example.s_balneare.domain.common.TransactionContext;
 
 import java.util.List;
 
+//TODO: aggiungere implementazione parcheggi
+//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
  * @see com.example.s_balneare.application.port.in.BookingUseCase BookingUseCase

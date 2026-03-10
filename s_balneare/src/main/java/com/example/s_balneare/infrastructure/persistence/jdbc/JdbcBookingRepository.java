@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+//TODO: aggiungere implementazione parcheggi
+//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Booking tramite
  * libreria JDBC.
