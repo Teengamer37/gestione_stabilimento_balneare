@@ -4,6 +4,7 @@
 \usepackage{booktabs} % For better looking horizontal lines
 \usepackage[margin=1in]{geometry}
 \usepackage{enumitem}
+\usepackage{array}
 
 % Define a custom command for the table style to save time
 \newcommand{\usecasetable}[9]{
@@ -11,7 +12,7 @@
 		\centering
 		\footnotesize
 		\renewcommand{\arraystretch}{1.4}
-		\begin{tabularx}{\textwidth}{|l|X|}
+		\begin{tabularx}{\textwidth}{|l|>{\raggedright\arraybackslash}X|}
 			\hline
 			\textbf{ID Use Case} & #1 \\ \hline
 			\textbf{Nome Use Case} & #2 \\ \hline
@@ -32,13 +33,29 @@
 	{Login to Account}
 	{User (Admin, Customer, Owner)}
 	{Permette ad un utente registrato di accedere all'account.}
-	{L'utente deve avere un account valido registrato.}
-	{L'utente viene reindirizzato alla sua dashboard.}
-	{1. L'utente inserisce username/email e password; \newline
-	 2. Il sistema convalida le credenziali; \newline
-	 3. Viene autorizzato l'accesso.}
-	{2a. Credenziali non valide: il sistema avvisa l'utente e invita a ritentare.}
-	{N/A}
+	{L'utente possiede credenziali valide registrate nel sistema.}
+	{L'utente viene autenticato e reindirizzato alla propria dashboard (in base al ruolo).}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'utente inserisce Email (o Username) e Password nella pagina di login;
+			\item L'utente clicca su "Accedi";
+			\item Il sistema verifica che le credenziali siano corrette;
+			\item Il sistema verifica lo stato dell'account (deve essere ATTIVO);
+			\item Il sistema concede l'accesso e crea la sessione utente.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[3a-e.] Credenziali Errate: Il sistema mostra un messaggio di errore ("Email o password non valide") e invita a riprovare.
+			\item[4a-e.] Utente Bannato - App Ban: Il sistema rileva che l'utente ha subito un "App Ban" dall'Admin. Il sistema blocca l'accesso e mostra il messaggio: "Il tuo account è stato disabilitato per violazione dei termini.".
+			\item[4b-e.] Spiaggia Disattivata - Solo Owner: Se l'utente è un Owner e la sua spiaggia è stata disattivata (Ban Spiaggia), il sistema blocca l'accesso e mostra: "La tua struttura è stata sospesa dall'amministratore.".
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Un account con "App Ban" non può mai generare una sessione di login valida.
+		\end{enumerate}
+	}
 	
 	\usecasetable
 	{UC-02}
@@ -149,7 +166,7 @@
 			\item L'utente accede alla sezione "Esplora Spiagge" dell'applicazione;
 			\item Il sistema recupera dal database e mostra l'elenco completo di tutte le spiagge con stato "Attivo";
 			\item L'utente seleziona una spiaggia dalla lista;
-			\item Il sistema mostra la pagina di dettaglio della spiaggia (Descrizione, Servizi, Posizione).
+			\item Il sistema mostra la pagina di dettaglio della spiaggia (Descrizione, Servizi, Posizione, Valutazione media e Lista delle Recensioni degli utenti).
 		\end{enumerate}
 	}
 	{
@@ -176,6 +193,241 @@
 			\item[•] Vengono mostrate esclusivamente le spiagge il cui stato è "Attivo" (impostato dall'Owner).
 			\item[•] I risultati della ricerca per città devono includere anche spiagge limitrofe se configurato nel sistema.
 			\item[•] La visualizzazione dei dettagli non impegna alcuna risorsa (non blocca posti spiaggia).
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-05}
+	{Create Booking}
+	{Customer, Owner}
+	{Permette ad un Customer di prenotare posti, servizi extra e parcheggi presso una spiaggia in una certa data. Permette inoltre a un Owner di registrare manualmente una prenotazione per un cliente telefonico.}
+	{L'utente deve aver effettuato il login. Se l'utente è un Customer, non deve essere bannato dalla spiaggia selezionata. Se l'utente è un Owner, deve possedere una spiaggia attiva. La spiaggia selezionata (o posseduta dall'Owner) deve essere nello stato ATTIVO.}
+	{Viene creato un nuovo record di prenotazione nel database con un prezzo totale calcolato e uno stato iniziale (PENDING per i Customer, APPROVED per gli Owner).}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item Il Customer seleziona una spiaggia (partendo da UC-04) e sceglie una data;
+			\item Il sistema verifica che il Customer non sia bannato da quella spiaggia;
+			\item Il sistema mostra la mappa o la lista delle disponibilità per la data scelta;
+			\item Il Customer seleziona i posti spiaggia desiderati (es. ombrelloni, lettini);
+			\item Il Customer seleziona eventuali extra (lettini, sdraio, sedie);
+			\item Il Customer inserisce il numero di posti auto (parcheggi) desiderati;
+			\item Il sistema calcola in tempo reale e mostra il prezzo totale riepilogativo;
+			\item Il Customer conferma la prenotazione;
+			\item Il sistema salva la prenotazione e le assegna lo stato "PENDING", mostrando un messaggio di successo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=27px]
+			\item[1a.] Flusso Owner (Prenotazione Telefonica):
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'Owner accede al pannello gestionale della propria spiaggia e avvia una nuova prenotazione;
+				\item[ii.] L'Owner seleziona la data, i posti, gli extra e i parcheggi (come nei passi 3-6 del Main Flow);
+				\item[iii.] L'Owner inserisce obbligatoriamente il Nome e il Numero di Telefono del cliente chiamante;
+				\item[iv.] Il sistema calcola e mostra il totale;
+				\item[v.] L'Owner conferma la prenotazione;
+				\item[vi.] Il sistema salva la prenotazione assegnandole automaticamente lo stato "APPROVED".
+			\end{enumerate}
+			\item[2a-e.] Utente Bannato: Il sistema rileva che il Customer è nella blacklist della spiaggia e blocca l'operazione mostrando il messaggio: "Non sei autorizzato a prenotare in questa struttura.".
+			\item[4/6a-e.] Disponibilità Esaurita: Se durante la selezione i posti o i parcheggi scelti vengono esauriti (es. prenotati da un altro utente nello stesso istante), il sistema avvisa l'utente e lo invita a modificare la scelta.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] I Customer partono sempre dallo stato PENDING (in attesa di conferma da parte dell'Owner).
+			\item[•] Le prenotazioni create dall'Owner sono considerate già confermate (APPROVED). 
+			\item[•] L'Owner non può selezionare la spiaggia: il sistema forza la prenotazione solo sullo stabilimento di sua proprietà.
+			\item[•] Il calcolo del totale si basa sul tariffario (Season/Zone) impostato per quella data.
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-06}
+	{Manage Bookings}
+	{Customer, Owner}
+	{Permette ai Customer di modificare o cancellare le proprie prenotazioni e agli Owner di approvare/rifiutare le richieste in sospeso o gestire le prenotazioni telefoniche.}
+	{L'utente deve aver effettuato il login. Deve esistere almeno una prenotazione associata all'utente (Customer) o alla spiaggia (Owner).}
+	{La prenotazione viene aggiornata e il suo stato (PENDING, CONFIRMED, REJECTED, CANCELLED) viene modificato di conseguenza nel database.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'utente accede alla sezione "Le mie prenotazioni" (Customer) o "Gestione Prenotazioni" (Owner);
+			\item Il sistema recupera e mostra lo storico delle prenotazioni;
+			\item L'utente seleziona una prenotazione specifica per visualizzarne i dettagli;
+			\item Il sistema verifica i vincoli temporali (la data odierna deve essere precedente alla data della prenotazione) e lo stato attuale;
+			\item L'utente (Customer) sceglie di modificare i parametri (aggiungere/rimuovere Posti, Extra, Parcheggi) oppure di "Cancellare" la prenotazione;
+			\item Nel caso di modifica, il sistema ricalcola il totale e l'utente conferma;
+			\item Il sistema salva l'aggiornamento: se la prenotazione modificata era CONFIRMED, il sistema la declassa allo stato PENDING. Se l'utente ha scelto di cancellare, lo stato diventa CANCELLED.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[5a.] Flusso Owner (Valutazione prenotazioni stato PENDING): 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'Owner seleziona una prenotazione Customer in stato PENDING;
+				\item[ii.] L'Owner clicca su "Approva" o "Rifiuta";
+				\item[iii.] Il sistema aggiorna lo stato in CONFIRMED o REJECTED e notifica il Customer (tramite mail e/o SMS).
+			\end{enumerate}
+			\item[5b.] Flusso Owner (Modifica Prenotazione Telefonica): 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'Owner seleziona una prenotazione registrata manualmente;
+				\item[ii.] Applica le modifiche (posti, extra, parcheggi) o cancella, rispettando gli stessi vincoli di tempo del Customer.
+			\end{enumerate}
+			\item[4a-e.] Vincolo Temporale Scaduto: Se la data odierna è uguale o successiva alla data della prenotazione, il sistema nasconde/disabilita i pulsanti di modifica e cancellazione.
+			\item[4b-e.] Stato Non Modificabile: Se la prenotazione è in stato REJECTED o CANCELLED, il sistema impedisce qualsiasi modifica da parte del Customer/Owner.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] La Spiaggia e la Data della prenotazione sono immutabili: per cambiarle, l'utente deve cancellare la prenotazione e crearne una nuova.
+			\item[•] Ogni modifica ai posti o ai servizi da parte del Customer riporta una prenotazione CONFIRMED allo stato PENDING (richiedendo una nuova approvazione da parte dell'Owner).
+			\item[•] Le modifiche sono inibite a partire dalla mezzanotte ($00:00$) del giorno stesso della prenotazione.
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-07}
+	{Write Review}
+	{Customer}
+	{Permette ad un Customer di valutare e commentare la propria esperienza presso una spiaggia in cui ha effettivamente soggiornato.}
+	{L'utente è loggato. La spiaggia è in stato ATTIVO. L'utente non ha un Ban per quella spiaggia. Deve esistere almeno una prenotazione per quella spiaggia con data nel passato (rispetto a quando viene applicato lo Use Case) e in stato CONFIRMED.}
+	{La recensione viene salvata nel database, associata alla spiaggia e all'utente.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'utente naviga nella sezione "Le mie prenotazioni" o sulla pagina della spiaggia;
+			\item L'utente clicca sul pulsante "Lascia una recensione" per la spiaggia selezionata;
+			\item Il sistema verifica che tutti i requisiti siano soddisfatti (prenotazione passata e CONFIRMED, assenza di ban, spiaggia attiva);
+			\item Il sistema mostra il modulo della recensione;
+			\item L'utente seleziona una valutazione (da 1 a 5 stelle) e inserisce un commento testuale;
+			\item L'utente clicca su "Pubblica";
+			\item Il sistema salva la recensione nel database e mostra un messaggio di conferma.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[3a-e.] Mancanza Requisiti: Se l'utente tenta di accedere all'URL della recensione senza averne diritto (es. prenotazione futura, prenotazione CANCELLED/REJECTED o mai stato in quella spiaggia), il sistema blocca l'azione mostrando: "Devi aver completato un soggiorno in questa struttura per poter lasciare una recensione.".
+			\item[3b-e.] Spiaggia Disattivata/Ban: Se la spiaggia non è più attiva o l'utente è stato bannato da quella struttura dopo il soggiorno, il sistema inibisce la funzione di recensione.
+			\item[6a-e.] Recensione non completata: Se l'utente non compila entrambi i campi, il sistema evidenzia i campi da compilare obbligatoriamente.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] La valutazione è obbligatoria ed è un valore intero tra 1 e 5.
+			\item[•] Il commento testuale è anch'esso obbligatorio.
+			\item[•] Il sistema accetta recensioni solo per prenotazioni la cui data è strettamente minore della data odierna (es. prenotazione il 19 luglio, recensibile dal 20 luglio).
+			\item[•] L'App Ban è già gestito a monte dal Login (UC-01).
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-08}
+	{Create Report}
+	{Customer, Owner}
+	{Permette ad un Customer di segnalare una spiaggia, oppure ad un Owner di segnalare un cliente, a seguito di un'interazione reale e conclusa.}
+	{L'utente deve aver effettuato il login. La spiaggia deve essere in stato ATTIVO. Deve esistere una prenotazione in stato CONFIRMED con data strettamente precedente a quella odierna. Il Customer non deve essere attualmente bannato (né dall'App né dalla spiaggia).}
+	{La segnalazione viene salvata nel database con stato PENDING, in attesa della revisione da parte di un Admin.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item Il Customer accede alla sezione delle proprie prenotazioni;
+			\item Seleziona una prenotazione passata relativa a una specifica spiaggia;
+			\item Clicca sul pulsante "Crea Segnalazione";
+			\item Il sistema verifica i requisiti (spiaggia attiva, prenotazione CONFIRMED, data passata, utente non bannato);
+			\item Il Customer digita il testo descrittivo del problema riscontrato;
+			\item Il Customer clicca su "Invia";
+			\item Il sistema salva il report impostando lo stato su PENDING e mostra un messaggio di conferma e mandata una email al Customer con il Report creato.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[1a.] Flusso Owner (Segnala Customer): 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'Owner accede alla sezione "Crea Segnalazione" del proprio pannello gestionale;
+				\item[ii.] Il sistema mostra la lista di tutte le prenotazioni passate in stato CONFIRMED relative alla sua spiaggia;
+				\item[iii.] L'Owner seleziona una prenotazione/cliente dalla lista e clicca su "Segnala";
+				\item[iv.] Il sistema esegue i controlli di validità (incluso verificare che il Customer non sia già stato bannato);
+				\item[v.] L'Owner digita il testo e clicca su "Invia";
+				\item[vi.] Il sistema salva il report in stato PENDING e manda una copia del Report alla email dell'Owner.
+			\end{enumerate}
+			\item[4a-e.] Requisiti non soddisfatti: Se le condizioni non sono rispettate (es. prenotazione futura, stato diverso da CONFIRMED, spiaggia inattiva, o Customer già bannato), il sistema disabilita la funzione di segnalazione o mostra un messaggio di errore: "Azione non consentita per questa prenotazione".
+			\item[6a-e.] Dati non compilati: Se l'utente non compila il campo descrizione del problema, il sistema evidenzia il campo invitando l'utente a compilarlo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Ogni segnalazione viene inizializzata in stato PENDING ed è visibile unicamente agli Admin.
+			\item[•] Non è possibile segnalare un Customer se le misure restrittive (App Ban o Beach Ban) sono già attive su di lui.
+			\item[•] La regola temporale è rigorosa: si possono segnalare solo eventi per cui la Data Prenotazione $<$ Data Odierna.
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-09}
+	{Create Beach}
+	{Owner}
+	{Permette a un Owner appena registrato (o senza strutture associate) di inserire nel sistema la propria spiaggia, configurandone dati anagrafici, inventario, servizi, parcheggi, stagioni e zone.}
+	{L'utente deve aver effettuato il login come Owner. Nel database NON deve esistere alcuna spiaggia già associata a questo account.}
+	{Viene creato un nuovo record "Spiaggia" nel database, associato all'Owner. Lo stato sarà ATTIVO se configurata completamente e confermata, altrimenti INATTIVO (bozza).}
+	{
+		\begin{enumerate}[nosep, leftmargin=15px]
+			\item L'Owner accede al sistema; il sistema rileva l'assenza di strutture e mostra il pulsante "Crea Spiaggia";
+			\item L'Owner clicca sul pulsante e accede al modulo di creazione;
+			\item L'Owner inserisce i Dati Obbligatori: Nome, Descrizione, Numero di Telefono, Indirizzo e Informazioni Extra;
+			\item L'Owner (opzionalmente) compila l'Inventario: quantità di ombrelloni, tende, sdraio, lettini, sedie, camerini;
+			\item L'Owner (opzionalmente) seleziona i Servizi: bagni, docce, piscina, bar, ristorante, Wi-Fi, campo da pallavolo;
+			\item L'Owner (opzionalmente) configura il Parcheggio: numero posti auto, moto, bici, veicoli elettrici e presenza telecamere di videosorveglianza;
+			\item L'Owner (opzionalmente) crea le Stagioni (prezzi base e tariffe sulle varie zone) e le Zone (layout ombrelloni/tende);
+			\item L'Owner clicca su "Salva Spiaggia";
+			\item Il sistema convalida i dati obbligatori;
+			\item Il sistema verifica la completezza della configurazione (presenza sia dei dati obbligatori che di quelli opzionali/operativi);
+			\item Avendo inserito tutti i dati, il sistema mostra un prompt: "Vuoi attivare la spiaggia e renderla visibile ora?";
+			\item L'Owner accetta (o rifiuta);
+			\item Il sistema salva definitivamente la spiaggia nel database (in stato ATTIVO se l'Owner ha accettato, altrimenti INATTIVO).
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[9a-e.] Campi Obbligatori Mancanti: Se Nome, Indirizzo o altri campi base sono vuoti, il sistema evidenzia gli errori e impedisce il salvataggio.
+			\item[10a.] Salvataggio Parziale (Bozza): Se l'Owner ha inserito i dati obbligatori ma ha saltato configurazioni chiave (es. Stagioni e Zone), il sistema non mostra il prompt di attivazione. Salva direttamente la spiaggia in stato INATTIVO. L'Owner dovrà usare "Manage Beach" (UC-10) in futuro per completarla e attivarla.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Relazione 1:1 rigida: un Owner può possedere e gestire al massimo una spiaggia nel sistema.
+			\item[•] Per poter passare allo stato ATTIVO, la spiaggia deve possedere almeno i requisiti minimi operativi (Inventario, Servizi e Parcheggi definiti; almeno una Stagione e una Zona configurate, come definito dalle regole di business generali).
+		\end{enumerate}
+	}
+	
+	\usecasetable
+	{UC-10}
+	{Manage Beach}
+	{Owner}
+	{Permette all'Owner di aggiornare i dati generali, l'inventario, i servizi, i parcheggi e di gestire la struttura delle Stagioni e delle Zone, nel rigoroso rispetto dello stato di attività della spiaggia.}
+	{L'Owner ha effettuato il login, possiede una spiaggia associata e l'account/spiaggia non sono soggetti a Ban (già verificato al login).}
+	{Il database viene aggiornato con le nuove informazioni della spiaggia, dell'inventario, delle zone e/o delle stagioni.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Owner accede alla dashboard di Gestione Spiaggia;
+			\item Il sistema recupera i dati attuali e verifica lo stato della spiaggia (ATTIVO o INATTIVO);
+			\item Il sistema "blocca" (sola lettura) o abilita i campi di modifica in base allo stato attuale;
+			\item L'Owner naviga tra le sezioni e applica le modifiche desiderate o aggiunge nuove Zone/Stagioni;
+			\item L'Owner clicca su "Salva Modifiche";
+			\item Il sistema esegue i controlli di integrità (es. validazione dell'inventario contro le esigenze delle stagioni future e capienza parcheggi per le prenotazioni attive);
+			\item Il sistema salva i dati aggiornati nel database e mostra un messaggio di successo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[3a.] Spiaggia in stato ATTIVO (Restrizioni): Il sistema rende in sola lettura: Nome, Descrizione, Numero di Telefono, Indirizzo, Inventario, Servizi e Parcheggio. L'Owner può solo aggiungere nuove Stagioni e nuove Zone. È vietata la modifica delle Stagioni esistenti e delle Zone usate nelle Stagioni esistenti.
+			\item[3b.] Spiaggia in stato INATTIVO (Permessi Estesi): Il sistema sblocca la modifica dei dati base, Inventario, Servizi e Parcheggio. Le Stagioni possono essere modificate se e solo se sono future (upcoming) e prive di prenotazioni. Le Zone possono essere modificate o rimosse se e solo se non fanno parte di alcuna Stagione.
+			\item[6a-e.] Conflitto Inventario: Se la spiaggia è INATTIVA e l'Owner riduce la quantità di inventario (ombrelloni, tende), il sistema verifica le stagioni attuali e future. Se la nuova capacità è inferiore a quella utilizzata nelle Stagioni, il sistema blocca il salvataggio mostrando: "Inventario insufficiente: capacità ridotta sotto la soglia richiesta dalle stagioni programmate."
+			\item[6b-e.] Violazione Regole Zone/Stagioni: Se l'Owner tenta di forzare (es. tramite API) la modifica di una Stagione passata/in corso, o l'eliminazione di una Zona associata a una Stagione, il sistema rifiuta l'operazione.
+			\item[6c-e.] Conflitto Parcheggi: Se l'Owner riduce il numero di parcheggi, il sistema somma i posti auto richiesti da tutte le prenotazioni PENDING e CONFIRMED per ogni singola data (odierna e futura). Se il nuovo limite inserito è inferiore al totale già prenotato in una qualsiasi di queste date, il sistema blocca l'operazione mostrando: "Capacità parcheggio insufficiente per coprire le prenotazioni già attive o in attesa."
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Dati anagrafici, Inventario, Servizi e Parcheggio sono modificabili esclusivamente in stato INATTIVO.
+			\item[•] Le Stagioni passate (past seasons) sono immutabili e vengono ignorate dal controllo sull'inventario.
+			\item[•] Una Zona diventa "bloccata" (non modificabile/eliminabile) nel momento in cui viene associata a una Stagione.
+			\item[•] I controlli di capienza (Inventario e Parcheggi) devono garantire la retrocompatibilità sia con le Stagioni in corso e quelle in futuro che con le prenotazioni già accettate o in approvazione (CONFIRMED/PENDING).
 		\end{enumerate}
 	}
 \end{document}

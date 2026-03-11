@@ -24,6 +24,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         this.transactionManager = transactionManager;
     }
 
+    //TODO: verificare che la spiaggia sia active = FALSE
     /**
      * Aggiornamento info generali spiaggia:
      * Prendo spiaggia da DB -> modifico parametro -> update nel DB
@@ -39,6 +40,8 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che la spiaggia sia active = FALSE
+    //TODO: aggiungere controllo nel rispettare inventario per le stagioni in corso e future
     /**
      * Aggiornamento inventario spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -53,6 +56,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che la spiaggia sia active = FALSE
     /**
      * Aggiornamento servizi spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -67,6 +71,8 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che la spiaggia sia active = FALSE
+    //TODO: aggiungere controllo nel rispettare parcheggi per prenotazioni odierne o in futuro
     /**
      * Aggiornamento parcheggio spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -81,6 +87,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che la spiaggia sia active = FALSE
     /**
      * Aggiornamento info extra spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -119,6 +126,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che le stagioni non si sovrappongano con le date
     /**
      * Aggiunta stagione in una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -133,6 +141,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che le stagioni non si sovrappongano con le date
     /**
      * Aggiunta lista di stagioni in una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -175,6 +184,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che non faccia parte di nessuna stagione
     /**
      * Rimozione zona da una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -189,6 +199,7 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
+    //TODO: verificare che non facciano parte di nessuna stagione
     /**
      * Rimozione lista di zone da una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB

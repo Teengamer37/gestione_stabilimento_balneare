@@ -72,7 +72,6 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
     }
 
     //Implementazione comune di UpdatePassword
-    //TODO: ho passato solo l'id l'user è superfluo, nei metodi sopra ho lasciato del  piccolo codice duplicato, dimmi se ti va bene
     @Override
     public void updatePassword(Integer id, String hashedPassword, TransactionContext context) {
         Connection conn = getConnection(context);
