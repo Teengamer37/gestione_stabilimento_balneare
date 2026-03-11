@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: aggiungere implementazione parcheggi
 //TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 public class Booking {
     //dati booking
@@ -20,12 +19,14 @@ public class Booking {
     private int extraSedie;
     private int camerini;
 
+    private BookingParking parking;
+
     //stato booking
     private BookingStatus status;
 
     //costruttore completo (per booking caricati dal DB)
     public Booking(Integer id, Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds,
-                   int extraSdraio, int extraLettini, int extraSedie, int camerini, BookingStatus status) {
+                   int extraSdraio, int extraLettini, int extraSedie, int camerini, BookingParking parking, BookingStatus status) {
         this.id = id;
 
         //check + assegnazione valore
@@ -53,12 +54,14 @@ public class Booking {
         checkInitialQuantity(camerini);
         this.camerini = camerini;
 
+        this.parking = parking;
+
         this.status = status != null ? status : BookingStatus.PENDING;
     }
 
     //costruttore per salvataggio nuovo booking (senza ID, extra a 0, status PENDING)
     public Booking(Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
-        this(0, beachId, customerId, date, spotIds, 0, 0, 0, 0, BookingStatus.PENDING);
+        this(0, beachId, customerId, date, spotIds, 0, 0, 0, 0, BookingParking.empty(), BookingStatus.PENDING);
     }
 
 
@@ -89,6 +92,9 @@ public class Booking {
     }
     public int getCamerini() {
         return camerini;
+    }
+    public BookingParking getParking() {
+        return parking;
     }
     public BookingStatus getStatus() {
         return status;
@@ -173,6 +179,40 @@ public class Booking {
         camerini += quantity;
     }
 
+    /**
+     * Aggiungi parcheggi extra alla prenotazione
+     * @param additional Record di parcheggi di diversa tipologia da aggiungere
+     * @param available Record di parcheggi di diversa tipologia disponibili alla prenotazione
+     */
+    public void addExtraParking(BookingParking additional, BookingParking available) {
+        //passo 1: verifico stato prenotazione
+        checkStatusPendingOrConfirmed("add extra quantity");
+
+        //passo 2: verifico che ci sia almeno un parcheggio da aggiungere
+        if (additional.autoPark() == 0 && additional.motoPark() == 0 && additional.bikePark() == 0 && additional.electricPark() == 0) {
+            throw new IllegalArgumentException("ERROR: no parkings specified to add");
+        }
+
+        //passo 3: verifico che le quantità da aggiungere siano <= di quelle disponibili
+        if (additional.autoPark() > available.autoPark() ||
+                additional.motoPark() > available.motoPark() ||
+                additional.bikePark() > available.bikePark() ||
+                additional.electricPark() > available.electricPark()) {
+            throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
+        }
+
+        //passo 4: aggiungo i parcheggi
+        this.parking = new BookingParking(
+                this.parking.autoPark() + additional.autoPark(),
+                this.parking.motoPark() + additional.motoPark(),
+                this.parking.bikePark() + additional.bikePark(),
+                this.parking.electricPark() + additional.electricPark()
+        );
+
+        //passo 5: se prenotazione confermata, ritorna a pending
+        revertToPendingIfConfirmed();
+    }
+
     //Helper interno per i business methods
     private void revertToPendingIfConfirmed() {
         if (status == BookingStatus.CONFIRMED) {
@@ -211,7 +251,6 @@ public class Booking {
         }
     }
     private void checkStatusIsPending(String action) {
-        // Corretto il bug originale (era == invece di !=)
         if (status != BookingStatus.PENDING) {
             throw new IllegalStateException("ERROR: booking " + id + " has to be pending in order to " + action);
         }

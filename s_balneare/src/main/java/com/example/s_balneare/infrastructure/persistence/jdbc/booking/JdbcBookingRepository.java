@@ -1,9 +1,11 @@
-package com.example.s_balneare.infrastructure.persistence.jdbc;
+package com.example.s_balneare.infrastructure.persistence.jdbc.booking;
 
-import com.example.s_balneare.application.port.out.BookingRepository;
+import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.domain.booking.Booking;
+import com.example.s_balneare.domain.booking.BookingParking;
 import com.example.s_balneare.domain.booking.BookingStatus;
 import com.example.s_balneare.domain.common.TransactionContext;
+import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -12,12 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-//TODO: aggiungere implementazione parcheggi
 //TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Booking tramite
  * libreria JDBC.
- * @see com.example.s_balneare.application.port.out.BookingRepository BookingRepository
+ * @see BookingRepository BookingRepository
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcBookingRepository implements BookingRepository {
@@ -56,8 +57,9 @@ public class JdbcBookingRepository implements BookingRepository {
         Connection connection = getConnection(context);
 
         //query
-        String sql = "INSERT INTO bookings(beachId, customerId, date, extraSdraio, extraLettini, extraSedie, camerini, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO bookings(beachId, customerId, date, extraSdraio, extraLettini, extraSedie, camerini, " +
+                "autoPark, motoPark, bikePark, electricPark, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             int newId;
@@ -67,11 +69,21 @@ public class JdbcBookingRepository implements BookingRepository {
                 statement.setInt(1, booking.getBeachId());
                 statement.setInt(2, booking.getCustomerId());
                 statement.setDate(3, java.sql.Date.valueOf(booking.getDate()));
+
+                //estrazione dati extra
                 statement.setInt(4, booking.getExtraSdraio());
                 statement.setInt(5, booking.getExtraLettini());
                 statement.setInt(6, booking.getExtraSedie());
                 statement.setInt(7, booking.getCamerini());
-                statement.setString(8, booking.getStatus().toString());
+
+                //estrazione dati parcheggio dal record
+                BookingParking parking = booking.getParking();
+                statement.setInt(8, parking != null ? parking.autoPark() : 0);
+                statement.setInt(9, parking != null ? parking.motoPark() : 0);
+                statement.setInt(10, parking != null ? parking.bikePark() : 0);
+                statement.setInt(11, parking != null ? parking.electricPark() : 0);
+
+                statement.setString(12, booking.getStatus().name());
                 statement.executeUpdate();
 
                 //prendo nuovo id generato dal DB
@@ -83,11 +95,12 @@ public class JdbcBookingRepository implements BookingRepository {
 
             //aggiungo spot del nuovo booking nel DB
             List<Integer> spotIds = booking.getSpotIds();
-            sql = "INSERT INTO bookings_spots(booking, spot) VALUES (?, ?)";
+            sql = "INSERT INTO booking_spots(bookingId, date, spotId) VALUES (?, ?, ?)";
             try (PreparedStatement statement2 = connection.prepareStatement(sql)) {
                 for (int spotId : spotIds) {
                     statement2.setInt(1, newId);
-                    statement2.setInt(2, spotId);
+                    statement2.setDate(2, java.sql.Date.valueOf(booking.getDate()));
+                    statement2.setInt(3, spotId);
                     statement2.addBatch();
                 }
                 statement2.executeBatch();
@@ -115,12 +128,16 @@ public class JdbcBookingRepository implements BookingRepository {
         if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
         //query
-        String sql = "DELETE FROM bookings WHERE id = ?";
+        String sqlSpots = "DELETE FROM booking_spots WHERE bookingId = ?";
+        String sqlBooking = "DELETE FROM bookings WHERE id = ?";
 
-        //apro connessione
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
+        try (PreparedStatement stSpots = connection.prepareStatement(sqlSpots);
+             PreparedStatement stBooking = connection.prepareStatement(sqlBooking)) {
+            stSpots.setInt(1, id);
+            stSpots.executeUpdate();
+
+            stBooking.setInt(1, id);
+            stBooking.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to delete booking", e);
         }
@@ -142,16 +159,27 @@ public class JdbcBookingRepository implements BookingRepository {
         if (booking.getId() == null || booking.getId() <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
         //query
-        String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, " +
+                "autoPark = ?, motoPark = ?, bikePark = ?, electricPark = ?, status = ? WHERE id = ?";
 
         //settaggio valori nella query + esecuzione query
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            //aggiunta extra accessori
             statement.setInt(1, booking.getExtraSdraio());
             statement.setInt(2, booking.getExtraLettini());
             statement.setInt(3, booking.getExtraSedie());
             statement.setInt(4, booking.getCamerini());
-            statement.setString(5, booking.getStatus().name());
-            statement.setInt(6, booking.getId());
+
+            //aggiunta parcheggi
+            BookingParking parking = booking.getParking();
+            statement.setInt(5, parking != null ? parking.autoPark() : 0);
+            statement.setInt(6, parking != null ? parking.motoPark() : 0);
+            statement.setInt(7, parking != null ? parking.bikePark() : 0);
+            statement.setInt(8, parking != null ? parking.electricPark() : 0);
+
+            //aggiunta status
+            statement.setString(9, booking.getStatus().name());
+            statement.setInt(10, booking.getId());
             statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to update booking", e);
@@ -176,7 +204,7 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //query
         String sql = "SELECT b.*, bs.spot FROM bookings b " +
-                     "LEFT JOIN bookings_spots bs ON b.id = bs.booking " +
+                     "LEFT JOIN booking_spots bs ON b.id = bs.bookingId " +
                      "WHERE b.id = ?";
 
         //inserisco ID ed eseguo
@@ -200,6 +228,14 @@ public class JdbcBookingRepository implements BookingRepository {
                 int camerini = rs.getInt("camerini");
                 BookingStatus status = BookingStatus.valueOf(rs.getString("status"));
 
+                //dati parcheggio
+                BookingParking parking = new BookingParking(
+                        rs.getInt("autoPark"),
+                        rs.getInt("motoPark"),
+                        rs.getInt("bikePark"),
+                        rs.getInt("electricPark")
+                );
+
                 //inserisco tutti gli spot associati al booking
                 List<Integer> spotIds = new ArrayList<>();
                 int spotId;
@@ -211,17 +247,25 @@ public class JdbcBookingRepository implements BookingRepository {
                 } while (rs.next());
 
                 //costruisco il Booking
-                Booking booking = new Booking(id, beachId, customerId, date, spotIds, extraSdraio, extraLettini, extraSedie, camerini, status);
+                Booking booking = new Booking(id,
+                        beachId,
+                        customerId,
+                        date,
+                        spotIds,
+                        extraSdraio,
+                        extraLettini,
+                        extraSedie,
+                        camerini,
+                        parking,
+                        status);
 
                 return Optional.of(booking);
             }
         } catch (SQLException e) {
-            System.out.println("ERROR: SQL query not executed correctly");
-            return Optional.empty();
+            throw new RuntimeException("ERROR: SQL query not executed correctly for booking " + id, e);
         }
     }
 
-    //FIXME: probabile metodo da mettere in un successivo Use Case
     /**
      * Trova spot occupati per una data specifica
      * @param beachId ID della spiaggia
@@ -240,8 +284,8 @@ public class JdbcBookingRepository implements BookingRepository {
         if (beachId == null || beachId <= 0 || date == null) throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
 
         //query
-        String sql = "SELECT bs.spot FROM bookings b " +
-                     "JOIN bookings_spots bs ON b.id = bs.booking " +
+        String sql = "SELECT bs.spotId FROM bookings b " +
+                     "JOIN booking_spots bs ON b.id = bs.bookingId " +
                      "WHERE b.beachId = ? AND b.date = ? " +
                      "AND b.status != 'CANCELLED' AND b.status != 'REJECTED'";
         List<Integer> occupiedSpots = new ArrayList<>();
@@ -250,7 +294,6 @@ public class JdbcBookingRepository implements BookingRepository {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, beachId);
             statement.setDate(2, java.sql.Date.valueOf(date));
-            statement.executeQuery();
 
             //aggiungo spot trovati occupati per la data x
             try (ResultSet rs = statement.executeQuery()) {

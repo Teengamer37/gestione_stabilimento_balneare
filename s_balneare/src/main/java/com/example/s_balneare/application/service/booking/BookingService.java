@@ -1,18 +1,18 @@
-package com.example.s_balneare.application.service;
+package com.example.s_balneare.application.service.booking;
 
-import com.example.s_balneare.application.port.in.BookingUseCase;
-import com.example.s_balneare.application.port.out.BookingRepository;
+import com.example.s_balneare.application.port.in.booking.BookingUseCase;
+import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.booking.Booking;
+import com.example.s_balneare.domain.booking.BookingParking;
 import com.example.s_balneare.domain.common.TransactionContext;
 
 import java.util.List;
 
-//TODO: aggiungere implementazione parcheggi
 //TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
- * @see com.example.s_balneare.application.port.in.BookingUseCase BookingUseCase
+ * @see BookingUseCase BookingUseCase
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class BookingService implements BookingUseCase {
@@ -27,10 +27,11 @@ public class BookingService implements BookingUseCase {
     /**
      * Aggiunta booking nel DB
      * @param booking Nuovo booking da aggiungere
+     * @param availableParking Parcheggi disponibili per quella data in quella spiaggia
      * @return ID del booking aggiunto generato dal Database
      */
     @Override
-    public Integer addBooking(Booking booking) {
+    public Integer addBooking(Booking booking, BookingParking availableParking) {
         return transactionManager.executeInTransaction(context -> {
             //check spot occupati
             List<Integer> occupiedSpots = bookingRepository.findOccupiedSpots(booking.getBeachId(), booking.getDate(), context);
@@ -41,6 +42,19 @@ public class BookingService implements BookingUseCase {
                 }
             }
 
+            //check disponibilità parcheggio
+            BookingParking requestedParking = booking.getParking();
+
+            if (requestedParking != null) {
+                if (requestedParking.autoPark() > availableParking.autoPark() ||
+                        requestedParking.motoPark() > availableParking.motoPark() ||
+                        requestedParking.bikePark() > availableParking.bikePark() ||
+                        requestedParking.electricPark() > availableParking.electricPark()) {
+                    throw new IllegalStateException("ERROR: not enough parking spaces available for this date");
+                }
+            }
+
+            //salva booking nel DB
             return bookingRepository.save(booking, context);
         });
     }
@@ -115,6 +129,24 @@ public class BookingService implements BookingUseCase {
             if (extraLettini > 0) booking.addExtraLettini(extraLettini, availableLettini);
             if (extraCamerini > 0) booking.addCamerini(extraCamerini, availableCamerini);
             if (extraSedie > 0) booking.addExtraSedie(extraSedie, availableSedie);
+
+            bookingRepository.update(booking, context);
+        });
+    }
+
+    /**
+     * Ricerca, aggiorna i parcheggi extra e salva booking nel DB
+     * @param id Identificatore booking da manipolare nel DB
+     * @param extraParking Oggetto contenente i parcheggi extra richiesti
+     * @param availableParking Oggetto contenente i parcheggi attualmente disponibili
+     */
+    @Override
+    public void addExtraParking(Integer id, BookingParking extraParking, BookingParking availableParking) {
+        transactionManager.executeInTransaction(context -> {
+            Booking booking = getBookingOrThrow(id, context);
+
+            //delega la logica di validazione all'entità Booking (che controllerà requested <= available)
+            booking.addExtraParking(extraParking, availableParking);
 
             bookingRepository.update(booking, context);
         });

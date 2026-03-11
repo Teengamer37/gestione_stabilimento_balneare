@@ -158,6 +158,12 @@ CREATE TABLE bookings (
     extraLettini INT NOT NULL,
     extraSedie INT NOT NULL,
     camerini INT NOT NULL,
+    -- TODO: check!!! (meglio implementarlo dentro che con una tabella separata: aggiunge overhead e pesantezza nel metodo SUM() di SQL)
+    autoPark INT NOT NULL DEFAULT 0,
+    motoPark INT NOT NULL DEFAULT 0,
+    bikePark INT NOT NULL DEFAULT 0,
+    electricPark INT NOT NULL DEFAULT 0,
+    -- fine check
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (customerId) REFERENCES customers(id),
@@ -263,7 +269,13 @@ ALTER TABLE bookings
     ADD CONSTRAINT chk_extra_sdraio_booking_nonneg CHECK (extraSdraio >= 0),
     ADD CONSTRAINT chk_extra_lettini_booking_nonneg CHECK (extraLettini >= 0),
     ADD CONSTRAINT chk_extra_sedie_booking_nonneg CHECK (extraSedie >= 0),
-    ADD CONSTRAINT chk_camerini_booking_nonneg CHECK (camerini >= 0);
+    ADD CONSTRAINT chk_camerini_booking_nonneg CHECK (camerini >= 0),
+    -- TODO: check!!! (semplicemente impedisce valori negativi)
+    ADD CONSTRAINT chk_autoPark_booking_nonneg CHECK (autoPark >= 0),
+    ADD CONSTRAINT chk_motoPark_booking_nonneg CHECK (motoPark >= 0),
+    ADD CONSTRAINT chk_bikePark_booking_nonneg CHECK (bikePark >= 0),
+    ADD CONSTRAINT chk_electricPark_booking_nonneg CHECK (electricPark >= 0);
+    -- fine check
 
 ALTER TABLE spots
     ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);
