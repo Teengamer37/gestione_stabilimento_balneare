@@ -52,6 +52,16 @@ public class JdbcCustomerRepository
                 "WHERE u.id = ?";
         return executeFindQuery(sql, context, id).stream().findFirst();
     }
+    @Override
+    public Optional<Customer> findByIdentifier(String identifier, TransactionContext context) {
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM users u " +
+                "INNER JOIN customers c ON u.id = c.id " +
+                "WHERE u.username = ? OR u.email = ?";
+
+        // Passiamo l'identifier due volte (una per l'username, una per l'email)
+        return executeFindQuery(sql, context, identifier, identifier).stream().findFirst();
+    }
 
     @Override
     public Optional<Customer> findByUsername(String username, TransactionContext context) {

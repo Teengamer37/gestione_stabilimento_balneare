@@ -31,16 +31,55 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         return jdbcContext.getConnection();
     }
 
-    //Implementazione comune di UpdatePassword
     @Override
-    public void updatePassword(User user, String hashedPassword, TransactionContext context) {
+    public Optional<String> findPassword(Integer id, TransactionContext context){
+        String sql ="SELECT hashPassword FROM users WHERE id = ?";
         Connection conn = getConnection(context);
-        String sql = "SELECT u.hashPassword FROM users u " +
-                "INNER JOIN admins a ON u.id = a.id " +
-                "WHERE u.username = ? OR u.email = ?";
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(rs.getString("hashPassword"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find password", e);
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> findPassword(String identifier, TransactionContext context) {
+        // Interroga solo la tabella padre 'users'
+        String sql = "SELECT hashPassword FROM users WHERE username = ? OR email = ?";
+        Connection conn = getConnection(context);
+
+        try (PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setString(1, identifier); // Associa a username
+            statement.setString(2, identifier); // Associa a email
+
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(rs.getString("hashPassword"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find password", e);
+        }
+
+        return Optional.empty();
+    }
+
+    //Implementazione comune di UpdatePassword
+    //TODO: ho passato solo l'id l'user è superfluo, nei metodi sopra ho lasciato del  piccolo codice duplicato, dimmi se ti va bene
+    @Override
+    public void updatePassword(Integer id, String hashedPassword, TransactionContext context) {
+        Connection conn = getConnection(context);
+        String sql = "UPDATE users u SET u.hashPassword=? WHERE u.id = ?";
         try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, hashedPassword);
-            st.setInt(2, user.getId());
+            st.setInt(2, id);
             st.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error updating password", e);

@@ -3,6 +3,7 @@ package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 import com.example.s_balneare.application.port.out.user.AdminRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Admin;
+import com.example.s_balneare.domain.user.Owner;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -43,6 +44,15 @@ public class JdbcAdminRepository
                 "INNER JOIN admins a ON u.id = a.id " +
                 "WHERE u.id = ?";
         return executeFindQuery(sql, context, id).stream().findFirst();
+    }
+    public Optional<Admin> findByIdentifier(String identifier, TransactionContext context) {
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM users u " +
+                "INNER JOIN admins a ON u.id = a.id " +
+                "WHERE u.username = ? OR u.email = ?";
+
+        // Passiamo l'identifier due volte (una per l'username, una per l'email)
+        return executeFindQuery(sql, context, identifier, identifier).stream().findFirst();
     }
 
     @Override

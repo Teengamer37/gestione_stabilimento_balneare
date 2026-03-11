@@ -2,6 +2,7 @@ package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
 import com.example.s_balneare.application.port.out.user.OwnerRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
+import com.example.s_balneare.domain.user.Customer;
 import com.example.s_balneare.domain.user.Owner;
 
 import javax.sql.DataSource;
@@ -43,6 +44,16 @@ public class JdbcOwnerRepository
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.id = ?";
         return executeFindQuery(sql, context, id).stream().findFirst();
+    }
+    @Override
+    public Optional<Owner> findByIdentifier(String identifier, TransactionContext context) {
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
+                "FROM users u " +
+                "INNER JOIN owners o ON u.id = o.id " +
+                "WHERE u.username = ? OR u.email = ?";
+
+        // Passiamo l'identifier due volte (una per l'username, una per l'email)
+        return executeFindQuery(sql, context, identifier, identifier).stream().findFirst();
     }
 
     @Override
