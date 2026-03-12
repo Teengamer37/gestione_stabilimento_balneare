@@ -32,7 +32,7 @@
 	{UC-01}
 	{Login to Account}
 	{User (Admin, Customer, Owner)}
-	{Permette ad un utente registrato di accedere all'account.}
+	{Permette ad un utente registrato di accedere all'account. Gestisce anche il cambio password obbligatorio per i nuovi Owner e Admin.}
 	{L'utente possiede credenziali valide registrate nel sistema.}
 	{L'utente viene autenticato e reindirizzato alla propria dashboard (in base al ruolo).}
 	{
@@ -40,22 +40,32 @@
 			\item L'utente inserisce Email (o Username) e Password nella pagina di login;
 			\item L'utente clicca su "Accedi";
 			\item Il sistema verifica che le credenziali siano corrette;
-			\item Il sistema verifica lo stato dell'account (deve essere ATTIVO);
+			\item Il sistema verifica lo stato dell'account (deve essere ATTIVO e non bannato);
+			\item Il sistema controlla se l'account richiede un cambio password obbligatorio (flag OTP);
 			\item Il sistema concede l'accesso e crea la sessione utente.
 		\end{enumerate}
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[3a-e.] Credenziali Errate: Il sistema mostra un messaggio di errore ("Email o password non valide") e invita a riprovare.
-			\item[4a-e.] Utente Bannato - App Ban: Il sistema rileva che l'utente ha subito un "App Ban" dall'Admin. Il sistema blocca l'accesso e mostra il messaggio: "Il tuo account è stato disabilitato per violazione dei termini.".
-			\item[4b-e.] Spiaggia Disattivata - Solo Owner: Se l'utente è un Owner e la sua spiaggia è stata disattivata (Ban Spiaggia), il sistema blocca l'accesso e mostra: "La tua struttura è stata sospesa dall'amministratore.".
+			\item[\textbf{3a-e.}] \textbf{Credenziali Errate:} Il sistema mostra un messaggio di errore ("Email o password non valide") e invita a riprovare.
+			\item[\textbf{4a-e.}] \textbf{Utente Bannato - App Ban:} Il sistema rileva che l'utente ha subito un "App Ban" dall'Admin. Il sistema blocca l'accesso e mostra il messaggio: "Il tuo account è stato disabilitato per violazione dei termini.".
+			\item[\textbf{4b-e.}] \textbf{Account Customer chiuso:} Il sistema rileva che l'account è stato chiuso; blocca quindi l'accesso e mostra il messaggio:"Impossibile accedere: account chiuso.".
+			\item[\textbf{4c-e.}] \textbf{Spiaggia Disattivata - Solo Owner:} Se l'utente è un Owner e la sua spiaggia è stata disattivata (Ban Spiaggia), il sistema blocca l'accesso e mostra: "La tua struttura è stata sospesa dall'amministratore.".
+			\item[\textbf{5a.}] \textbf{Cambio Password Obbligatorio (Primo Accesso Owner o Admin):} Se il sistema rileva il flag temporaneo sulla password, sospende il login e reindirizza l'utente a una schermata obbligatoria di "Imposta Nuova Password". 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'utente inserisce la nuova password e la conferma;
+				\item[ii.] Il sistema la salva crittografata, rimuove il flag temporaneo e procede col normale login (torna al passo 6).
+			\end{enumerate}
 		\end{enumerate}
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item[•] Un account con "App Ban" non può mai generare una sessione di login valida.
+			\item[•] I nuovi account Owner e Admin creati da un (altro) Admin non possono accedere alle funzionalità del sistema senza aver prima sostituito la password OTP.
 		\end{enumerate}
 	}
+	
+	\newpage
 	
 	\usecasetable
 	{UC-02}
@@ -76,9 +86,9 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[2a.] (L'utente è un Customer) Il sistema mostra anche l'indirizzo;
-			\item[3a.] (L'utente è un Customer) L'utente può modificare anche l'indirizzo; 
-			\item[1a.] Cambio email (da passo 1):
+			\item[\textbf{2a.}] \textbf{L'utente è un Customer:} Il sistema mostra anche l'indirizzo;
+			\item[\textbf{3a.}] \textbf{L'utente è un Customer} L'utente può modificare anche l'indirizzo; 
+			\item[\textbf{1a.}] \textbf{Cambio email (da passo 1):}
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'utente naviga su "Cambia Email"; 
 				\item[ii.] Il sistema mostra una pagina dedicata per il cambio email;
@@ -87,9 +97,9 @@
 				\item[v.] L'utente clicca sul link di conferma inviato tramite mail; 
 				\item[vi.] Il sistema aggiorna la nuova email nel database.
 			\end{enumerate}
-			\item[1b-e.] Email già usata per un altro account/non valida: Il sistema segnala l'errore all'utente e invita a ricontrollare.
-			\item[1b-e.] Password non valida: Il sistema segnala l'errore all'utente e invita a reinserire la password.
-			\item[1c.] Cambio numero di telefono (L'utente è un Customer, da passo 1): 
+			\item[\textbf{1b-e.}] \textbf{Email già usata per un altro account/non valida:} Il sistema segnala l'errore all'utente e invita a ricontrollare.
+			\item[\textbf{1b-e.}] \textbf{Password non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la password.
+			\item[\textbf{1c.}] \textbf{Cambio numero di telefono (L'utente è un Customer, da passo 1):} 
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'utente naviga su "Cambia numero di telefono";
 				\item[ii.] Il sistema mostra una pagina dedicata per il cambio numero di telefono;
@@ -98,9 +108,9 @@
 				\item[v.] L'utente clicca sul link di conferma inviato tramite SMS; 
 				\item[vi.] Il sistema aggiorna il nuovo numero nel database.
 			\end{enumerate}
-			\item[1c-e.] Numero di telefono già usato per un altro account/non valido: Il sistema segnala l'errore all'utente e invita a ricontrollare.
-			\item[1c-e.] Password non valida: Il sistema segnala l'errore all'utente e invita a reinserire la password.
-			\item[1d.] Cambio password (da passo 1):
+			\item[\textbf{1c-e.}] \textbf{Numero di telefono già usato per un altro account/non valido:} Il sistema segnala l'errore all'utente e invita a ricontrollare.
+			\item[\textbf{1c-e.}] \textbf{Password non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la password.
+			\item[\textbf{1d.}] \textbf{Cambio password (da passo 1):}
 			\begin{enumerate}[nosep, leftmargin=1px]
 				\item[i.] L'utente naviga su "Cambia password"; 
 				\item[ii.] Il sistema mostra una pagina dedicata per il cambio password;
@@ -108,7 +118,7 @@
 				\item[iv.] Il sistema verifica la password vecchia;
 				\item[v.] Il sistema aggiorna la password nel database e mostra un messaggio di conferma all'utente.
 			\end{enumerate}
-			\item[1d-e.] Password vecchia non valida: Il sistema segnala l'errore all'utente e invita a reinserire la vecchia password.
+			\item[\textbf{1d-e.}] \textbf{Password vecchia non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la vecchia password.
 		\end{enumerate}
 	}
 	{
@@ -118,6 +128,8 @@
 			\item[•] Username, nome, cognome (per i Customers: indirizzo) possono essere cambiati allo stesso momento. Email, Password (per i Customers: numero di telefono) invece devono essere cambiati singolarmente attraversando dei check di sicurezza.
 		\end{enumerate}
 	}
+	
+	\newpage
 	
 	\usecasetable
 	{UC-03}
@@ -140,10 +152,10 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
-			\item[4a.] Username già esistente: Il sistema segnala che lo username è già utilizzato e invita a sceglierne uno nuovo.
-			\item[5a.] Numero di telefono/Email già esistente: Se l'email o il telefono sono già associati ad un account, il sistema evidenzia i campi errati.
-			\item[7a.] Mancata verifica: Se l'utente non completa le verifiche entro un tempo limite, l'account viene rimosso.
-			\item[7b.] Errore codice OTP: Se l'utente inserisce un codice errato, il sistema permette di richiederne uno nuovo.
+			\item[\textbf{4a.}] \textbf{Username già esistente:} Il sistema segnala che lo username è già utilizzato e invita a sceglierne uno nuovo.
+			\item[\textbf{5a.}] \textbf{Numero di telefono/Email già esistente:} Se l'email o il telefono sono già associati ad un account, il sistema evidenzia i campi errati.
+			\item[\textbf{7a.}] \textbf{Mancata verifica:} Se l'utente non completa le verifiche entro un tempo limite, l'account viene rimosso.
+			\item[\textbf{7b.}] \textbf{Errore codice OTP:} Se l'utente inserisce un codice errato, il sistema permette di richiederne uno nuovo.
 		\end{enumerate}
 	}
 	{
@@ -153,13 +165,15 @@
 			\item[•] L'account non deve permettere il login finché sia l'Email che il Telefono non sono stati verificati.
 		\end{enumerate}
 	}
-
+		
+	\newpage
+	
 	\usecasetable
 	{UC-04}
 	{Browse Active Beaches}
 	{Guest, Customer}
 	{Permette agli utenti di visualizzare l'elenco delle spiagge operative, effettuare ricerche mirate per nome o città e consultare i dettagli di ogni stabilimento.}
-	{Nessuna (Accessibile sia ad utenti Guest che Customer).}
+	{Nessuna (Accessibile sia ad utenti Guest che Customer). Per interagire come Customer (es. vedere il tasto prenota), l'utente deve aver effettuato il login e il suo account deve essere in stato ATTIVO (non chiuso, non disattivato e non soggetto a Ban).}
 	{L'utente ha visualizzato le informazioni di una spiaggia; il Customer, oltre a ciò, ha anche la possibilità di avviare una prenotazione.}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
@@ -171,18 +185,18 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
-			\item[2a.] Ricerca per Nome o Città: 
+			\item[\textbf{2a.}] \textbf{Ricerca per Nome o Città:} 
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'utente inserisce il nome dello stabilimento o il nome della città nella barra di ricerca;
 				\item[ii.] Il sistema filtra i risultati e mostra solo le spiagge corrispondenti ai criteri;
 				\item[iii.] Se non ci sono risultati, il sistema mostra il messaggio "Nessuna spiaggia trovata".
 			\end{enumerate}
-			\item[4a.] Interazione Customer (Prenotazione): 
+			\item[\textbf{4a.}] \textbf{Interazione Customer (Prenotazione):}
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] Se l'utente è autenticato come Customer, il sistema mostra il pulsante "Prenota!";
 				\item[ii.] Cliccando, il sistema reindirizza l'utente a UC-05 (Create Booking).
 			\end{enumerate}
-			\item[4b.] Interazione Guest: 
+			\item[\textbf{4b.}] \textbf{Interazione Guest:} 
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] Se l'utente è Guest, il sistema mostra, oltre alle informazioni della spiaggia, un messaggio informativo: "Accedi o Registrati per poter effettuare una prenotazione".
 			\end{enumerate}
@@ -195,6 +209,8 @@
 			\item[•] La visualizzazione dei dettagli non impegna alcuna risorsa (non blocca posti spiaggia).
 		\end{enumerate}
 	}
+		
+	\newpage
 	
 	\usecasetable
 	{UC-05}
@@ -218,7 +234,7 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=27px]
-			\item[1a.] Flusso Owner (Prenotazione Telefonica):
+			\item[\textbf{1a.}] \textbf{Flusso Owner (Prenotazione Telefonica):}
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'Owner accede al pannello gestionale della propria spiaggia e avvia una nuova prenotazione;
 				\item[ii.] L'Owner seleziona la data, i posti, gli extra e i parcheggi (come nei passi 3-6 del Main Flow);
@@ -227,18 +243,20 @@
 				\item[v.] L'Owner conferma la prenotazione;
 				\item[vi.] Il sistema salva la prenotazione assegnandole automaticamente lo stato "APPROVED".
 			\end{enumerate}
-			\item[2a-e.] Utente Bannato: Il sistema rileva che il Customer è nella blacklist della spiaggia e blocca l'operazione mostrando il messaggio: "Non sei autorizzato a prenotare in questa struttura.".
-			\item[4/6a-e.] Disponibilità Esaurita: Se durante la selezione i posti o i parcheggi scelti vengono esauriti (es. prenotati da un altro utente nello stesso istante), il sistema avvisa l'utente e lo invita a modificare la scelta.
+			\item[\textbf{2a-e.}] \textbf{Utente Bannato:} Il sistema rileva che il Customer è nella blacklist della spiaggia e blocca l'operazione mostrando il messaggio: "Non sei autorizzato a prenotare in questa struttura.".
+			\item[\textbf{4/6a-e.}] \textbf{Disponibilità Esaurita:} Se durante la selezione i posti o i parcheggi scelti vengono esauriti (es. prenotati da un altro utente nello stesso istante), il sistema avvisa l'utente e lo invita a modificare la scelta.
 		\end{enumerate}
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
-			\item[•] I Customer partono sempre dallo stato PENDING (in attesa di conferma da parte dell'Owner).
+			\item[•] Le prenotazioni dei Customer partono sempre dallo stato PENDING e richiedono un passaggio a CONFIRMED da parte dell'Owner.
 			\item[•] Le prenotazioni create dall'Owner sono considerate già confermate (APPROVED). 
 			\item[•] L'Owner non può selezionare la spiaggia: il sistema forza la prenotazione solo sullo stabilimento di sua proprietà.
 			\item[•] Il calcolo del totale si basa sul tariffario (Season/Zone) impostato per quella data.
 		\end{enumerate}
 	}
+		
+	\newpage
 	
 	\usecasetable
 	{UC-06}
@@ -260,19 +278,19 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[5a.] Flusso Owner (Valutazione prenotazioni stato PENDING): 
+			\item[\textbf{5a.}] \textbf{Flusso Owner (Valutazione prenotazioni stato PENDING):} 
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'Owner seleziona una prenotazione Customer in stato PENDING;
 				\item[ii.] L'Owner clicca su "Approva" o "Rifiuta";
 				\item[iii.] Il sistema aggiorna lo stato in CONFIRMED o REJECTED e notifica il Customer (tramite mail e/o SMS).
 			\end{enumerate}
-			\item[5b.] Flusso Owner (Modifica Prenotazione Telefonica): 
+			\item[\textbf{5b.}] \textbf{Flusso Owner (Modifica Prenotazione Telefonica):} 
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'Owner seleziona una prenotazione registrata manualmente;
 				\item[ii.] Applica le modifiche (posti, extra, parcheggi) o cancella, rispettando gli stessi vincoli di tempo del Customer.
 			\end{enumerate}
-			\item[4a-e.] Vincolo Temporale Scaduto: Se la data odierna è uguale o successiva alla data della prenotazione, il sistema nasconde/disabilita i pulsanti di modifica e cancellazione.
-			\item[4b-e.] Stato Non Modificabile: Se la prenotazione è in stato REJECTED o CANCELLED, il sistema impedisce qualsiasi modifica da parte del Customer/Owner.
+			\item[\textbf{4a-e.}] \textbf{Vincolo Temporale Scaduto:} Se la data odierna è uguale o successiva alla data della prenotazione, il sistema nasconde/disabilita i pulsanti di modifica e cancellazione.
+			\item[\textbf{4b-e.}] \textbf{Stato Non Modificabile:} Se la prenotazione è in stato REJECTED o CANCELLED, il sistema impedisce qualsiasi modifica da parte del Customer/Owner.
 		\end{enumerate}
 	}
 	{
@@ -282,6 +300,8 @@
 			\item[•] Le modifiche sono inibite a partire dalla mezzanotte ($00:00$) del giorno stesso della prenotazione.
 		\end{enumerate}
 	}
+		
+	\newpage
 	
 	\usecasetable
 	{UC-07}
@@ -303,9 +323,9 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[3a-e.] Mancanza Requisiti: Se l'utente tenta di accedere all'URL della recensione senza averne diritto (es. prenotazione futura, prenotazione CANCELLED/REJECTED o mai stato in quella spiaggia), il sistema blocca l'azione mostrando: "Devi aver completato un soggiorno in questa struttura per poter lasciare una recensione.".
-			\item[3b-e.] Spiaggia Disattivata/Ban: Se la spiaggia non è più attiva o l'utente è stato bannato da quella struttura dopo il soggiorno, il sistema inibisce la funzione di recensione.
-			\item[6a-e.] Recensione non completata: Se l'utente non compila entrambi i campi, il sistema evidenzia i campi da compilare obbligatoriamente.
+			\item[\textbf{3a-e.}] \textbf{Mancanza Requisiti:} Se l'utente tenta di accedere all'URL della recensione senza averne diritto (es. prenotazione futura, prenotazione CANCELLED/REJECTED o mai stato in quella spiaggia), il sistema blocca l'azione mostrando: "Devi aver completato un soggiorno in questa struttura per poter lasciare una recensione.".
+			\item[\textbf{3b-e.}] \textbf{Spiaggia Disattivata/Ban:} Se la spiaggia non è più attiva o l'utente è stato bannato da quella struttura dopo il soggiorno, il sistema inibisce la funzione di recensione.
+			\item[\textbf{6a-e.}] \textbf{Recensione non completata:} Se l'utente non compila entrambi i campi, il sistema evidenzia i campi da compilare obbligatoriamente.
 		\end{enumerate}
 	}
 	{
@@ -316,13 +336,51 @@
 			\item[•] L'App Ban è già gestito a monte dal Login (UC-01).
 		\end{enumerate}
 	}
+		
+	\newpage
 	
 	\usecasetable
 	{UC-08}
+	{Close Account}
+	{Customer}
+	{Permette ad un Customer di chiudere definitivamente il proprio profilo. L'operazione comporta la cancellazione automatica di tutte le prenotazioni future.}
+	{L'utente deve aver effettuato il login.}
+	{L'account del Customer viene disattivato permanentemente. Tutte le sue prenotazioni future passano allo stato CANCELLED. La sessione corrente viene terminata.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item Il Customer accede alla sezione "Impostazioni Account" e seleziona l'opzione "Chiudi Account";
+			\item Il sistema mostra un avviso critico (Warning) che spiega le conseguenze: perdita definitiva dell'accesso e cancellazione di tutte le prenotazioni future;
+			\item Il sistema richiede l'inserimento della password attuale per confermare l'identità;
+			\item Il Customer inserisce la password e conferma l'intenzione di eliminare l'account;
+			\item Il sistema valida la password;
+			\item Il sistema individua tutte le prenotazioni del Customer (in stato PENDING o CONFIRMED) con data successiva a quella odierna;
+			\item Il sistema imposta lo stato di queste prenotazioni su CANCELLED;
+			\item Il sistema disattiva definitivamente l'account del Customer;
+			\item Il sistema esegue il logout forzato e reindirizza l'utente alla homepage.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{4a.}] \textbf{Annullamento operazione:} Se il Customer clicca su "Annulla" o chiude la finestra di avviso, il processo si interrompe e il sistema lo riporta alle impostazioni.
+			\item[\textbf{5a-e.}] \textbf{Password errata:} Se la password inserita per la conferma non è corretta, il sistema blocca l'eliminazione, mostra un messaggio di errore e invita a riprovare.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Le prenotazioni passate (storico) non vengono cancellate, ma restano a disposizione degli Owner per motivi fiscali e di reportistica.
+			\item[•] Vengono cancellate solo le prenotazioni con data $>$ data odierna.
+			\item[•] L'operazione è irreversibile: il Customer non potrà più accedere né recuperare l'account.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-09}
 	{Create Report}
 	{Customer, Owner}
 	{Permette ad un Customer di segnalare una spiaggia, oppure ad un Owner di segnalare un cliente, a seguito di un'interazione reale e conclusa.}
-	{L'utente deve aver effettuato il login. La spiaggia deve essere in stato ATTIVO. Deve esistere una prenotazione in stato CONFIRMED con data strettamente precedente a quella odierna. Il Customer non deve essere attualmente bannato (né dall'App né dalla spiaggia).}
+	{L'utente deve aver effettuato il login. La spiaggia deve essere in stato ATTIVO. Deve esistere una prenotazione in stato CONFIRMED con data strettamente precedente a quella odierna. Il Customer non deve essere attualmente bannato (né dall'App né dalla spiaggia) e non deve avere l'account chiuso.}
 	{La segnalazione viene salvata nel database con stato PENDING, in attesa della revisione da parte di un Admin.}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
@@ -337,7 +395,7 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[1a.] Flusso Owner (Segnala Customer): 
+			\item[\textbf{1a.}] \textbf{Flusso Owner (Segnala Customer):} 
 			\begin{enumerate}[nosep, leftmargin=*]
 				\item[i.] L'Owner accede alla sezione "Crea Segnalazione" del proprio pannello gestionale;
 				\item[ii.] Il sistema mostra la lista di tutte le prenotazioni passate in stato CONFIRMED relative alla sua spiaggia;
@@ -346,8 +404,8 @@
 				\item[v.] L'Owner digita il testo e clicca su "Invia";
 				\item[vi.] Il sistema salva il report in stato PENDING e manda una copia del Report alla email dell'Owner.
 			\end{enumerate}
-			\item[4a-e.] Requisiti non soddisfatti: Se le condizioni non sono rispettate (es. prenotazione futura, stato diverso da CONFIRMED, spiaggia inattiva, o Customer già bannato), il sistema disabilita la funzione di segnalazione o mostra un messaggio di errore: "Azione non consentita per questa prenotazione".
-			\item[6a-e.] Dati non compilati: Se l'utente non compila il campo descrizione del problema, il sistema evidenzia il campo invitando l'utente a compilarlo.
+			\item[\textbf{4a-e.}] \textbf{Requisiti non soddisfatti:} Se le condizioni non sono rispettate (es. prenotazione futura, stato diverso da CONFIRMED, spiaggia inattiva, o Customer già bannato), il sistema disabilita la funzione di segnalazione o mostra un messaggio di errore: "Azione non consentita per questa prenotazione".
+			\item[\textbf{6a-e.}] \textbf{Dati non compilati:} Se l'utente non compila il campo descrizione del problema, il sistema evidenzia il campo invitando l'utente a compilarlo.
 		\end{enumerate}
 	}
 	{
@@ -357,9 +415,11 @@
 			\item[•] La regola temporale è rigorosa: si possono segnalare solo eventi per cui la Data Prenotazione $<$ Data Odierna.
 		\end{enumerate}
 	}
+		
+	\newpage
 	
 	\usecasetable
-	{UC-09}
+	{UC-10}
 	{Create Beach}
 	{Owner}
 	{Permette a un Owner appena registrato (o senza strutture associate) di inserire nel sistema la propria spiaggia, configurandone dati anagrafici, inventario, servizi, parcheggi, stagioni e zone.}
@@ -384,8 +444,8 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[9a-e.] Campi Obbligatori Mancanti: Se Nome, Indirizzo o altri campi base sono vuoti, il sistema evidenzia gli errori e impedisce il salvataggio.
-			\item[10a.] Salvataggio Parziale (Bozza): Se l'Owner ha inserito i dati obbligatori ma ha saltato configurazioni chiave (es. Stagioni e Zone), il sistema non mostra il prompt di attivazione. Salva direttamente la spiaggia in stato INATTIVO. L'Owner dovrà usare "Manage Beach" (UC-10) in futuro per completarla e attivarla.
+			\item[\textbf{9a-e.}] \textbf{Campi Obbligatori Mancanti:} Se Nome, Indirizzo o altri campi base sono vuoti, il sistema evidenzia gli errori e impedisce il salvataggio.
+			\item[\textbf{10a.}] \textbf{Salvataggio Parziale (Bozza):} Se l'Owner ha inserito i dati obbligatori ma ha saltato configurazioni chiave (es. Stagioni e Zone), il sistema non mostra il prompt di attivazione. Salva direttamente la spiaggia in stato INATTIVO. L'Owner dovrà usare "Manage Beach" (UC-11) in futuro per completarla e attivarla.
 		\end{enumerate}
 	}
 	{
@@ -394,20 +454,22 @@
 			\item[•] Per poter passare allo stato ATTIVO, la spiaggia deve possedere almeno i requisiti minimi operativi (Inventario, Servizi e Parcheggi definiti; almeno una Stagione e una Zona configurate, come definito dalle regole di business generali).
 		\end{enumerate}
 	}
+		
+	\newpage
 	
 	\usecasetable
-	{UC-10}
+	{UC-11}
 	{Manage Beach}
 	{Owner}
 	{Permette all'Owner di aggiornare i dati generali, l'inventario, i servizi, i parcheggi e di gestire la struttura delle Stagioni e delle Zone, nel rigoroso rispetto dello stato di attività della spiaggia.}
 	{L'Owner ha effettuato il login, possiede una spiaggia associata e l'account/spiaggia non sono soggetti a Ban (già verificato al login).}
-	{Il database viene aggiornato con le nuove informazioni della spiaggia, dell'inventario, delle zone e/o delle stagioni.}
+	{Il database viene aggiornato con le nuove informazioni della spiaggia, dell'inventario, dei servizi e/o dei parcheggi.}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item L'Owner accede alla dashboard di Gestione Spiaggia;
 			\item Il sistema recupera i dati attuali e verifica lo stato della spiaggia (ATTIVO o INATTIVO);
 			\item Il sistema "blocca" (sola lettura) o abilita i campi di modifica in base allo stato attuale;
-			\item L'Owner naviga tra le sezioni e applica le modifiche desiderate o aggiunge nuove Zone/Stagioni;
+			\item L'Owner naviga tra le sezioni e applica le modifiche desiderate (Anagrafica, Inventario, Servizi, Parcheggi);
 			\item L'Owner clicca su "Salva Modifiche";
 			\item Il sistema esegue i controlli di integrità (es. validazione dell'inventario contro le esigenze delle stagioni future e capienza parcheggi per le prenotazioni attive);
 			\item Il sistema salva i dati aggiornati nel database e mostra un messaggio di successo.
@@ -415,19 +477,285 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
-			\item[3a.] Spiaggia in stato ATTIVO (Restrizioni): Il sistema rende in sola lettura: Nome, Descrizione, Numero di Telefono, Indirizzo, Inventario, Servizi e Parcheggio. L'Owner può solo aggiungere nuove Stagioni e nuove Zone. È vietata la modifica delle Stagioni esistenti e delle Zone usate nelle Stagioni esistenti.
-			\item[3b.] Spiaggia in stato INATTIVO (Permessi Estesi): Il sistema sblocca la modifica dei dati base, Inventario, Servizi e Parcheggio. Le Stagioni possono essere modificate se e solo se sono future (upcoming) e prive di prenotazioni. Le Zone possono essere modificate o rimosse se e solo se non fanno parte di alcuna Stagione.
-			\item[6a-e.] Conflitto Inventario: Se la spiaggia è INATTIVA e l'Owner riduce la quantità di inventario (ombrelloni, tende), il sistema verifica le stagioni attuali e future. Se la nuova capacità è inferiore a quella utilizzata nelle Stagioni, il sistema blocca il salvataggio mostrando: "Inventario insufficiente: capacità ridotta sotto la soglia richiesta dalle stagioni programmate."
-			\item[6b-e.] Violazione Regole Zone/Stagioni: Se l'Owner tenta di forzare (es. tramite API) la modifica di una Stagione passata/in corso, o l'eliminazione di una Zona associata a una Stagione, il sistema rifiuta l'operazione.
-			\item[6c-e.] Conflitto Parcheggi: Se l'Owner riduce il numero di parcheggi, il sistema somma i posti auto richiesti da tutte le prenotazioni PENDING e CONFIRMED per ogni singola data (odierna e futura). Se il nuovo limite inserito è inferiore al totale già prenotato in una qualsiasi di queste date, il sistema blocca l'operazione mostrando: "Capacità parcheggio insufficiente per coprire le prenotazioni già attive o in attesa."
+			\item[\textbf{3a.}] \textbf{Spiaggia in stato ATTIVO (Restrizioni):} Il sistema rende in sola lettura: Nome, Descrizione, Numero di Telefono, Indirizzo, Inventario, Servizi e Parcheggio. Non è permessa alcuna alterazione strutturale finché la spiaggia riceve prenotazioni.
+			\item[\textbf{3b.}] \textbf{Spiaggia in stato INATTIVO (Permessi Estesi):} Il sistema sblocca la modifica dei dati base, Inventario, Servizi e Parcheggio.
+			\item[\textbf{6a-e.}] \textbf{Conflitto Inventario:} Se la spiaggia è INATTIVA e l'Owner riduce la quantità di inventario (ombrelloni, tende), il sistema verifica le stagioni attuali e future. Se la nuova capacità è inferiore a quella utilizzata nelle Stagioni, il sistema blocca il salvataggio mostrando: "Inventario insufficiente: capacità ridotta sotto la soglia richiesta dalle stagioni programmate."
+			\item[\textbf{6b-e.}] \textbf{Conflitto Parcheggi:} Se l'Owner riduce il numero di parcheggi, il sistema somma i posti auto richiesti da tutte le prenotazioni PENDING e CONFIRMED per ogni singola data (odierna e futura). Se il nuovo limite inserito è inferiore al totale già prenotato in una qualsiasi di queste date, il sistema blocca l'operazione mostrando: "Capacità parcheggio insufficiente per coprire le prenotazioni già attive o in attesa."
 		\end{enumerate}
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item[•] Dati anagrafici, Inventario, Servizi e Parcheggio sono modificabili esclusivamente in stato INATTIVO.
-			\item[•] Le Stagioni passate (past seasons) sono immutabili e vengono ignorate dal controllo sull'inventario.
-			\item[•] Una Zona diventa "bloccata" (non modificabile/eliminabile) nel momento in cui viene associata a una Stagione.
 			\item[•] I controlli di capienza (Inventario e Parcheggi) devono garantire la retrocompatibilità sia con le Stagioni in corso e quelle in futuro che con le prenotazioni già accettate o in approvazione (CONFIRMED/PENDING).
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-12}
+	{Acttivate/Deactivate Beach}
+	{Owner}
+	{Permette all'Owner di modificare lo stato operativo della propria struttura, rendendola visibile (ATTIVA) o nascondendola (INATTIVA) per le nuove prenotazioni.}
+	{L'Owner ha effettuato il login. Possiede una spiaggia nel sistema e questa non è soggetta a un Ban da parte dell'Admin.}
+	{Lo stato della spiaggia viene aggiornato nel database. Se attivata, appare nelle ricerche dei Customer. Se disattivata, scompare dalle ricerche ma le prenotazioni attuali restano invariate.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Owner accede alla dashboard principale della propria spiaggia;
+			\item Il sistema mostra lo stato attuale della struttura tramite un apposito pulsante/interruttore (Es. "Attiva Spiaggia" o "Disattiva Spiaggia");
+			\item L'Owner clicca sul pulsante per invertire lo stato attuale;
+			\item Il sistema identifica il tipo di operazione richiesta (Attivazione o Disattivazione);
+			\item Se l'operazione è di Attivazione, il sistema verifica la presenza dei requisiti minimi operativi (Inventario, Servizi, Parcheggi, Zone e Stagioni);
+			\item Il sistema aggiorna lo stato nel database;
+			\item Il sistema mostra un messaggio di conferma dell'avvenuto cambio di stato.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{4a.}] \textbf{Flusso di Disattivazione:} Se l'Owner sceglie di disattivare la spiaggia, il sistema non richiede alcun controllo bloccante. Procede al punto 6, avvisando l'utente che la struttura non riceverà nuove prenotazioni e che quelle già registrate restano valide e gestibili tramite la sezione "Gestione Prenotazioni".
+			\item[\textbf{5a-e.}] \textbf{Requisiti Mancanti per Attivazione:} Se l'Owner tenta di attivare la spiaggia ma il sistema rileva dati mancanti, l'operazione viene bloccata. Il sistema mostra un alert specifico: "Impossibile attivare la struttura. È necessario prima configurare:[Elenco dei dati mancanti, es. Inventario, almeno 1 Zona, almeno 1 Stagione futura/in corso].".
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Per l'Attivazione sono richiesti obbligatoriamente: campi Inventario, campi Servizi, campi Parcheggio, almeno una Zona definita e almeno una Stagione configurata con data di fine $>$ data odierna.
+			\item[•] La Disattivazione è un'operazione non distruttiva: non altera lo stato (PENDING/CONFIRMED) delle prenotazioni esistenti e permette all'Owner di continuare a operare su di esse.
+			\item[•] Se l'intento è quello di chiudere definitivamente la spiaggia, vedi UC-13 (Close Beach).
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-13}
+	{Close Beach}
+	{Owner}
+	{Permette all'Owner di terminare definitivamente le operazioni della spiaggia, cancellando automaticamente tutte le prenotazioni future (PENDING/CONFIRMED) e notificando i clienti via email.}
+	{L'Owner ha effettuato il login e la spiaggia è attualmente in stato ATTIVO.}
+	{La spiaggia passa in stato CLOSED (Chiuso Definitivamente). Tutte le prenotazioni future risultano CANCELLED. Gli utenti interessati ricevono una notifica email.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Owner accede alla dashboard e seleziona "Chiudi Attività";
+			\item Il sistema mostra un avviso di sicurezza: "Attenzione, questa operazione chiuderà DEFINITIVAMENTE la spiaggia ed annullerà TUTTE le prenotazioni future (inviando una mail ai clienti). Questa azione NON È REVERSIBILE. Confermi?";
+			\item L'Owner conferma l'operazione;
+			\item Il sistema filtra tutte le prenotazioni (PENDING/CONFIRMED) con data > data odierna;
+			\item Il sistema imposta lo stato di tali prenotazioni a "CANCELLED";
+			\item Il sistema invia una email automatica a ogni cliente coinvolto;
+			\item Il sistema imposta la spiaggia in stato CLOSED.
+		\end{enumerate}
+	}
+	{
+		\begin{description}[nosep, leftmargin=25px]
+			\item[\textbf{3a-e.}] \textbf{Conferma mancata:} Se l'Owner chiude la finestra di conferma, l'operazione viene annullata senza alcuna modifica ai dati.
+		\end{description}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] La chiusura è un'azione irreversibile riguardante le prenotazioni e la spiaggia. 
+			\item[•] Vengono aggiornate nello stato CANCELLED solo le prenotazioni che devono ancora avvenire.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-14}
+	{Manage Seasons}
+	{Owner}
+	{Permette all'Owner di definire i periodi operativi della spiaggia (date di inizio e fine) e di impostare contestualmente il listino prezzi base e le tariffe specifiche per le Zone incluse.}
+	{L'Owner ha effettuato il login, l'account/spiaggia non sono soggetti a Ban. La spiaggia è in stato INATTIVO e non chiusa definitivamente.}
+	{Il calendario delle stagioni, comprensivo di prezzi e tariffe zonali, viene aggiornato nel database.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Owner accede alla dashboard e naviga nella sezione "Gestione Stagioni";
+			\item Il sistema recupera e mostra l'elenco delle stagioni configurate;
+			\item L'Owner seleziona "Nuova Stagione" (oppure "Modifica" / "Elimina" per una esistente);
+			\item Il sistema applica i blocchi temporali e relazionali in base allo storico della stagione;
+			\item L'Owner inserisce i parametri temporali (nome stagione, data inizio, data fine);
+			\item L'Owner seleziona le Zone da includere e definisce i prezzi base al giorno (extra letini/sedie/sdraio, parcheggio, camerini) e le relative tariffe di Zona (prezzo ombrellone/tenda);
+			\item L'Owner conferma l'operazione;
+			\item Il sistema esegue le validazioni temporali (incluso il controllo anti-overlap) e salva i dati (date e prezzi) nel database.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{3a.}] \textbf{Estensione Stagione (Date):} Se la stagione è in corso o futura, il sistema rende in sola lettura la Data di Inizio. L'Owner può solo posticipare la "Data di Fine".
+			\item[\textbf{3b-e.}] \textbf{Prezzi Bloccati (Immutabilità Finanziaria):} Se l'Owner modifica una stagione, l'intera sezione relativa a prezzi base e tariffe di zona passa in modalità Sola Lettura.
+			\item[\textbf{3c-e.}] \textbf{Eliminazione Bloccata:} Se si tenta di eliminare una stagione con prenotazioni associate, il sistema blocca l'azione mostrando l'avviso: "Impossibile eliminare: questa stagione contiene prenotazioni registrate.".
+			\item[\textbf{8a-e.}] \textbf{Errore Sovrapposizione Date (Overlap):} Durante il salvataggio (creazione di una nuova stagione o posticipo della fine di una esistente), il sistema verifica che il nuovo intervallo di date non intersechi i periodi di altre stagioni. Se rileva un conflitto, blocca l'operazione mostrando l'errore: "Il periodo selezionato si sovrappone a una stagione esistente.", ed invita l'utente a modificare l'intervallo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Le nuove stagioni possono essere create unicamente con date nel futuro rispetto alla data odierna.
+			\item[•] Non è possibile accorciare la durata o posticipare l'inizio di una stagione già creata.
+			\item[•] Prezzi e tariffe zonali diventano completamente immutabili dal secondo esatto in cui viene generata la prima prenotazione per quella specifica stagione.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-15}
+	{Manage Zones}
+	{Owner}
+	{Permette all'Owner di creare e configurare le diverse aree fisiche della spiaggia (es. Prima Fila, Area VIP) stabilendone il layout e i posti assegnati.}
+	{L'Owner ha effettuato il login, l'account/spiaggia non sono soggetti a Ban. La spiaggia non è chiusa ed è attualmente in stato INATTIVO.}
+	{Le zone e la loro configurazione spaziale vengono salvate nel database, pronte per essere incorporate all'interno delle Stagioni.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Owner accede alla sezione "Gestione Zone";
+			\item Il sistema mostra le zone attualmente presenti nel sistema;
+			\item L'Owner seleziona "Nuova Zona", "Modifica" o "Elimina";
+			\item Il sistema verifica se la zona selezionata possiede dipendenze (se è agganciata a una o più stagioni);
+			\item L'Owner configura i dettagli (nome zona, posizionamento inventario/ombrelloni al suo interno) e clicca su "Salva";
+			\item Il sistema registra la zona nel database.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{4a-e.}] \textbf{Modifica/Eliminazione Bloccata (Zona In Uso):} Se l'Owner tenta di modificare o eliminare una zona che risulta già associata ad almeno una Stagione configurata (passata, presente o futura), il sistema inibisce l'azione rendendo i campi "Read-Only". Viene mostrato l'avviso: "Operazione negata. Questa zona è vincolata a una stagione e non può essere alterata."
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Una volta creata, una zona è "libera" e completamente modificabile.
+			\item[•] Nel momento esatto in cui la Zona viene aggiunta al set di una Stagione, questa diventa rigorosamente Immutabile in termini di layout, per preservare lo storico della disposizione della spiaggia.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-16}
+	{Create Owner Account}
+	{Admin}
+	{Permette all'Admin di registrare manualmente un nuovo proprietario di spiaggia (Owner) nel sistema, assegnandogli le credenziali di primo accesso.}
+	{L'Admin deve aver effettuato il login al proprio account.}
+	{Viene creato un nuovo record utente di tipo "Owner" nel database. L'account viene contrassegnato con un flag che impone il cambio password al primo accesso.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Admin riceve i dati del nuovo cliente (tramite telefono o email esterna);
+			\item L'Admin accede alla propria dashboard e naviga nella sezione "Gestione Utenti";
+			\item Clicca sul pulsante "Crea un nuovo utente Owner";
+			\item Il sistema mostra il modulo di registrazione;
+			\item L'Admin compila i campi obbligatori: Nome, Cognome, Username, Email e inserisce una Password temporanea;
+			\item L'Admin clicca su "Salva";
+			\item Il sistema verifica l'univocità dello Username e dell'Email;
+			\item Il sistema salva il nuovo Owner nel database e mostra un messaggio di successo all'Admin.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{7a-e.}] \textbf{Errore Dati Duplicati:} Se il sistema rileva che l'Email o lo Username inseriti appartengono già a un altro account (di qualsiasi ruolo) nel database, blocca il salvataggio. Evidenzia i campi incriminati e mostra l'errore: "Impossibile creare l'utente: Username o Email già registrati nel sistema."
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Tutti i campi anagrafici e le credenziali sono obbligatori (non null).
+			\item[•] Email e Username devono essere globalmente univoci all'interno di tutto il database utenti.
+			\item[•] La password assegnata è temporanea (One-Time Password) e il nuovo Owner sarà forzato a cambiarla al primo accesso.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-17}
+	{Create Admin Account}
+	{Admin}
+	{Permette ad un Admin di creare un nuovo account con privilegi di amministrazione (Admin), assegnandogli le credenziali di primo accesso.}
+	{L'Admin creatore deve aver effettuato regolarmente il login al sistema.}
+	{Viene creato un nuovo record utente di tipo "Admin" nel database, configurato con una One-Time Password per il primo accesso.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Admin accede alla propria dashboard e naviga nella sezione "Gestione Utenti";
+			\item Clicca sul pulsante "Crea nuovo account Admin";
+			\item Il sistema mostra il modulo di registrazione dedicato;
+			\item L'Admin compila tutti i campi obbligatori: Nome, Cognome, Username, Email e inserisce una Password temporanea;
+			\item L'Admin clicca su "Salva";
+			\item Il sistema verifica l'univocità dello Username e dell'Email nel database;
+			\item Il sistema salva il nuovo account Admin e mostra un messaggio di conferma dell'avvenuta creazione.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{6a-e.}] \textbf{Errore Dati Duplicati:} Se il sistema rileva che l'Email o lo Username inseriti sono già associati a un account esistente (di qualsiasi ruolo), blocca il salvataggio. Il sistema evidenzia i campi errati e mostra l'avviso: "Impossibile creare l'amministratore: Username o Email già presenti nel sistema."
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Tutti i campi anagrafici e le credenziali sono obbligatori (non null).
+			\item[•] Email e Username devono essere globalmente univoci all'interno dell'intero database utenti.
+			\item[•] La password assegnata è temporanea (One-Time Password) e il nuovo Admin sarà forzato a cambiarla al primo accesso.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-18}
+	{Review Reports}
+	{Admin}
+	{Permette all'Admin di esaminare i Report in sospeso (creati da Customer o Owner) e decidere se approvarli o rifiutarli in base allo storico degli utenti coinvolti e alla descrizione del report.}
+	{L'Admin ha effettuato il login al sistema. Esiste almeno un report in stato PENDING.}
+	{Lo stato del report viene aggiornato in APPROVED o REJECTED e diventa immutabile.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Admin accede alla propria dashboard e naviga nella sezione "Revisione Segnalazioni";
+			\item Il sistema recupera e mostra l'elenco dei report in stato PENDING;
+			\item L'Admin seleziona uno specifico report per aprirne il dettaglio;
+			\item Il sistema mostra il testo della segnalazione, i dati del segnalante, i dati del segnalato e il numero totale di report pregressi (storico) a carico di entrambi gli utenti;
+			\item L'Admin valuta la gravità della situazione e clicca su "Approva Segnalazione" oppure "Rifiuta Segnalazione";
+			\item Il sistema salva il nuovo stato del report nel database;
+			\item Se il report è stato approvato e l'Admin ritiene necessaria una sanzione, il flusso si sposta su UC-19 (Applica Ban).
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{2a.}] \textbf{Nessun report in sospeso:} Se non ci sono report PENDING, il sistema mostra il messaggio "Nessuna segnalazione da revisionare al momento."
+			\item[\textbf{5a.}] \textbf{Rifiuto del Report:} Se l'Admin seleziona "Rifiuta Segnalazione", il processo termina al punto 6 senza alcuna conseguenza disciplinare per il segnalato.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Un report valutato (APPROVED o REJECTED) non può mai tornare in stato PENDING.
+			\item[•] Il sistema deve obbligatoriamente mostrare lo storico dei report passati per fornire il contesto necessario all'Admin.
+		\end{enumerate}
+	}
+		
+	\newpage
+	
+	\usecasetable
+	{UC-19}
+	{Apply Ban}
+	{Admin}
+	{Permette all'Admin di sanzionare in via definitiva un utente (Customer o Owner) o di interdirgli l'accesso a una specifica spiaggia, come conseguenza diretta di un report approvato.}
+	{L'Admin sta eseguendo UC-18 (Revisione Segnalazioni) ed ha appena approvato un report a carico dell'utente. L'utente non ha già subito la sanzione massima (App Ban).}
+	{L'utente (o la spiaggia) viene bannato permanentemente. Le prenotazioni future coinvolte vengono cancellate in automatico.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item A seguito dell'approvazione del report (UC-18), l'Admin clicca sul pulsante "Applica Sanzione" relativo all'utente segnalato;
+			\item Il sistema mostra le opzioni di Ban disponibili (App Ban o Beach Ban) in base al ruolo dell'utente;
+			\item L'Admin seleziona il tipo di Ban desiderato e inserisce una motivazione formale;
+			\item L'Admin clicca su "Conferma Ban Definitivo";
+			\item Il sistema mostra un avviso critico (Warning): "Attenzione: l'azione è irreversibile. Confermi?";
+			\item L'Admin conferma definitivamente;
+			\item Il sistema aggiorna lo stato dell'utente o dei suoi permessi nel database;
+			\item Il sistema procede alla cancellazione automatica delle prenotazioni future (come da regole di business) e notifica l'utente.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{2a.}] \textbf{Opzioni limitate per Owner:} Se l'utente segnalato è un Owner, il sistema nasconde l'opzione "Beach Ban" e permette esclusivamente di applicare l'"App Ban".
+			\item[\textbf{5a-e.}] \textbf{Annullamento operazione:} Se l'Admin annulla l'operazione al momento del warning, il Ban non viene applicato (ma il report rimane APPROVED).
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] I Ban sono definitivi. Non esiste alcuna procedura a sistema per la rimozione o la revoca di un Ban.
+			\item[•] Conseguenze Beach Ban (Customer): Impedisce permanentemente la creazione di nuove prenotazioni nella spiaggia oggetto del report.
+			\item[•] Conseguenze App Ban (Customer o Owner): Disattiva permanentemente l'accesso al sistema. Cancella automaticamente in stato CANCELLED tutte le prenotazioni future (PENDING o CONFIRMED). Se applicato a un Owner, disattiva d'ufficio e permanentemente la sua spiaggia.
 		\end{enumerate}
 	}
 \end{document}

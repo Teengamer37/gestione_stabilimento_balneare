@@ -5,6 +5,7 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.util.ArrayList;
 import java.util.List;
 
+//TODO: aggiungere attributo closed (booleana) che serve a chiudere definitivamente una spiaggia, cancellando tutte le future prenotazioni
 public class Beach {
     //attributi
     private final Integer id;
