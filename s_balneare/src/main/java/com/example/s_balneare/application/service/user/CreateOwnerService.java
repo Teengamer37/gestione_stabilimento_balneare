@@ -14,6 +14,13 @@ public class CreateOwnerService extends CreateUserService<Owner, CreateOwnerRequ
 
     @Override
     protected Owner registerUser(CreateOwnerRequest request, TransactionContext context) {
-        return new Owner(0, request.getEmail(), request.getUsername(), request.getName(), request.getSurname());
+        return new Owner(
+                0,
+                request.getEmail(),
+                request.getUsername(),
+                request.getName(),
+                request.getSurname(),
+                true
+        );
     }
 }

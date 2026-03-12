@@ -1,7 +1,6 @@
 package com.example.s_balneare.application.port.in.user;
 
 public class CreateCustomerRequest extends CreateUserRequest {
-
     private final String phoneNumber;
     private final Boolean active;
     private final String street;
@@ -10,10 +9,22 @@ public class CreateCustomerRequest extends CreateUserRequest {
     private final String zipCode;
     private final String country;
 
-    public CreateCustomerRequest(String email, String username, String name, String surname, String phoneNumber, boolean active, String phoneNumber1, Boolean active1, String street, String streetNumber, String city, String zipCode, String country) {
-        super(email, username, name, surname, phoneNumber, active);
-        this.phoneNumber = phoneNumber1;
-        this.active = active1;
+    public CreateCustomerRequest(
+            String email,
+            String username,
+            String name,
+            String surname,
+            String phoneNumber,
+            Boolean active,
+            String street,
+            String streetNumber,
+            String city,
+            String zipCode,
+            String country)
+    {
+        super(email, username, name, surname);
+        this.phoneNumber = phoneNumber;
+        this.active = active;
         this.street = street;
         this.streetNumber = streetNumber;
         this.city = city;
@@ -21,17 +32,25 @@ public class CreateCustomerRequest extends CreateUserRequest {
         this.country = country;
     }
 
-    public String getPhoneNumber() {return phoneNumber;}
-
-    public String getStreet() {return street;}
-
-    public String getCity() {return city;}
-
-    public String getStreetNumber() {return streetNumber;}
-
-    public String getZipCode() {return zipCode;}
-
-    public String getCountry() {return country;}
-
-    public boolean isActive() {return active;}
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+    public String getStreet() {
+        return street;
+    }
+    public String getCity() {
+        return city;
+    }
+    public String getStreetNumber() {
+        return streetNumber;
+    }
+    public String getZipCode() {
+        return zipCode;
+    }
+    public String getCountry() {
+        return country;
+    }
+    public boolean isActive() {
+        return active;
+    }
 }

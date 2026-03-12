@@ -9,7 +9,7 @@ import com.example.s_balneare.domain.user.User;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public abstract class CreateUserService<T extends User, R extends CreateUserRequest>
-    implements UserRegistrationCase<R> {
+        implements UserRegistrationCase<R> {
     private final UserRepository<T> userRepository;
     private final TransactionManager transactionManager;
 
@@ -22,18 +22,17 @@ public abstract class CreateUserService<T extends User, R extends CreateUserRequ
 
     @Override
     public final int register(R request, String rawPassword) {
-        // 1. Hash FUORI dalla transazione (Performance CPU)
+        //passo 1: hash password
         String hashedPassword = BCrypt.withDefaults().hashToString(12, rawPassword.toCharArray());
 
-        // 2. Apertura transazione (Atomicità)
+        //passo 2: apro transazione
         return transactionManager.executeInTransaction(context -> {
 
-            // 3. Chiamata al pezzo mancante (implementato dal figlio)
+            //passo 3: chiamo funzione registerUser
             T userEntity = registerUser(request, context);
 
-            // 4. Salvataggio finale (tabella app_users + tabelle specifiche)
+            //passo 4: salvo nel DB
             return userRepository.save(userEntity, hashedPassword, context);
         });
     }
-
 }

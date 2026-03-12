@@ -19,11 +19,25 @@ public class CreateCustomerService extends CreateUserService<Customer, CreateCus
 
     @Override
     protected Customer registerUser(CreateCustomerRequest request, TransactionContext context) {
-        Address address = new Address(0,request.getStreet(),request.getStreetNumber(),request.getCity(),request.getZipCode(),request.getCountry());
+        Address address = new Address(
+                0,
+                request.getStreet(),
+                request.getStreetNumber(),
+                request.getCity(),
+                request.getZipCode(),
+                request.getCountry()
+        );
         Integer addressId = addressRepository.save(address, context);
+
         return new Customer(
-                0, request.getEmail(), request.getUsername(), request.getName(), request.getSurname(), request.getPhoneNumber(), addressId, request.isActive()
+                0,
+                request.getEmail(),
+                request.getUsername(),
+                request.getName(),
+                request.getSurname(),
+                request.getPhoneNumber(),
+                addressId,
+                request.isActive()
         );
     }
-
 }

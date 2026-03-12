@@ -1,7 +1,6 @@
 package com.example.s_balneare.application.port.out.user;
 
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.domain.user.Admin;
 import com.example.s_balneare.domain.user.Customer;
 
 import java.util.Optional;

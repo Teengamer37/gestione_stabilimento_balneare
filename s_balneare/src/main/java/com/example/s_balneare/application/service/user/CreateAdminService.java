@@ -8,13 +8,19 @@ import com.example.s_balneare.domain.user.Admin;
 
 
 public class CreateAdminService extends CreateUserService<Admin, CreateAdminRequest> {
-
     public CreateAdminService(UserRepository<Admin> userRepository, TransactionManager transactionManager) {
         super(userRepository, transactionManager);
     }
 
     @Override
     protected Admin registerUser(CreateAdminRequest request, TransactionContext context) {
-        return new Admin(0, request.getEmail(), request.getUsername(), request.getName(), request.getSurname());
+        return new Admin(
+                0,
+                request.getEmail(),
+                request.getUsername(),
+                request.getName(),
+                request.getSurname(),
+                true
+        );
     }
 }

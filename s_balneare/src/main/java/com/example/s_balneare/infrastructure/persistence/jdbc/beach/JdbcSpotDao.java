@@ -1,6 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
 import com.example.s_balneare.domain.beach.Beach;
+import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.layout.Spot;
 import com.example.s_balneare.domain.layout.SpotType;
 import com.example.s_balneare.domain.layout.Zone;
@@ -99,7 +100,7 @@ class JdbcSpotDao {
      * @throws SQLException se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao#deleteOrphanedZones(Integer, Connection) JdbcZoneDao.deleteOrphanedZones()
-     * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository#update(Beach) JdbcBeachRepository.update()
+     * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository#update(Beach, TransactionContext) JdbcBeachRepository.update()
      */
     void deleteAllZones(Integer beachId, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) {

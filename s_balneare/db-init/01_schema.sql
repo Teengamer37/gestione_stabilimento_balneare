@@ -40,11 +40,13 @@ CREATE TABLE customers (
 
 CREATE TABLE owners (
     id INT PRIMARY KEY,
+    OTP BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
 CREATE TABLE admins (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    OTP BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id) REFERENCES users(id)
 );
 
@@ -166,7 +168,7 @@ CREATE TABLE bookings (
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (customerId) REFERENCES customers(id),
     UNIQUE (beachId,customerId,date),
-    UNIQUE (id,date) -- TODO: si potrebbe eliminare intrinseco nella definizione?? Eliminandolo da errore attenzione
+    UNIQUE (id,date)
 );
 
 CREATE TABLE booking_spots (

@@ -9,17 +9,14 @@ import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
-public class JdbcCustomerRepository
-        extends JdbcUserRepository<Customer>
-        implements CustomerRepository {
-
+public class JdbcCustomerRepository extends JdbcUserRepository<Customer> implements CustomerRepository {
     protected JdbcCustomerRepository(DataSource dataSource) {
         super(dataSource);
     }
 
     @Override
-    protected void saveSpecificData(Connection conn, Integer newId, Customer user) throws SQLException{
-        String sql = "INSERT INTO customers(id,phoneNumber, addressId, active) VALUES(?,?,?,?)";
+    protected void saveSpecificData(Connection conn, Integer newId, Customer user) throws SQLException {
+        String sql = "INSERT INTO customers(id, phoneNumber, addressId, active) VALUES(?, ?, ?, ?)";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, newId);
             statement.setString(2, user.getPhoneNumber());
@@ -59,7 +56,7 @@ public class JdbcCustomerRepository
                 "INNER JOIN customers c ON u.id = c.id " +
                 "WHERE u.username = ? OR u.email = ?";
 
-        // Passiamo l'identifier due volte (una per l'username, una per l'email)
+        //passo identifier due volte (una per lo username, una per l'email)
         return executeFindQuery(sql, context, identifier, identifier).stream().findFirst();
     }
 
@@ -95,6 +92,7 @@ public class JdbcCustomerRepository
                 "c.phoneNumber, c.addressId, c.active " +
                 "FROM users u " +
                 "INNER JOIN customers c ON u.id = c.id ";
+
         return executeFindQuery(sql,context);
     }
 

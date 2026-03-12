@@ -18,6 +18,11 @@ public final class Customer extends User {
     @Override
     public Role getRole() { return Role.CUSTOMER; }
 
+    @Override
+    public boolean isOTP() {
+        return false;
+    }
+
     public void changePhoneNumber(String newPhone) {
         validatePhoneNumber(newPhone);
         this.phoneNumber = newPhone;

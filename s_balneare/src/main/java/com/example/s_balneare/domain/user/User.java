@@ -20,6 +20,7 @@ public abstract class User {
     }
 
     public abstract Role getRole();
+    public abstract boolean isOTP();
 
     //metodi di Business
     public void updateEmail(String email) {

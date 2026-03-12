@@ -12,18 +12,18 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class JdbcUserRepository<T extends User> implements UserRepository<T> {
-
     protected final DataSource dataSource;
 
     protected JdbcUserRepository(DataSource dataSource) {
         this.dataSource = dataSource;
     }
-    //METODI ASTRATTI: mattoncini da utilizzare per la logica comune:
+
+    //metodi astratti
     protected abstract void saveSpecificData(Connection conn, Integer newId, T user) throws SQLException;
     protected abstract void updateSpecificData(Connection conn, T user) throws SQLException;
     protected abstract T mapToEntity(ResultSet rs) throws SQLException;
 
-    // METIODO HELPER: utilizzato per la gestione della connession
+    // METIODO HELPER: utilizzato per la gestione della connessione
     protected Connection getConnection(TransactionContext context) {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
@@ -51,13 +51,13 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
 
     @Override
     public Optional<String> findPassword(String identifier, TransactionContext context) {
-        // Interroga solo la tabella padre 'users'
+        //interroga solo la tabella padre 'users'
         String sql = "SELECT hashPassword FROM users WHERE username = ? OR email = ?";
         Connection conn = getConnection(context);
 
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setString(1, identifier); // Associa a username
-            statement.setString(2, identifier); // Associa a email
+            statement.setString(1, identifier);
+            statement.setString(2, identifier);
 
             try (ResultSet rs = statement.executeQuery()) {
                 if (rs.next()) {
@@ -71,21 +71,22 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         return Optional.empty();
     }
 
-    //Implementazione comune di UpdatePassword
+    //implementazione comune di UpdatePassword
     @Override
     public void updatePassword(Integer id, String hashedPassword, TransactionContext context) {
         Connection conn = getConnection(context);
-        String sql = "UPDATE users u SET u.hashPassword=? WHERE u.id = ?";
+        String sql = "UPDATE users u SET u.hashPassword = ? WHERE u.id = ?";
         try (PreparedStatement st = conn.prepareStatement(sql)) {
             st.setString(1, hashedPassword);
             st.setInt(2, id);
             st.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException("Error updating password", e);
+            throw new RuntimeException("ERROR: unable to update password", e);
         }
     }
+
     //Strumenti di logica comune per gli utenti, utili per evitare replicazione del codice
-     @Override
+    @Override
     public Integer save(T user, String password, TransactionContext context) {
         Connection conn = getConnection(context);
 
@@ -96,7 +97,8 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
             String sqlUser = "INSERT INTO users(name, surname, username, email, hashPassword) " +
                     "VALUES(?, ?, ?, ?, ?)";
             int newId;
-            //Inserisco prima il record in app_users
+
+            //inserisco prima il record in app_users
             try (PreparedStatement statement = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, user.getName());
                 statement.setString(2, user.getSurname());
@@ -109,7 +111,7 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
                     else throw new SQLException("ERROR: SQL FAILED, no ID generated for user");
                 }
             }
-            //Non si necessita di un rollback perchè necessita di un executeTransaction a causa del legame con address
+            //non si necessita di un rollback perché necessita di un executeTransaction a causa del legame con address
             saveSpecificData(conn, newId, user);
             return newId;
         } catch (SQLException e) {
@@ -138,14 +140,14 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
         }
     }
 
-    // UNICO METODO PER TUTTE LE QUERY (FindAll e FindBy)
+    //unico metodo per findAll e findBy
     protected List<T> executeFindQuery(String sql, TransactionContext context, Object... parameters) {
         List<T> list = new ArrayList<>();
         Connection conn = getConnection(context);
 
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
 
-            // Inserisce i parametri (se ce ne sono)
+            //inserisco i parametri (se ce ne sono)
             for (int i = 0; i < parameters.length; i++) {
                 statement.setObject(i + 1, parameters[i]);
             }
