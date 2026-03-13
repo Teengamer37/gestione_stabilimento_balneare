@@ -16,19 +16,18 @@ public class Ban {
 
     //TODO: crea 2 costruttori: uno con createdAt e uno senza
 
-    // 1. Costruttore per NUOVI BAN (senza ID e senza createdAt, usati nell'applicazione)
-    public Ban(Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
-        this(null, bannedId, banType, bannedFromBeachId, adminId, reason, Instant.now());
+    // 1. Costruttore per NUOVI BAN, senza il parametro createdAt
+    //delega la costruzione al costruttore completo
+    public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
+        this(id, bannedId, banType, bannedFromBeachId, adminId, reason, Instant.now());
     }
 
-    // 2. Costruttore COMPLETO (usato dal Repository per ricostruire l'oggetto dal DB)
+    // 2. Costruttore COMPLETO (usato dal Repository per ricostruire l'oggetto dal DB), necessita del parametro createAt
     public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason, Instant createdAt) {
-        // Eseguiamo i check sui parametri passati, NON sulle variabili d'istanza
         checkBannedId(bannedId);
         checkAdminId(adminId);
         checkReason(reason);
         checkCreatedAt(createdAt);
-        // Passiamo entrambi i valori per il check logico incrociato
         checkBannedFromBeachId(bannedFromBeachId, banType);
 
         this.id = id;
