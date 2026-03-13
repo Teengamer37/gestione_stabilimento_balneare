@@ -158,7 +158,7 @@ public class JdbcBookingRepository implements BookingRepository {
         //check validità ID
         if (booking.getId() == null || booking.getId() <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
-        //query
+        //passo 1: aggiorno tabella bookings
         String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, " +
                 "autoPark = ?, motoPark = ?, bikePark = ?, electricPark = ?, status = ? WHERE id = ?";
 
@@ -181,6 +181,24 @@ public class JdbcBookingRepository implements BookingRepository {
             statement.setString(9, booking.getStatus().name());
             statement.setInt(10, booking.getId());
             statement.executeUpdate();
+
+            //passo 2: aggiorno tabella booking_spots (cancello i vecchi spots, inserisco i nuovi spots)
+            String deleteSpots = "DELETE FROM booking_spots WHERE bookingId = ?";
+            try (PreparedStatement delSt = connection.prepareStatement(deleteSpots)) {
+                delSt.setInt(1, booking.getId());
+                delSt.executeUpdate();
+            }
+
+            String insertSpots = "INSERT INTO booking_spots(bookingId, date, spotId) VALUES (?, ?, ?)";
+            try (PreparedStatement insSt = connection.prepareStatement(insertSpots)) {
+                for (int spotId : booking.getSpotIds()) {
+                    insSt.setInt(1, booking.getId());
+                    insSt.setDate(2, java.sql.Date.valueOf(booking.getDate()));
+                    insSt.setInt(3, spotId);
+                    insSt.addBatch();
+                }
+                insSt.executeBatch();
+            }
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to update booking", e);
         }
@@ -203,7 +221,7 @@ public class JdbcBookingRepository implements BookingRepository {
         if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
         //query
-        String sql = "SELECT b.*, bs.spot FROM bookings b " +
+        String sql = "SELECT b.*, bs.spotId FROM bookings b " +
                      "LEFT JOIN booking_spots bs ON b.id = bs.bookingId " +
                      "WHERE b.id = ?";
 
@@ -240,7 +258,7 @@ public class JdbcBookingRepository implements BookingRepository {
                 List<Integer> spotIds = new ArrayList<>();
                 int spotId;
                 do {
-                    spotId = rs.getInt("spot");
+                    spotId = rs.getInt("spotId");
                     if (!rs.wasNull()) {
                         spotIds.add(spotId);
                     }
@@ -268,37 +286,42 @@ public class JdbcBookingRepository implements BookingRepository {
 
     /**
      * Trova spot occupati per una data specifica
+     * Con excludeBookingId, vado a levare i posti tecnicamente occupati del Booking che sto modificando
      * @param beachId ID della spiaggia
      * @param date Data da cercare
+     * @param excludeBookingId ID del Booking da escludere dalla ricerca
      * @param context Connessione JDBC
      * @return Una lista di ID di Spots occupati di quella spiaggia in quel giorno
      * @throws IllegalArgumentException se ci sono parametri non validi
      * @throws RuntimeException se ci sono problemi di connessione col Database
      */
     @Override
-    public List<Integer> findOccupiedSpots(Integer beachId, LocalDate date, TransactionContext context) {
+    public List<Integer> findOccupiedSpots(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context) {
         //estraggo la connessione JDBC
         Connection connection = getConnection(context);
 
         //check validità parametri
         if (beachId == null || beachId <= 0 || date == null) throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
+        if (excludeBookingId != null && excludeBookingId <= 0) throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
 
         //query
         String sql = "SELECT bs.spotId FROM bookings b " +
                      "JOIN booking_spots bs ON b.id = bs.bookingId " +
                      "WHERE b.beachId = ? AND b.date = ? " +
-                     "AND b.status != 'CANCELLED' AND b.status != 'REJECTED'";
+                     "AND b.status != 'CANCELLED' AND b.status != 'REJECTED' " +
+                     "AND b.id != ?";
         List<Integer> occupiedSpots = new ArrayList<>();
 
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, beachId);
             statement.setDate(2, java.sql.Date.valueOf(date));
+            statement.setInt(3, excludeBookingId != null ? excludeBookingId : -1);
 
             //aggiungo spot trovati occupati per la data x
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    occupiedSpots.add(rs.getInt("spot"));
+                    occupiedSpots.add(rs.getInt("spotId"));
                 }
             }
         } catch (SQLException e) {

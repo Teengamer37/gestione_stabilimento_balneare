@@ -13,7 +13,7 @@ public class Booking {
     private final LocalDate date;
 
     //oggetti booking
-    private final List<Integer> spotIds;
+    private List<Integer> spotIds;
     private int extraSdraio;
     private int extraLettini;
     private int extraSedie;
@@ -130,13 +130,11 @@ public class Booking {
     /**
      * Aggiungi extra sdraio con controlli
      * @param quantity Numero di sdraio da aggiungere
-     * @param availableSdraio Numero di sdraio disponibili
      */
-    public void addExtraSdraio(int quantity, int availableSdraio) {
+    public void updateExtraSdraio(int quantity) {
         checkStatusPendingOrConfirmed("add extra quantity");
-        checkAddedQuantity(quantity, availableSdraio);
 
-        extraSdraio += quantity;
+        extraSdraio = quantity;
         //controllo stato booking (se CONFIRMED, ritorna a PENDING)
         revertToPendingIfConfirmed();
     }
@@ -144,72 +142,57 @@ public class Booking {
     /**
      * Aggiungi extra lettini con controlli
      * @param quantity Numero di lettini da aggiungere
-     * @param availableLettini Numero di lettini disponibili
      */
-    public void addExtraLettini(int quantity, int availableLettini) {
+    public void updateExtraLettini(int quantity) {
         checkStatusPendingOrConfirmed("add extra quantity");
-        checkAddedQuantity(quantity, availableLettini);
 
-        extraLettini += quantity;
+        extraLettini = quantity;
         revertToPendingIfConfirmed();
     }
 
     /**
      * Aggiungi extra sedie con controlli
      * @param quantity Numero di sedie da aggiungere
-     * @param availableSedie Numero di sedie disponibili
      */
-    public void addExtraSedie(int quantity, int availableSedie) {
+    public void updateExtraSedie(int quantity) {
         checkStatusPendingOrConfirmed("add extra quantity");
-        checkAddedQuantity(quantity, availableSedie);
 
-        extraSedie += quantity;
+        extraSedie = quantity;
         revertToPendingIfConfirmed();
     }
 
     /**
      * Aggiungi camerini con controlli
      * @param quantity Numero di camerini da aggiungere
-     * @param availableCamerini Numero di camerini disponibili
      */
-    public void addCamerini(int quantity, int availableCamerini) {
+    public void updateCamerini(int quantity) {
         checkStatusPendingOrConfirmed("add extra quantity");
-        checkAddedQuantity(quantity, availableCamerini);
 
-        camerini += quantity;
+        camerini = quantity;
+        revertToPendingIfConfirmed();
     }
 
     /**
-     * Aggiungi parcheggi extra alla prenotazione
-     * @param additional Record di parcheggi di diversa tipologia da aggiungere
-     * @param available Record di parcheggi di diversa tipologia disponibili alla prenotazione
+     * Aggiorna gli spot e i parcheggi prenotati nel Booking
+     * @param updatedSpotIds Lista di spot aggiornati
+     * @param updatedParking Parcheggi aggiornati
      */
-    public void addExtraParking(BookingParking additional, BookingParking available) {
-        //passo 1: verifico stato prenotazione
-        checkStatusPendingOrConfirmed("add extra quantity");
+    public void updateSpotsAndParking(List<Integer> updatedSpotIds, BookingParking updatedParking) {
+        checkStatusPendingOrConfirmed("be updated");
+        checkSpotIds(updatedSpotIds);
 
-        //passo 2: verifico che ci sia almeno un parcheggio da aggiungere
-        if (additional.autoPark() == 0 && additional.motoPark() == 0 && additional.bikePark() == 0 && additional.electricPark() == 0) {
-            throw new IllegalArgumentException("ERROR: no parkings specified to add");
+        //verifico che i nuovi parcheggi siano validi
+        if (updatedParking.autoPark() < 0 || updatedParking.motoPark() < 0 ||
+                updatedParking.bikePark() < 0 || updatedParking.electricPark() < 0) {
+            throw new IllegalArgumentException("ERROR: parking values cannot be negative");
         }
+        this.parking = updatedParking;
 
-        //passo 3: verifico che le quantità da aggiungere siano <= di quelle disponibili
-        if (additional.autoPark() > available.autoPark() ||
-                additional.motoPark() > available.motoPark() ||
-                additional.bikePark() > available.bikePark() ||
-                additional.electricPark() > available.electricPark()) {
-            throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
-        }
+        //rimuovo tutti gli spot, ne aggiungo di nuovi
+        this.spotIds.clear();
+        this.spotIds.addAll(updatedSpotIds);
 
-        //passo 4: aggiungo i parcheggi
-        this.parking = new BookingParking(
-                this.parking.autoPark() + additional.autoPark(),
-                this.parking.motoPark() + additional.motoPark(),
-                this.parking.bikePark() + additional.bikePark(),
-                this.parking.electricPark() + additional.electricPark()
-        );
-
-        //passo 5: se prenotazione confermata, ritorna a pending
+        //se prenotazione confermata, ritorna a pending
         revertToPendingIfConfirmed();
     }
 
@@ -240,14 +223,6 @@ public class Booking {
     private void checkInitialQuantity(int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("ERROR: extra quantity must be >= 0 for booking " + id);
-        }
-    }
-    private void checkAddedQuantity(int quantity, int available) {
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("ERROR: quantity must be > 0");
-        }
-        if (quantity > available) {
-            throw new IllegalArgumentException("ERROR: quantity must be <= available quantity");
         }
     }
     private void checkStatusIsPending(String action) {

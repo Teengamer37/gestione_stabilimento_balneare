@@ -2,12 +2,19 @@ package com.example.s_balneare.application.service.booking;
 
 import com.example.s_balneare.application.port.in.booking.BookingUseCase;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
+import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
+import com.example.s_balneare.application.port.out.booking.BookedInventory;
+import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.domain.beach.Beach;
+import com.example.s_balneare.domain.beach.BeachInventory;
+import com.example.s_balneare.domain.beach.Parking;
 import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.booking.BookingParking;
 import com.example.s_balneare.domain.common.TransactionContext;
 
+import java.time.LocalDate;
 import java.util.List;
 
 //TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
@@ -19,52 +26,71 @@ import java.util.List;
 public class BookingService implements BookingUseCase {
     private final BookingRepository bookingRepository;
     private final BeachRepository beachRepository;
+    private final AvailabilityQuery availabilityQuery;
     private final TransactionManager transactionManager;
 
-    public BookingService(BookingRepository bookingRepository, TransactionManager transactionManager, BeachRepository beachRepository) {
+    public BookingService(BookingRepository bookingRepository, TransactionManager transactionManager,
+                          BeachRepository beachRepository, AvailabilityQuery availabilityQuery) {
         this.bookingRepository = bookingRepository;
         this.transactionManager = transactionManager;
         this.beachRepository = beachRepository;
+        this.availabilityQuery = availabilityQuery;
     }
 
-    //TODO: modificare tutta la logica update per UC-06
+    //TODO: modificare tutta la logica update per UC-05 e UC-06 lato Owner
     /**
-     * Modifica booking nel DB
-     * @param booking Nuovo booking da aggiungere
-     * @param availableParking Parcheggi disponibili per quella data in quella spiaggia
-     * @return ID del booking aggiunto generato dal Database
+     * Aggiorna booking nel DB con nuovi dettagli
+     * @param id ID del Booking da modificare
+     * @param newSpotIds Spot prenotati da aggiornare nel Booking
+     * @param newParking Parcheggi da aggiornare al Booking
+     * @param newSdraio Extra sdraio da aggiornare al Booking
+     * @param newLettini Extra lettini da aggiornare al Booking
+     * @param newSedie Extra sedie da aggiornare al Booking
+     * @param newCamerini Extra camerini da aggiornare al Booking
      */
     @Override
-    public Integer updateBooking(Booking booking, BookingParking availableParking) {
-        return transactionManager.executeInTransaction(context -> {
-            //check spot occupati
-            List<Integer> occupiedSpots = bookingRepository.findOccupiedSpots(booking.getBeachId(), booking.getDate(), context);
+    public void updateBooking(Integer id, List<Integer> newSpotIds, BookingParking newParking,
+                              int newSdraio, int newLettini, int newSedie, int newCamerini) {
+        transactionManager.executeInTransaction(context -> {
+            //passo 1: recupero la prenotazione dal DB
+            Booking booking = getBookingOrThrow(id, context);
+            Beach beach = beachRepository.findById(booking.getBeachId(), context).get();
 
-            for (Integer spotId : booking.getSpotIds()) {
-                if (occupiedSpots.contains(spotId)) {
-                    throw new IllegalArgumentException("ERROR: Spot " + spotId + " is already occupied on " + booking.getDate());
-                }
+            //passo 2: check sulla data per vedere se è possibile modificare la prenotazione
+            if (!booking.getDate().isAfter(LocalDate.now())) {
+                throw new IllegalStateException("ERROR: booking cannot be updated on or after its date.");
             }
 
-            //check disponibilità parcheggio
-            BookingParking requestedParking = booking.getParking();
+            //passo 3: calcolo il numero di posti parcheggio ed extra oggetti prenotati finora
+            BookedParkingSpaces bookedParking = availabilityQuery.getBookedParking(beach.getId(), booking.getDate(), id, context);
+            BookedInventory bookedInv = availabilityQuery.getBookedInventory(beach.getId(), booking.getDate(), id, context);
 
-            if (requestedParking != null) {
-                if (requestedParking.autoPark() > availableParking.autoPark() ||
-                        requestedParking.motoPark() > availableParking.motoPark() ||
-                        requestedParking.bikePark() > availableParking.bikePark() ||
-                        requestedParking.electricPark() > availableParking.electricPark()) {
-                    throw new IllegalStateException("ERROR: not enough parking spaces available for this date");
-                }
+            //passo 4: controllo disponibilità parcheggi
+            if (!isParkingAvailable(beach.getParking(), bookedParking, newParking)) {
+                throw new IllegalStateException("ERROR: too many parking spaces selected");
             }
 
-            //check se gli spot appartengono effettivamente alla spiaggia
-            if (!beachRepository.doSpotsBelongToBeach(booking.getBeachId(), booking.getSpotIds(), context)) {
+            //passo 5: controllo disponibilità extra oggetti
+            BeachInventory cap = beach.getBeachInventory();
+            if ((cap.countExtraSdraio() - bookedInv.sdraio() < newSdraio) ||
+                    (cap.countExtraLettini() - bookedInv.lettini() < newLettini) ||
+                    (cap.countExtraSedie() - bookedInv.sedie() < newSedie) ||
+                    (cap.countCamerini() - bookedInv.camerini() < newCamerini)) {
+                throw new IllegalStateException("ERROR: not enough inventory items available");
+            }
+
+            //passo 6: verifico se gli spot appartengono effettivamente alla spiaggia
+            if (!beachRepository.doSpotsBelongToBeach(beach.getId(), newSpotIds, context)) {
                 throw new SecurityException("ERROR: one or more spots do not belong to the beach");
             }
 
-            //salva booking nel DB
-            return bookingRepository.save(booking, context);
+            //passo 7: aggiornamento e salvataggio nel DB
+            booking.updateExtraSdraio(newSdraio);
+            booking.updateExtraLettini(newLettini);
+            booking.updateExtraSedie(newSedie);
+            booking.updateCamerini(newCamerini);
+            booking.updateSpotsAndParking(newSpotIds, newParking);
+            bookingRepository.update(booking, context);
         });
     }
 
@@ -76,6 +102,11 @@ public class BookingService implements BookingUseCase {
     public void confirmBooking(Integer id) {
         transactionManager.executeInTransaction(context -> {
             Booking booking = getBookingOrThrow(id, context);
+
+            //check sulla data per vedere se è possibile modificare la prenotazione
+            if (!booking.getDate().isAfter(LocalDate.now())) {
+                throw new IllegalStateException("ERROR: booking cannot be confirmed on or after its date.");
+            }
 
             booking.confirmBooking();
 
@@ -92,6 +123,11 @@ public class BookingService implements BookingUseCase {
         transactionManager.executeInTransaction(context -> {
             Booking booking = getBookingOrThrow(id, context);
 
+            //check sulla data per vedere se è possibile modificare la prenotazione
+            if (!booking.getDate().isAfter(LocalDate.now())) {
+                throw new IllegalStateException("ERROR: booking cannot be rejected on or after its date.");
+            }
+
             booking.rejectBooking();
 
             bookingRepository.update(booking, context);
@@ -107,55 +143,12 @@ public class BookingService implements BookingUseCase {
         transactionManager.executeInTransaction(context -> {
             Booking booking = getBookingOrThrow(id, context);
 
+            //check sulla data per vedere se è possibile modificare la prenotazione
+            if (!booking.getDate().isAfter(LocalDate.now())) {
+                throw new IllegalStateException("ERROR: booking cannot be cancelled on or after its date.");
+            }
+
             booking.cancelBooking();
-
-            bookingRepository.update(booking, context);
-        });
-    }
-
-    /**
-     * Ricerca, aggiorna gli extra e salva booking nel DB
-     * @param id Identificatore booking da manipolare nel DB
-     * @param extraSdraio Numero di sdraio extra da aggiungere alla prenotazione
-     * @param extraLettini Numero di lettini extra da aggiungere alla prenotazione
-     * @param extraCamerini Numero di camerini da aggiungere alla prenotazione
-     * @param extraSedie Numero di sedie extra da aggiungere alla prenotazione
-     * @param availableSdraio Numero di sdraio prenotabili nella spiaggia in quel giorno
-     * @param availableLettini Numero di lettini prenotabili nella spiaggia in quel giorno
-     * @param availableCamerini Numero di camerini prenotabili nella spiaggia in quel giorno
-     * @param availableSedie Numero di sedie prenotabili nella spiaggia in quel giorno
-     */
-    @Override
-    public void addExtras (Integer id,
-                           int extraSdraio, int extraLettini,
-                           int extraCamerini, int extraSedie,
-                           int availableSdraio, int availableLettini,
-                           int availableCamerini, int availableSedie) {
-        transactionManager.executeInTransaction(context -> {
-            Booking booking = getBookingOrThrow(id, context);
-
-            if (extraSdraio > 0) booking.addExtraSdraio(extraSdraio, availableSdraio);
-            if (extraLettini > 0) booking.addExtraLettini(extraLettini, availableLettini);
-            if (extraCamerini > 0) booking.addCamerini(extraCamerini, availableCamerini);
-            if (extraSedie > 0) booking.addExtraSedie(extraSedie, availableSedie);
-
-            bookingRepository.update(booking, context);
-        });
-    }
-
-    /**
-     * Ricerca, aggiorna i parcheggi extra e salva booking nel DB
-     * @param id Identificatore booking da manipolare nel DB
-     * @param extraParking Oggetto contenente i parcheggi extra richiesti
-     * @param availableParking Oggetto contenente i parcheggi attualmente disponibili
-     */
-    @Override
-    public void addExtraParking(Integer id, BookingParking extraParking, BookingParking availableParking) {
-        transactionManager.executeInTransaction(context -> {
-            Booking booking = getBookingOrThrow(id, context);
-
-            //delega la logica di validazione all'entità Booking (che controllerà requested <= available)
-            booking.addExtraParking(extraParking, availableParking);
 
             bookingRepository.update(booking, context);
         });
@@ -172,5 +165,22 @@ public class BookingService implements BookingUseCase {
     private Booking getBookingOrThrow(Integer id, TransactionContext context) {
         return bookingRepository.findById(id, context)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: Booking not found with id: " + id));
+    }
+
+    /**
+     * Metodo privato che va a fare questo calcolo:
+     * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
+     * Questa operazione viene fatta per ciascuna categoria di parcheggio.
+     * @param capacity Parcheggio della spiaggia
+     * @param booked Parcheggi prenotati in quella data
+     * @param requested Parcheggi richiesti
+     * @return una booleana che risponde alla domanda "ci sono parcheggi disponibili per questa prenotazione?"
+     */
+    private boolean isParkingAvailable(Parking capacity, BookedParkingSpaces booked, BookingParking requested) {
+        if (capacity == null) return false;
+        return (capacity.nAutoPark() - booked.bookedAuto() >= requested.autoPark()) &&
+                (capacity.nMotoPark() - booked.bookedMoto() >= requested.motoPark()) &&
+                (capacity.nBikePark() - booked.bookedBike() >= requested.bikePark()) &&
+                (capacity.nElectricPark() - booked.bookedElectric() >= requested.electricPark());
     }
 }

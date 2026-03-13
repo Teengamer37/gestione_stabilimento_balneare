@@ -22,5 +22,5 @@ public interface BookingRepository {
     Optional<Booking> findById(Integer id, TransactionContext context);
 
     //trova spot occupati per una data specifica
-    List<Integer> findOccupiedSpots(Integer beachId, LocalDate date, TransactionContext context);
+    List<Integer> findOccupiedSpots(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context);
 }

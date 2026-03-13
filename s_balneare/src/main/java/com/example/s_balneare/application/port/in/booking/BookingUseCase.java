@@ -1,8 +1,9 @@
 package com.example.s_balneare.application.port.in.booking;
 
 import com.example.s_balneare.application.service.booking.BookingService;
-import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.booking.BookingParking;
+
+import java.util.List;
 
 //TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
@@ -11,14 +12,9 @@ import com.example.s_balneare.domain.booking.BookingParking;
  * @see BookingService BookingService
  */
 public interface BookingUseCase {
-    Integer updateBooking(Booking booking, BookingParking availableParking);
+    void updateBooking(Integer id, List<Integer> newSpotIds, BookingParking newParking,
+                       int newSdraio, int newLettini, int newSedie, int newCamerini);
     void confirmBooking(Integer id);
     void rejectBooking(Integer id);
     void cancelBooking(Integer id);
-    void addExtras (Integer id,
-                    int extraSdraio, int extraLettini,
-                    int extraCamerini, int extraSedie,
-                    int availableSdraio, int availableLettini,
-                    int availableCamerini, int availableSedie);
-    void addExtraParking(Integer id, BookingParking extraParking, BookingParking availableParking);
 }

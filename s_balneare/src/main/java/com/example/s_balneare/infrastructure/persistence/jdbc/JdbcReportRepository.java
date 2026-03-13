@@ -163,7 +163,6 @@ public class JdbcReportRepository implements ReportRepository {
     }
 
     @Override
-    //TODO: consigliato passare l'oggetto intero anche se per noi è immutabile dimmi come vuoi eseguire
     public void updateStatus(ReportStatus status, TransactionContext context, Integer Id) {
         Connection conn =  getConnection(context);
         String sql =  "UPDATE reports SET status=? WHERE id=?";

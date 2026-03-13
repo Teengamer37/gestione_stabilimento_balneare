@@ -4,7 +4,7 @@ import com.example.s_balneare.domain.user.Role;
 
 import java.time.Instant;
 
-//TODO: controlla implementazione di una factory static e corretta posizione in cui assegnare Instant.now()
+//TODO: controlla costruttori (ne basta uno), delega assegnazione createdAt ai service
 
 public class Report {
     private final Integer id;
@@ -64,14 +64,14 @@ public class Report {
 
     public void approve() {
         if (this.status != ReportStatus.PENDING) {
-            throw new IllegalStateException("Report cannot be approved, it is in: " + this.status);
+            throw new IllegalStateException("ERROR: report cannot be approved, it is in: " + this.status);
         }
         this.status = ReportStatus.APPROVED;
     }
 
     public void reject() {
         if (this.status != ReportStatus.PENDING) {
-            throw new IllegalStateException("Report cannot be rejected, it is in: " + this.status);
+            throw new IllegalStateException("ERROR: report cannot be rejected, it is in: " + this.status);
         }
         this.status = ReportStatus.REJECTED;
     }
