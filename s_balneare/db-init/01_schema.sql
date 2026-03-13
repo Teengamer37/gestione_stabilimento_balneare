@@ -188,7 +188,7 @@ CREATE TABLE bans (
     bannedFromBeachId INT,
     adminId INT NOT NULL,
     reason VARCHAR(512) NOT NULL,
-    time DATETIME NOT NULL,
+    createdAt DATETIME NOT NULL,
     FOREIGN KEY (bannedId) REFERENCES customers(id),
     FOREIGN KEY (bannedFromBeachId) REFERENCES beaches(id),
     FOREIGN KEY (adminId) REFERENCES admins(id)

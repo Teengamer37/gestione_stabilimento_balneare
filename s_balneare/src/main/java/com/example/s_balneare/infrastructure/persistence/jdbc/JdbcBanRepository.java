@@ -27,7 +27,7 @@ public class JdbcBanRepository implements BanRepository {
     public Integer save(Ban ban, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql = "INSERT INTO bans (bannedId, banType, bannedFromBeachId, adminId, reason, time) VALUES (?, ?, ?, ?, ?, ?) ";
+        String sql = "INSERT INTO bans (bannedId, banType, bannedFromBeachId, adminId, reason, createdAt) VALUES (?, ?, ?, ?, ?, ?) ";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, ban.getBannedId());
@@ -53,7 +53,7 @@ public class JdbcBanRepository implements BanRepository {
     public Optional<Ban> findById(Integer id, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, time FROM bans WHERE id = ?";
+        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
@@ -73,7 +73,7 @@ public class JdbcBanRepository implements BanRepository {
 
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, time FROM bans";
+        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans";
         List<Ban> bans = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -92,7 +92,7 @@ public class JdbcBanRepository implements BanRepository {
     public List<Ban> findByBannedId(Integer bannedId, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, time FROM bans WHERE bannedId = ?";
+        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE bannedId = ?";
         List<Ban> bans = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, bannedId);
@@ -111,7 +111,7 @@ public class JdbcBanRepository implements BanRepository {
     public List<Ban> findByBannedFromBeachId(Integer bannedFromBeachId, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, time FROM bans WHERE bannedFromBeachId = ?";
+        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE bannedFromBeachId = ?";
         List<Ban> bans = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, bannedFromBeachId);
@@ -121,7 +121,26 @@ public class JdbcBanRepository implements BanRepository {
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find bans by bannedFrombeachID", e);
+            throw new RuntimeException("ERROR: unable to find bans by bannedFromBeachID", e);
+        }
+        return bans;
+    }
+
+    @Override
+    public List<Ban> findByBanType(Integer banType, TransactionContext context) {
+        Connection connection = getConnection(context);
+
+        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE banType = ?";
+        List<Ban> bans = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, banType);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    bans.add(mapToEntity(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to find bans by banType", e);
         }
         return bans;
     }

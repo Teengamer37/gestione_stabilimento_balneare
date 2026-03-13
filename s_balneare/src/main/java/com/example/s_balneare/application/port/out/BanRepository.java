@@ -13,4 +13,5 @@ public interface BanRepository {
     //Un utente può avere più ban, ed una spiaggia può avere più utenti bannati
     public List<Ban> findByBannedId(Integer id, TransactionContext context);
     public List<Ban> findByBannedFromBeachId(Integer bannedFromBeachId, TransactionContext context);
+    public List<Ban> findByBanType(Integer banType, TransactionContext context);
 }
