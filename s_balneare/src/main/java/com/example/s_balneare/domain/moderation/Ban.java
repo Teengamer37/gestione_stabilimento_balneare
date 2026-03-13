@@ -14,8 +14,7 @@ public class Ban {
     private final String reason;
     private final Instant createdAt;
 
-    //TODO: controlla questi due costruttori con l'assegnamento null a createdAt del  costruttore se rispetta i pattern a me gemini dice
-    // di sì ma non mi convince, inoltre a me consiglia di inserire due costruttori diversi per tutte le entià che hanno id generato dal DB
+    //TODO: crea 2 costruttori: uno con createdAt e uno senza
 
     // 1. Costruttore per NUOVI BAN (senza ID e senza createdAt, usati nell'applicazione)
     public Ban(Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
