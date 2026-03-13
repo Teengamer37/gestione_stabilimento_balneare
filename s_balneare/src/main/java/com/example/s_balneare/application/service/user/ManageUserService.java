@@ -78,10 +78,16 @@ public class ManageUserService<T extends User> {
             userRepository.update(user, context);
         });
     }
+
     //transazione unica eliminazione email, da gestire per controlli lato applicazione
-    public void updateEmail (Integer id, String email) {
+    public void updateEmail (Integer id, String email, String currentPassword) {
         transactionManager.executeInTransaction(context -> {
             T user = getUserOrThrow(id, context);
+
+            String currentHashedPassword = userRepository.findPassword(id, context)
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: Password not found"));
+            verifyPassword(currentPassword, currentHashedPassword);
+
             user.updateEmail(email);
             userRepository.update(user, context);
         });

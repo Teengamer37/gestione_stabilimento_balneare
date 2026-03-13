@@ -27,7 +27,7 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
     }
 
     @Override
-    protected void updateSpecificData(Connection conn, Customer user) throws SQLException{
+    protected void updateSpecificData(Connection conn, Customer user) throws SQLException {
         String sqlCustomer = "UPDATE customers SET phoneNumber = ?, addressId = ?, active = ? WHERE id = ?";
         try (PreparedStatement statement = conn.prepareStatement(sqlCustomer)) {
             statement.setString(1, user.getPhoneNumber());
@@ -35,6 +35,12 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
             statement.setBoolean(3, user.isActive());
             statement.setInt(4, user.getId());
             statement.executeUpdate();
+        } catch (SQLException e) {
+            //SQLState "23000" indica errore di integrità referenziale
+            if ("23000".equals(e.getSQLState())) {
+                throw new IllegalArgumentException("ERROR: Phone Number is already in use by another account");
+            }
+            throw new RuntimeException("ERROR: unable to update user", e);
         }
     }
 
