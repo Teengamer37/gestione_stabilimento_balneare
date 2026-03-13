@@ -93,9 +93,7 @@
 				\item[i.] L'utente naviga su "Cambia Email"; 
 				\item[ii.] Il sistema mostra una pagina dedicata per il cambio email;
 				\item[iii.] L'utente inserisce la nuova email e la password attuale; 
-				\item[iv.] Il sistema verifica l'unicità della email nel database e manda una mail di conferma cambiamento sulla nuova email; 
-				\item[v.] L'utente clicca sul link di conferma inviato tramite mail; 
-				\item[vi.] Il sistema aggiorna la nuova email nel database.
+				\item[iv.] Il sistema verifica l'unicità della email nel database e aggiorna la nuova email nel database.
 			\end{enumerate}
 			\item[\textbf{1b-e.}] \textbf{Email già usata per un altro account/non valida:} Il sistema segnala l'errore all'utente e invita a ricontrollare.
 			\item[\textbf{1b-e.}] \textbf{Password non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la password.
@@ -104,9 +102,7 @@
 				\item[i.] L'utente naviga su "Cambia numero di telefono";
 				\item[ii.] Il sistema mostra una pagina dedicata per il cambio numero di telefono;
 				\item[iii.] L'utente inserisce il nuovo numero di telefono e la password attuale;
-				\item[iv.] Il sistema verifica l'unicità del numero nel database e manda un SMS di conferma cambiamento sul nuovo numero;
-				\item[v.] L'utente clicca sul link di conferma inviato tramite SMS; 
-				\item[vi.] Il sistema aggiorna il nuovo numero nel database.
+				\item[iv.] Il sistema verifica l'unicità del numero nel database e aggiorna il nuovo numero nel database.
 			\end{enumerate}
 			\item[\textbf{1c-e.}] \textbf{Numero di telefono già usato per un altro account/non valido:} Il sistema segnala l'errore all'utente e invita a ricontrollare.
 			\item[\textbf{1c-e.}] \textbf{Password non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la password.
@@ -137,7 +133,7 @@
 	{Guest}
 	{Permette a un utente non registrato di creare un nuovo profilo Customer inserendo i dati anagrafici e verificando i propri recapiti (Email e Telefono).}
 	{L'utente non deve essere autenticato nel sistema (stato Guest).}
-	{Viene creato un nuovo record nel database per l'account Customer; l'account diventa attivo solo dopo le verifiche.}
+	{Viene creato un nuovo record nel database per l'account Customer.}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item L'utente accede alla pagina di registrazione;
@@ -145,24 +141,19 @@
 			\item L'utente inserisce tutti i dati richiesti e preme "Registrati";
 			\item Il sistema verifica che lo Username non sia già presente nel database;
 			\item Il sistema verifica la validità di Email e Numero di Telefono;
-			\item Il sistema invia simultaneamente un link di verifica all'Email e un codice OTP via SMS al numero fornito;
-			\item L'utente clicca sul link di verifica e inserisce il codice OTP nel sistema;
 			\item Il sistema attiva l'account e mostra un messaggio di successo.
 		\end{enumerate}
 	}
 	{
-		\begin{enumerate}[nosep, leftmargin=*]
+		\begin{enumerate}[nosep, leftmargin=25px]
 			\item[\textbf{4a.}] \textbf{Username già esistente:} Il sistema segnala che lo username è già utilizzato e invita a sceglierne uno nuovo.
 			\item[\textbf{5a.}] \textbf{Numero di telefono/Email già esistente:} Se l'email o il telefono sono già associati ad un account, il sistema evidenzia i campi errati.
-			\item[\textbf{7a.}] \textbf{Mancata verifica:} Se l'utente non completa le verifiche entro un tempo limite, l'account viene rimosso.
-			\item[\textbf{7b.}] \textbf{Errore codice OTP:} Se l'utente inserisce un codice errato, il sistema permette di richiederne uno nuovo.
 		\end{enumerate}
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item[•] Tutti i campi sono obbligatori (non null).
 			\item[•] Lo Username deve essere univoco a livello globale.
-			\item[•] L'account non deve permettere il login finché sia l'Email che il Telefono non sono stati verificati.
 		\end{enumerate}
 	}
 		

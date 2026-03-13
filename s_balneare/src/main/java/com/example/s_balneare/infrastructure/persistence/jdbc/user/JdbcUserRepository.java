@@ -115,6 +115,14 @@ public abstract class JdbcUserRepository<T extends User> implements UserReposito
             saveSpecificData(conn, newId, user);
             return newId;
         } catch (SQLException e) {
+            //SQLState "23000" indica errore di integrità referenziale
+            if ("23000".equals(e.getSQLState())) {
+                if (e.getMessage().contains("email")) {
+                    throw new IllegalArgumentException("ERROR: Email is already in use by another account");
+                } else if (e.getMessage().contains("username")) {
+                    throw new IllegalArgumentException("ERROR: Username is already in use by another account");
+                }
+            }
             throw new RuntimeException("ERROR: unable to save user", e);
         }
     }
