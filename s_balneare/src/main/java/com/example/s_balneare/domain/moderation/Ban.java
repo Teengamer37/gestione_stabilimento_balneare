@@ -14,32 +14,33 @@ public class Ban {
     private final String reason;
     private final Instant createdAt;
 
-    public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
-        if (bannedId == null ||bannedId <= 0) throw new IllegalArgumentException("ERROR: bannedId not valid");
-        if (banType == null) throw new IllegalArgumentException("ERROR: banType not valid");
-        if (adminId == null || adminId <= 0) throw new IllegalArgumentException("ERROR: adminId not valid");
+    //TODO: controlla questi due costruttori con l'assegnamento null a createdAt del  costruttore se rispetta i pattern a me gemini dice
+    // di sì ma non mi convince, inoltre a me consiglia di inserire due costruttori diversi per tutte le entià che hanno id generato dal DB
 
-        if (banType == BanType.BEACH && (bannedFromBeachId == null || bannedFromBeachId <= 0)) {
-            throw new IllegalArgumentException("ERROR: bannedFromBeachID must be set for BEACH ban");
-        }
+    // 1. Costruttore per NUOVI BAN (senza ID e senza createdAt, usati nell'applicazione)
+    public Ban(Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
+        this(null, bannedId, banType, bannedFromBeachId, adminId, reason, Instant.now());
+    }
 
-        if (banType == BanType.APPLICATION) {
-            this.bannedFromBeachId = null;
-        } else {
-            this.bannedFromBeachId = bannedFromBeachId;
-        }
-
-        if (reason == null || reason.isBlank()) {
-            throw new IllegalArgumentException("ERROR: reason must be set");
-        }
+    // 2. Costruttore COMPLETO (usato dal Repository per ricostruire l'oggetto dal DB)
+    public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason, Instant createdAt) {
+        // Eseguiamo i check sui parametri passati, NON sulle variabili d'istanza
+        checkBannedId(bannedId);
+        checkAdminId(adminId);
+        checkReason(reason);
+        checkCreatedAt(createdAt);
+        // Passiamo entrambi i valori per il check logico incrociato
+        checkBannedFromBeachId(bannedFromBeachId, banType);
 
         this.id = id;
         this.bannedId = bannedId;
         this.banType = banType;
+        this.bannedFromBeachId = bannedFromBeachId;
         this.adminId = adminId;
         this.reason = reason;
-        this.createdAt = Instant.now();
+        this.createdAt = createdAt;
     }
+
 
     public Integer getId() {
         return id;
@@ -68,4 +69,26 @@ public class Ban {
     public Instant getCreatedAt() {
         return createdAt;
     }
+
+    private void checkBannedId(Integer bannedId) {
+        if (bannedId == null || bannedId <= 0) throw new IllegalArgumentException("ERROR: bannedId not valid");
+    }
+
+    private void checkBannedFromBeachId(Integer bannedFromBeachId, BanType banType) {
+        if (banType == BanType.BEACH && (bannedFromBeachId == null || bannedFromBeachId <= 0)) throw new IllegalArgumentException("ERROR: bannedFromBeachID not valid");
+        if (banType == BanType.APPLICATION && bannedFromBeachId != null) throw new IllegalArgumentException("ERROR: bannedFromBeachID not valid");
+    }
+
+    private void checkAdminId(Integer adminId) {
+        if (adminId == null || adminId <= 0) throw new IllegalArgumentException("ERROR: adminId not valid");
+    }
+
+    private void checkReason(String reason) {
+        if (reason == null || reason.isBlank()) throw new IllegalArgumentException("ERROR: reason must be set");
+    }
+
+    private void checkCreatedAt(Instant createdAt) {
+        if (createdAt == null) throw new IllegalArgumentException("ERROR: createdAt must not be null");
+    }
+
 }
