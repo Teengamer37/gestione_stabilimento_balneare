@@ -98,7 +98,8 @@ public class JdbcAddressRepository implements AddressRepository {
                 statement.setString(3, address.city());
                 statement.setString(4, address.zipCode());
                 statement.setString(5, address.country());
-                statement.setInt(6, address.id());statement.executeUpdate();
+                statement.setInt(6, address.id());
+                statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to update address", e);
         }

@@ -165,6 +165,40 @@ class JdbcSpotDao {
         return zones;
     }
 
+    /**
+     * Controlla che tutti gli Spot appartengano a quella spiaggia
+     * @param beachId ID della spiaggia
+     * @param spotIds Lista di ID degli Spot da controllare
+     * @param conn Connessione JDBC
+     * @return se appartengono tutti alla spiaggia o meno (boolean)
+     * @throws SQLException se ci sono problemi col Database
+     */
+    public boolean doSpotsBelongToBeach(Integer beachId, List<Integer> spotIds, Connection conn) throws SQLException {
+        if (spotIds == null || spotIds.isEmpty()) return false;
+
+        //creazione di query dinamica per aggiungere gli N spot indipendentemente dalla dimensione della lista
+        StringBuilder sql = new StringBuilder("SELECT COUNT(id) FROM spots WHERE beachId = ? AND id IN (");
+        for (int i = 0; i < spotIds.size(); i++) {
+            sql.append("?");
+            if (i < spotIds.size() - 1) sql.append(", ");
+        }
+        sql.append(")");
+
+        try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            ps.setInt(1, beachId);
+            for (int i = 0; i < spotIds.size(); i++) {
+                ps.setInt(i + 2, spotIds.get(i));
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    //se il COUNT() restituisce la dimensione della lista, allora tutti gli Spot appartengono alla spiaggia
+                    return rs.getInt(1) == spotIds.size();
+                }
+            }
+        }
+        return false;
+    }
+
 
     //HELPERS
     /**

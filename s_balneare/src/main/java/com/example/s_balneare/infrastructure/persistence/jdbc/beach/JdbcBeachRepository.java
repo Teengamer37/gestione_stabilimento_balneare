@@ -1,6 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
-import com.example.s_balneare.application.port.out.BeachRepository;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.layout.Zone;
@@ -17,7 +17,7 @@ import java.util.Optional;
  * libreria JDBC.
  * Detiene anche riferimenti alle varie DAO del package attuale per dividere ancora meglio le operazioni.
  * Nella maggior parte dei casi, questa Repository orchestra le DAO per l'interazione tra oggetti e Database.
- * @see com.example.s_balneare.application.port.out.BeachRepository BeachRepository
+ * @see BeachRepository BeachRepository
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachInventoryDao JdbcBeachInventoryDao
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachServicesDao JdbcBeachServicesDao
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcParkingDao JdbcParkingDao
@@ -511,6 +511,29 @@ public class JdbcBeachRepository implements BeachRepository {
 
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to update beach status", e);
+        }
+    }
+
+    /**
+     * Chiama metodo su JdbcSpotDao per controllare se una list di Spot apprtengono alla spiaggia
+     * @param beachId ID della spiaggia
+     * @param spotIds Lista di ID dei Spot da controllare
+     * @param context Connessione JDBC
+     * @return risultato di JdbcSpotDao.doSpotsBelongToBeach()
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se i parametri passati non sono validi
+     * @see JdbcSpotDao#doSpotsBelongToBeach(Integer, List, Connection) JdbcSpotDao.doSpotsBelongToBeach()
+     */
+    @Override
+    public boolean doSpotsBelongToBeach(Integer beachId, List<Integer> spotIds, TransactionContext context) {
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+        if (spotIds == null || spotIds.isEmpty()) return false;
+
+        Connection connection = getConnection(context);
+        try {
+            return spotDao.doSpotsBelongToBeach(beachId, spotIds, connection);
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to verify spot ownership", e);
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.in.beach.ManageBeachUseCase;
-import com.example.s_balneare.application.port.out.BeachRepository;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.common.TransactionContext;

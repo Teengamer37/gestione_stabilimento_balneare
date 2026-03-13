@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.port.out;
+package com.example.s_balneare.application.port.out.beach;
 
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.beach.Season;
@@ -31,4 +31,7 @@ public interface BeachRepository {
 
     //aggiorna solo lo stato della spiaggia senza usare update()
     void updateStatus(Integer beachId, boolean active, TransactionContext context);
+
+    //verifica se gli spot appartengono alla spiaggia
+    boolean doSpotsBelongToBeach(Integer beachId, List<Integer> spotIds, TransactionContext context);
 }

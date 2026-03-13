@@ -11,7 +11,7 @@ import com.example.s_balneare.domain.booking.BookingParking;
  * @see BookingService BookingService
  */
 public interface BookingUseCase {
-    Integer addBooking(Booking booking, BookingParking availableParking);
+    Integer updateBooking(Booking booking, BookingParking availableParking);
     void confirmBooking(Integer id);
     void rejectBooking(Integer id);
     void cancelBooking(Integer id);

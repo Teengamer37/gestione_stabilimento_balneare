@@ -1,6 +1,7 @@
 package com.example.s_balneare.application.service.booking;
 
 import com.example.s_balneare.application.port.in.booking.BookingUseCase;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.booking.Booking;
@@ -17,21 +18,24 @@ import java.util.List;
  */
 public class BookingService implements BookingUseCase {
     private final BookingRepository bookingRepository;
+    private final BeachRepository beachRepository;
     private final TransactionManager transactionManager;
 
-    public BookingService(BookingRepository bookingRepository, TransactionManager transactionManager) {
+    public BookingService(BookingRepository bookingRepository, TransactionManager transactionManager, BeachRepository beachRepository) {
         this.bookingRepository = bookingRepository;
         this.transactionManager = transactionManager;
+        this.beachRepository = beachRepository;
     }
 
+    //TODO: modificare tutta la logica update per UC-06
     /**
-     * Aggiunta booking nel DB
+     * Modifica booking nel DB
      * @param booking Nuovo booking da aggiungere
      * @param availableParking Parcheggi disponibili per quella data in quella spiaggia
      * @return ID del booking aggiunto generato dal Database
      */
     @Override
-    public Integer addBooking(Booking booking, BookingParking availableParking) {
+    public Integer updateBooking(Booking booking, BookingParking availableParking) {
         return transactionManager.executeInTransaction(context -> {
             //check spot occupati
             List<Integer> occupiedSpots = bookingRepository.findOccupiedSpots(booking.getBeachId(), booking.getDate(), context);
@@ -52,6 +56,11 @@ public class BookingService implements BookingUseCase {
                         requestedParking.electricPark() > availableParking.electricPark()) {
                     throw new IllegalStateException("ERROR: not enough parking spaces available for this date");
                 }
+            }
+
+            //check se gli spot appartengono effettivamente alla spiaggia
+            if (!beachRepository.doSpotsBelongToBeach(booking.getBeachId(), booking.getSpotIds(), context)) {
+                throw new SecurityException("ERROR: one or more spots do not belong to the beach");
             }
 
             //salva booking nel DB

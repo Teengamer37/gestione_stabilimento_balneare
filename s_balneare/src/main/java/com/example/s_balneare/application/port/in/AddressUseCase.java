@@ -15,5 +15,4 @@ public interface AddressUseCase {
     Address getAddress(Integer id);
     List<Address> getAddressesByCity(String city);
     List<Address> getAddressesByCountry(String country);
-    void deleteAddress(Integer id);
 }

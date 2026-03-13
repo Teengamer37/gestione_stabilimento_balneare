@@ -93,17 +93,6 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Eliminazione indirizzo dal DB
-     * @param id Identificatore indirizzo da eliminare
-     */
-    @Override
-    public void deleteAddress(Integer id) {
-        transactionManager.executeInTransaction(context -> {
-            addressRepository.delete(id, context);
-        });
-    }
-
-    /**
      * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
      * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
      * @param id Identificativo indirizzo da cercare
