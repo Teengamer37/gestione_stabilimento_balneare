@@ -13,12 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class JdbcAdminRepository extends JdbcUserRepository<Admin> implements AdminRepository {
-
-
-    protected JdbcAdminRepository(DataSource dataSource) {
-        super(dataSource);
-    }
-
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, Admin user) throws SQLException {
         //Scrivere qui il salvataggio di attributi aggiuntivi di Admin

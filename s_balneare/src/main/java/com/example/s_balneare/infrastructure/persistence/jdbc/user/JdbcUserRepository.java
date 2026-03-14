@@ -12,12 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class JdbcUserRepository<T extends User> implements UserRepository<T> {
-    protected final DataSource dataSource;
-
-    protected JdbcUserRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     //metodi astratti
     protected abstract void saveSpecificData(Connection conn, Integer newId, T user) throws SQLException;
     protected abstract void updateSpecificData(Connection conn, T user) throws SQLException;

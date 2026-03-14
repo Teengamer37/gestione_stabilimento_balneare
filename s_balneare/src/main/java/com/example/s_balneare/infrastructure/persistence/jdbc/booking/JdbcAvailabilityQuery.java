@@ -14,13 +14,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class JdbcAvailabilityQuery implements AvailabilityQuery {
-
-    private final DataSource dataSource;
-
-    public JdbcAvailabilityQuery(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext) e

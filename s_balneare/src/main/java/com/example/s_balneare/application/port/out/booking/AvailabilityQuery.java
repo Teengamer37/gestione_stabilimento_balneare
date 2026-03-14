@@ -1,5 +1,6 @@
 package com.example.s_balneare.application.port.out.booking;
 
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.infrastructure.persistence.jdbc.booking.JdbcAvailabilityQuery;
 
@@ -10,7 +11,7 @@ import java.time.LocalDate;
  * disponibilità dei parcheggi di una spiaggia.
  * Implementata in:
  * @see JdbcAvailabilityQuery JdbcAvailabilityQuery
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public interface AvailabilityQuery {
     BookedParkingSpaces getBookedParking(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context);

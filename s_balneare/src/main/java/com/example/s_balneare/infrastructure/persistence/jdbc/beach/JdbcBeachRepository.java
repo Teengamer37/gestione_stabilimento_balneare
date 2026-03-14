@@ -27,8 +27,6 @@ import java.util.Optional;
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcBeachRepository implements BeachRepository {
-    private final DataSource dataSource;
-
     private final JdbcBeachInventoryDao inventoryDao;
     private final JdbcBeachServicesDao servicesDao;
     private final JdbcParkingDao parkingDao;
@@ -36,9 +34,7 @@ public class JdbcBeachRepository implements BeachRepository {
     private final JdbcSeasonDao seasonDao;
     private final JdbcSpotDao spotDao;
 
-    public JdbcBeachRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-
+    public JdbcBeachRepository() {
         this.inventoryDao = new JdbcBeachInventoryDao();
         this.servicesDao = new JdbcBeachServicesDao();
         this.parkingDao = new JdbcParkingDao();

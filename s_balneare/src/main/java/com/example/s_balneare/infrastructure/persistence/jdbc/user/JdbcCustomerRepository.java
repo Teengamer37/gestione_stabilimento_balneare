@@ -10,10 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class JdbcCustomerRepository extends JdbcUserRepository<Customer> implements CustomerRepository {
-    protected JdbcCustomerRepository(DataSource dataSource) {
-        super(dataSource);
-    }
-
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, Customer user) throws SQLException {
         String sql = "INSERT INTO customers(id, phoneNumber, addressId, active) VALUES(?, ?, ?, ?)";

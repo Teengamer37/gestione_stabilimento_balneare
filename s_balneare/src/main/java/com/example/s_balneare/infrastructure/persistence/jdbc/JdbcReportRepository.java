@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class JdbcReportRepository implements ReportRepository {
-    private final DataSource dataSource;
-
-    public JdbcReportRepository(DataSource dataSource) {this.dataSource = dataSource;}
-
     private Connection getConnection(TransactionContext context) {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");

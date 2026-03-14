@@ -17,12 +17,6 @@ import java.util.Optional;
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcAddressRepository implements AddressRepository {
-    private final DataSource dataSource;
-
-    public JdbcAddressRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext) e

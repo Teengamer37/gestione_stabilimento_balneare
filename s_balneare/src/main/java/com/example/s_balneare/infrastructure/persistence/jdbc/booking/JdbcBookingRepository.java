@@ -19,12 +19,6 @@ import java.util.*;
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcBookingRepository implements BookingRepository {
-    private final DataSource dataSource;
-
-    public JdbcBookingRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext) e

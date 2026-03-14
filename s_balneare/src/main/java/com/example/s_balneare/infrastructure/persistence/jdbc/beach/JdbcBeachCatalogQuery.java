@@ -17,12 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
-    private final DataSource dataSource;
-
-    public JdbcBeachCatalogQuery(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext)

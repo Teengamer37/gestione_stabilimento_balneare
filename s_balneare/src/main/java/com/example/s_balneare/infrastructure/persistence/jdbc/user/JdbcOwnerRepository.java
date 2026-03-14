@@ -13,10 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements OwnerRepository {
-    protected JdbcOwnerRepository(DataSource dataSource) {
-        super(dataSource);
-    }
-
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, Owner user) throws SQLException {
         //Scrivere qui il salvataggio di attributi aggiuntivi di Owner
