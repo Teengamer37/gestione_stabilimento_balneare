@@ -93,9 +93,10 @@ public class ManageUserService<T extends User> {
         });
     }
 
-    //TODO:controlla passaggio context in find ERRORE: creazione due connessioni (SOLDI) probabilemente eliminabile o spostabile
     protected T getUserOrThrow(Integer id, TransactionContext context){
         return userRepository.findById(id,context)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: user not found with id: " + id));
     }
 }
+
+//TODO: finire controlla aggiunta metodi con gli useCase

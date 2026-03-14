@@ -25,8 +25,7 @@ public class BanService implements BanUseCase {
         });
     }
 
-    //TODO: non so quali altri metodi poter inserire?? getBan? manca getUser?
-    // sia in user che in ban non ci sono metodi nel service che utilizzano i find del jdbc
+    //TODO: finire aggiungi metodi
 
 
 }
