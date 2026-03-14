@@ -1,10 +1,11 @@
 package com.example.s_balneare.application.port.in.booking;
 
+import com.example.s_balneare.application.service.booking.CreateBookingService;
+
 /**
  * Interfaccia che definisce le funzioni utili per implementare lo Use Case di creare una prenotazione.
- * Essa ha bisogno di un oggetto Parking e di un oggetto Beach.
  * Implementata in:
- * @see com.example.s_balneare.application.service.beach.CreateBeachService CreateBeachService
+ * @see CreateBookingService CreateBookingService
  */
 public interface CreateBookingUseCase {
     Integer createBooking(CreateBookingCommand command);

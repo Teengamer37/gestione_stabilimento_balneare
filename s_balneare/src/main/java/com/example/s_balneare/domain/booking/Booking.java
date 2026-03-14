@@ -9,7 +9,9 @@ public class Booking {
     //dati booking
     private final Integer id;
     private final Integer beachId;
-    private final Integer customerId;
+    private final Integer customerId;   //se prenotazione online
+    private final String callerName;    //se prenotazione telefonica
+    private final String callerPhone;   //se prenotazione telefonica
     private final LocalDate date;
 
     //oggetti booking
@@ -21,20 +23,32 @@ public class Booking {
 
     private BookingParking parking;
 
+    private double totalPrice;
+
     //stato booking
     private BookingStatus status;
 
     //costruttore completo (per booking caricati dal DB)
-    public Booking(Integer id, Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds,
-                   int extraSdraio, int extraLettini, int extraSedie, int camerini, BookingParking parking, BookingStatus status) {
+    public Booking(Integer id, Integer beachId, Integer customerId, String callerName, String callerPhone, LocalDate date, List<Integer> spotIds,
+                   int extraSdraio, int extraLettini, int extraSedie, int camerini, BookingParking parking, double totalPrice, BookingStatus status) {
         this.id = id;
 
         //check + assegnazione valore
         checkBeachId(beachId);
         this.beachId = beachId;
 
-        checkCustomerId(customerId);
-        this.customerId = customerId;
+        if(customerId != null) {
+            checkCustomerId(customerId);
+            this.customerId = customerId;
+            this.callerName = null;
+            this.callerPhone = null;
+        } else {
+            this.customerId = null;
+            checkCallerName(callerName);
+            this.callerName = callerName;
+            this.callerPhone = validateCallerPhone(callerPhone);
+        }
+
 
         checkDate(date);
         this.date = date;
@@ -56,12 +70,15 @@ public class Booking {
 
         this.parking = parking;
 
+        checkTotalPrice(totalPrice);
+        this.totalPrice = totalPrice;
+
         this.status = status != null ? status : BookingStatus.PENDING;
     }
 
     //costruttore per salvataggio nuovo booking (senza ID, extra a 0, status PENDING)
-    public Booking(Integer beachId, Integer customerId, LocalDate date, List<Integer> spotIds) {
-        this(0, beachId, customerId, date, spotIds, 0, 0, 0, 0, BookingParking.empty(), BookingStatus.PENDING);
+    public Booking(Integer beachId, Integer customerId, String callerName, String callerPhone, LocalDate date, List<Integer> spotIds) {
+        this(0, beachId, customerId, callerName, callerPhone, date, spotIds, 0, 0, 0, 0, BookingParking.empty(), 0.0, BookingStatus.PENDING);
     }
 
 
@@ -74,6 +91,12 @@ public class Booking {
     }
     public Integer getCustomerId() {
         return customerId;
+    }
+    public String getCallerName() {
+        return callerName;
+    }
+    public String getCallerPhone() {
+        return callerPhone;
     }
     public LocalDate getDate() {
         return date;
@@ -95,6 +118,9 @@ public class Booking {
     }
     public BookingParking getParking() {
         return parking;
+    }
+    public double getTotalPrice() {
+        return totalPrice;
     }
     public BookingStatus getStatus() {
         return status;
@@ -128,7 +154,7 @@ public class Booking {
     }
 
     /**
-     * Aggiungi extra sdraio con controlli
+     * Aggiorna extra sdraio con controlli
      * @param quantity Numero di sdraio da aggiungere
      */
     public void updateExtraSdraio(int quantity) {
@@ -140,7 +166,7 @@ public class Booking {
     }
 
     /**
-     * Aggiungi extra lettini con controlli
+     * Aggiorna extra lettini con controlli
      * @param quantity Numero di lettini da aggiungere
      */
     public void updateExtraLettini(int quantity) {
@@ -151,7 +177,7 @@ public class Booking {
     }
 
     /**
-     * Aggiungi extra sedie con controlli
+     * Aggiorna extra sedie con controlli
      * @param quantity Numero di sedie da aggiungere
      */
     public void updateExtraSedie(int quantity) {
@@ -162,7 +188,7 @@ public class Booking {
     }
 
     /**
-     * Aggiungi camerini con controlli
+     * Aggiorna camerini con controlli
      * @param quantity Numero di camerini da aggiungere
      */
     public void updateCamerini(int quantity) {
@@ -170,6 +196,15 @@ public class Booking {
 
         camerini = quantity;
         revertToPendingIfConfirmed();
+    }
+
+    /**
+     * Aggiorna il prezzo totale del Booking
+     * @param totalPrice Prezzo totale aggiornato
+     */
+    public void updateTotalPrice(double totalPrice) {
+        checkTotalPrice(totalPrice);
+        this.totalPrice = totalPrice;
     }
 
     /**
@@ -211,6 +246,17 @@ public class Booking {
     private void checkCustomerId(Integer customerId) {
         if (customerId == null || customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + id);
     }
+    private void checkCallerName(String callerName) {
+        if (callerName == null || callerName.isBlank()) throw new IllegalArgumentException("ERROR: callerName not valid for booking " + id);
+    }
+    private String validateCallerPhone(String callerPhone) {
+        if (callerPhone == null) throw new IllegalArgumentException("ERROR: callerPhone cannot be null");
+        String cleaned = callerPhone.replaceAll("\\s", "");
+        if (cleaned.isBlank()) throw new IllegalArgumentException("ERROR: callerPhone cannot be blank");
+        if (cleaned.length() > 50) throw new IllegalArgumentException("ERROR: callerPhone cannot exceed 50 characters");
+        if (!cleaned.matches("^\\+\\d+$")) throw new IllegalArgumentException("ERROR: callerPhone not valid");
+        return cleaned;
+    }
     private void checkDate(LocalDate date) {
         if (date == null) throw new IllegalArgumentException("ERROR: date cannot be null for booking " + id);
     }
@@ -224,6 +270,10 @@ public class Booking {
         if (quantity < 0) {
             throw new IllegalArgumentException("ERROR: extra quantity must be >= 0 for booking " + id);
         }
+    }
+    private void checkTotalPrice(double totalPrice) {
+        if (totalPrice < 0)
+            throw new IllegalArgumentException("ERROR: total price must be >= 0 for booking " + id);
     }
     private void checkStatusIsPending(String action) {
         if (status != BookingStatus.PENDING) {

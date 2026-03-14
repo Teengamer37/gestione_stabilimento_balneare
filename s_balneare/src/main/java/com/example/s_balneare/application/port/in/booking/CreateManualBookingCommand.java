@@ -4,13 +4,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Record che prende come parametri tutti gli attributi di Booking e BookingParking per la creazione di un Booking da parte del Customer.
+ * Record che prende come parametri tutti gli attributi di Booking e BookingParking nel caso di creazione Booking da parte dell'Owner.
  * Usato in:
- * @see CreateBookingUseCase CreateBookingUseCase
+ * @see CreateManualBookingUseCase CreateManualBookingUseCase
  */
-public record CreateBookingCommand(
-        Integer beachId,
-        Integer customerId,
+public record CreateManualBookingCommand(
+        Integer ownerId,
+        String callerName,
+        String callerPhone,
         LocalDate date,
         List<Integer> spotIds,
         int autoPark,
@@ -22,9 +23,10 @@ public record CreateBookingCommand(
         int extraSedie,
         int camerini
 ) {
-    public CreateBookingCommand {
-        if (beachId == null) throw new IllegalArgumentException("ERROR: beachId cannot be null");
-        if (customerId == null) throw new IllegalArgumentException("ERROR: customerId cannot be null");
+    public CreateManualBookingCommand {
+        if (ownerId == null) throw new IllegalArgumentException("ERROR: ownerId cannot be null");
+        if (callerName == null || callerName.isBlank()) throw new IllegalArgumentException("ERROR: callerName cannot be null/blank");
+        if (callerPhone == null || callerPhone.isBlank()) throw new IllegalArgumentException("ERROR: callerPhone cannot be null/blank");
         if (date == null) throw new IllegalArgumentException("ERROR: date cannot be null");
         if (spotIds == null) throw new IllegalArgumentException("ERROR: cannot create Booking without spots");
         if (spotIds.isEmpty()) throw new IllegalArgumentException("ERROR: cannot create Booking without spots");

@@ -154,7 +154,9 @@ CREATE TABLE spots (
 CREATE TABLE bookings (
     id INT PRIMARY KEY AUTO_INCREMENT,
     beachId INT NOT NULL,
-    customerId INT NOT NULL,
+    customerId INT,
+    callerName VARCHAR(100),
+    callerPhone VARCHAR(50),
     date DATE NOT NULL,
     extraSdraio INT NOT NULL,
     extraLettini INT NOT NULL,
@@ -164,6 +166,7 @@ CREATE TABLE bookings (
     motoPark INT NOT NULL DEFAULT 0,
     bikePark INT NOT NULL DEFAULT 0,
     electricPark INT NOT NULL DEFAULT 0,
+    totalPrice DECIMAL(10,2) NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (beachId) REFERENCES beaches(id),
     FOREIGN KEY (customerId) REFERENCES customers(id),
@@ -266,6 +269,7 @@ ALTER TABLE zone_tariffs
     ADD CONSTRAINT chk_price_tenda_nonneg CHECK (priceTenda >= 0);
 
 ALTER TABLE bookings
+    ADD CONSTRAINT chk_customer_param_nonneg CHECK (customerId IS NOT NULL OR (callerName IS NOT NULL AND callerPhone IS NOT NULL)),
     ADD CONSTRAINT chk_extra_sdraio_booking_nonneg CHECK (extraSdraio >= 0),
     ADD CONSTRAINT chk_extra_lettini_booking_nonneg CHECK (extraLettini >= 0),
     ADD CONSTRAINT chk_extra_sedie_booking_nonneg CHECK (extraSedie >= 0),
@@ -274,7 +278,6 @@ ALTER TABLE bookings
     ADD CONSTRAINT chk_motoPark_booking_nonneg CHECK (motoPark >= 0),
     ADD CONSTRAINT chk_bikePark_booking_nonneg CHECK (bikePark >= 0),
     ADD CONSTRAINT chk_electricPark_booking_nonneg CHECK (electricPark >= 0);
-    -- fine check
 
 ALTER TABLE spots
     ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);

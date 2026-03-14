@@ -1,13 +1,14 @@
 package com.example.s_balneare.application.service.booking;
 
-import com.example.s_balneare.application.port.in.booking.CreateBookingCommand;
 import com.example.s_balneare.application.port.in.booking.CreateBookingUseCase;
-import com.example.s_balneare.application.port.out.beach.BeachRepository;
+import com.example.s_balneare.application.port.in.booking.CreateManualBookingCommand;
+import com.example.s_balneare.application.port.in.booking.CreateManualBookingUseCase;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
+import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
-import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.beach.BeachInventory;
 import com.example.s_balneare.domain.beach.Parking;
@@ -17,7 +18,7 @@ import com.example.s_balneare.domain.booking.BookingStatus;
 import com.example.s_balneare.domain.booking.PriceCalculator;
 
 /**
- * Implementazione dello Use Case di aggiunta prenotazione (fatta da un Customer) nel DB:
+ * Implementazione dello Use Case di aggiunta prenotazione (fatta da un Owner) nel DB:
  * Interagisce con BeachRepository per trovare la spiaggia e per verificare che gli Spot appartengono alla spiaggia stessa;
  * Successivamente usa AvailabilityQuery per trovare i posti occupati di quel giorno in quella spiaggia;
  * Viene alla fine usata BookingRepository per salvare la nuova prenotazione.
@@ -29,37 +30,36 @@ import com.example.s_balneare.domain.booking.PriceCalculator;
  * @see BookingRepository BookingRepository
  * @see AvailabilityQuery AvailabilityQuery
  */
-public class CreateBookingService implements CreateBookingUseCase {
-
+public class CreateManualBookingService implements CreateManualBookingUseCase {
     private final BeachRepository beachRepository;
     private final BookingRepository bookingRepository;
     private final AvailabilityQuery availabilityQuery;
     private final TransactionManager transactionManager;
 
-    public CreateBookingService(BeachRepository beachRepository,
-                                BookingRepository bookingRepository,
-                                AvailabilityQuery availabilityQuery,
-                                TransactionManager transactionManager) {
+    public CreateManualBookingService(BeachRepository beachRepository,
+                                      BookingRepository bookingRepository,
+                                      AvailabilityQuery availabilityQuery,
+                                      TransactionManager transactionManager) {
         this.beachRepository = beachRepository;
         this.bookingRepository = bookingRepository;
         this.availabilityQuery = availabilityQuery;
         this.transactionManager = transactionManager;
     }
 
-    //TODO: aggiungere controllo se utente bannato dalla spiaggia! (dopo aver fatto BanRepository)
-    @Override
-    public Integer createBooking(CreateBookingCommand command) {
+    //TODO: aggiungere controllo se owner bannato dalla spiaggia! (dopo aver fatto BanRepository)
+    public Integer createManualBooking(CreateManualBookingCommand command) {
         return transactionManager.executeInTransaction(context -> {
-            //passo 1: cerco la spiaggia tramite ID
-            Beach beach = beachRepository.findById(command.beachId(), context)
-                    .orElseThrow(() -> new IllegalArgumentException("ERROR: Beach not found"));
+            //passo 1: estraggo la Beach dall'ownerId
+            Beach beach = beachRepository.findByOwnerId(command.ownerId(), context)
+                    .orElseThrow(() -> new IllegalStateException("ERROR: Owner does not have a registered beach"));
             //controllo se spiaggia attiva
             if (!beach.isActive()) {
-                throw new IllegalStateException("ERROR: cannot create bookings for an inactive beach.");
+                throw new IllegalStateException("ERROR: Cannot create bookings for an inactive beach.");
             }
+            Integer beachId = beach.getId();
 
             //passo 2: recupero i posti parcheggio occupati in quel giorno
-            BookedParkingSpaces booked = availabilityQuery.getBookedParking(command.beachId(), command.date(), null, context);
+            BookedParkingSpaces booked = availabilityQuery.getBookedParking(beachId, command.date(), null, context);
             BookingParking requestedParking = new BookingParking(
                     command.autoPark(), command.motoPark(), command.bikePark(), command.electricPark()
             );
@@ -80,17 +80,17 @@ public class CreateBookingService implements CreateBookingUseCase {
             }
 
             //passo 5: verifico se gli spot appartengono effettivamente alla spiaggia
-            if (!beachRepository.doSpotsBelongToBeach(command.beachId(), command.spotIds(), context)) {
+            if (!beachRepository.doSpotsBelongToBeach(beachId, command.spotIds(), context)) {
                 throw new SecurityException("ERROR: one or more spots do not belong to the beach");
             }
 
             //passo 6: creo la prenotazione
             Booking booking = new Booking(
                     0,
-                    command.beachId(),
-                    command.customerId(),
+                    beachId,
                     null,
-                    null,
+                    command.callerName(),
+                    command.callerPhone(),
                     command.date(),
                     command.spotIds(),
                     command.extraSdraio(),
@@ -99,7 +99,7 @@ public class CreateBookingService implements CreateBookingUseCase {
                     command.camerini(),
                     requestedParking,
                     0.0,
-                    BookingStatus.PENDING
+                    BookingStatus.CONFIRMED
             );
 
             //passo 7: calcolo il prezzo totale della prenotazione

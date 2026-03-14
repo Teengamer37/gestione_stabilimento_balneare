@@ -1,6 +1,7 @@
 package com.example.s_balneare.application.port.in.booking;
 
 import com.example.s_balneare.application.service.booking.BookingService;
+import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.booking.BookingParking;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface BookingUseCase {
     void confirmBooking(Integer id);
     void rejectBooking(Integer id);
     void cancelBooking(Integer id);
+    List<Booking> getCustomerBookings(Integer customerId);
+    List<Booking> getBeachBookings(Integer ownerId);
 }

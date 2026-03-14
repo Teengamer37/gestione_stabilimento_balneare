@@ -10,9 +10,7 @@ import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionMan
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 //TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
@@ -57,9 +55,9 @@ public class JdbcBookingRepository implements BookingRepository {
         Connection connection = getConnection(context);
 
         //query
-        String sql = "INSERT INTO bookings(beachId, customerId, date, extraSdraio, extraLettini, extraSedie, camerini, " +
-                "autoPark, motoPark, bikePark, electricPark, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO bookings(beachId, customerId, callerName, callerPhone, date, extraSdraio, extraLettini, extraSedie, camerini, " +
+                "autoPark, motoPark, bikePark, electricPark, totalPrice, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             int newId;
@@ -67,7 +65,9 @@ public class JdbcBookingRepository implements BookingRepository {
             //settaggio valori nella query + esecuzione query
             try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setInt(1, booking.getBeachId());
-                statement.setInt(2, booking.getCustomerId());
+                statement.setObject(2, booking.getCustomerId(), Types.INTEGER);
+                statement.setString(3, booking.getCallerName());
+                statement.setString(4, booking.getCallerPhone());
                 statement.setDate(3, java.sql.Date.valueOf(booking.getDate()));
 
                 //estrazione dati extra
@@ -83,7 +83,8 @@ public class JdbcBookingRepository implements BookingRepository {
                 statement.setInt(10, parking != null ? parking.bikePark() : 0);
                 statement.setInt(11, parking != null ? parking.electricPark() : 0);
 
-                statement.setString(12, booking.getStatus().name());
+                statement.setDouble(12, booking.getTotalPrice());
+                statement.setString(13, booking.getStatus().name());
                 statement.executeUpdate();
 
                 //prendo nuovo id generato dal DB
@@ -160,7 +161,7 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //passo 1: aggiorno tabella bookings
         String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, " +
-                "autoPark = ?, motoPark = ?, bikePark = ?, electricPark = ?, status = ? WHERE id = ?";
+                "autoPark = ?, motoPark = ?, bikePark = ?, electricPark = ?, totalPrice = ?, status = ? WHERE id = ?";
 
         //settaggio valori nella query + esecuzione query
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -177,9 +178,10 @@ public class JdbcBookingRepository implements BookingRepository {
             statement.setInt(7, parking != null ? parking.bikePark() : 0);
             statement.setInt(8, parking != null ? parking.electricPark() : 0);
 
-            //aggiunta status
-            statement.setString(9, booking.getStatus().name());
-            statement.setInt(10, booking.getId());
+            //aggiunta prezzo totale e status
+            statement.setDouble(9, booking.getTotalPrice());
+            statement.setString(10, booking.getStatus().name());
+            statement.setInt(11, booking.getId());
             statement.executeUpdate();
 
             //passo 2: aggiorno tabella booking_spots (cancello i vecchi spots, inserisco i nuovi spots)
@@ -238,12 +240,15 @@ public class JdbcBookingRepository implements BookingRepository {
 
                 //ricavo la prima riga ritornata dal SELECT
                 int beachId = rs.getInt("beachId");
-                int customerId = rs.getInt("customerId");
+                Integer customerId = rs.getObject("customerId") != null ? rs.getInt("customerId") : null;
+                String callerName = rs.getString("callerName");
+                String callerPhone = rs.getString("callerPhone");
                 LocalDate date = rs.getDate("date").toLocalDate();
                 int extraSdraio = rs.getInt("extraSdraio");
                 int extraLettini = rs.getInt("extraLettini");
                 int extraSedie = rs.getInt("extraSedie");
                 int camerini = rs.getInt("camerini");
+                double totalPrice = rs.getDouble("totalPrice");
                 BookingStatus status = BookingStatus.valueOf(rs.getString("status"));
 
                 //dati parcheggio
@@ -268,6 +273,8 @@ public class JdbcBookingRepository implements BookingRepository {
                 Booking booking = new Booking(id,
                         beachId,
                         customerId,
+                        callerName,
+                        callerPhone,
                         date,
                         spotIds,
                         extraSdraio,
@@ -275,6 +282,7 @@ public class JdbcBookingRepository implements BookingRepository {
                         extraSedie,
                         camerini,
                         parking,
+                        totalPrice,
                         status);
 
                 return Optional.of(booking);
@@ -329,5 +337,144 @@ public class JdbcBookingRepository implements BookingRepository {
         }
 
         return occupiedSpots;
+    }
+
+    /**
+     * Trova tutte le prenotazioni fatte da un customer online
+     * @param customerId ID del customer da cercare
+     * @param context Connessione JDBC
+     * @return La lista di tutti i Booking fatti dal customer in questione
+     */
+    @Override
+    public List<Booking> findByCustomerId(Integer customerId, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
+        //check validità ID
+        if (customerId == null || customerId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
+
+        String sql = "SELECT b.*, bs.spotId FROM bookings b " +
+                "LEFT JOIN booking_spots bs ON b.id = bs.bookingId " +
+                "WHERE b.customerId = ? " +
+                "ORDER BY b.date DESC";
+
+        //map per raggruppare gli spot in un'unica prenotazione
+        Map<Integer, Booking> bookingMap = new LinkedHashMap<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, customerId);
+
+            //praticamente in questa query ho booking ripetuti con vari spots
+            //booking 1 - spot 2
+            //booking 1 - spot 3
+            //booking 2 - spot 5 ...
+            //l'obiettivo è quello di raggruppare tutti gli spots nei vari bookings
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+
+                    //se non ho ancora creato l'oggetto Booking per questo ID, lo creo
+                    if (!bookingMap.containsKey(id)) {
+                        int beachId = rs.getInt("beachId");
+                        LocalDate date = rs.getDate("date").toLocalDate();
+                        int extraSdraio = rs.getInt("extraSdraio");
+                        int extraLettini = rs.getInt("extraLettini");
+                        int extraSedie = rs.getInt("extraSedie");
+                        int camerini = rs.getInt("camerini");
+                        double totalPrice = rs.getDouble("totalPrice");
+                        BookingStatus status = BookingStatus.valueOf(rs.getString("status"));
+
+                        BookingParking parking = new BookingParking(
+                                rs.getInt("autoPark"), rs.getInt("motoPark"),
+                                rs.getInt("bikePark"), rs.getInt("electricPark")
+                        );
+
+                        Booking booking = new Booking(id, beachId, customerId, null, null, date, new ArrayList<>(),
+                                extraSdraio, extraLettini, extraSedie, camerini, parking, totalPrice, status);
+                        bookingMap.put(id, booking);
+                    }
+
+                    //aggiungo lo spot alla lista della prenotazione corrispondente
+                    int spotId = rs.getInt("spotId");
+                    if (!rs.wasNull()) {
+                        bookingMap.get(id).getSpotIds().add(spotId);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to fetch customer bookings", e);
+        }
+
+        //salvo tutto nella nuova lista, raggruppando bookings e spots
+        return new ArrayList<>(bookingMap.values());
+    }
+
+    /**
+     * Trova tutte le prenotazioni fatte per una determinata spiaggia
+     * @param beachId ID della spiaggia da cercare
+     * @param context Connessione JDBC
+     * @return lista di Bookings fatti in quella spiaggia
+     */
+    @Override
+    public List<Booking> findByBeachId(Integer beachId, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
+        //check validità ID
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+
+        String sql = "SELECT b.*, bs.spotId FROM bookings b " +
+                "LEFT JOIN booking_spots bs ON b.id = bs.bookingId " +
+                "WHERE b.beachId = ? ORDER BY b.date DESC";
+
+        //map per raggruppare gli spot in un'unica prenotazione
+        java.util.Map<Integer, Booking> bookingMap = new java.util.LinkedHashMap<>();
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, beachId);
+
+            //praticamente in questa query ho booking ripetuti con vari spots
+            //booking 1 - spot 2
+            //booking 1 - spot 3
+            //booking 2 - spot 5 ...
+            //l'obiettivo è quello di raggruppare tutti gli spots nei vari bookings
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    int id = rs.getInt("id");
+
+                    //se non ho ancora creato l'oggetto Booking per questo ID, lo creo
+                    if (!bookingMap.containsKey(id)) {
+                        Integer customerId = rs.getObject("customerId") != null ? rs.getInt("customerId") : null;
+
+                        BookingParking parking = new BookingParking(
+                                rs.getInt("autoPark"), rs.getInt("motoPark"),
+                                rs.getInt("bikePark"), rs.getInt("electricPark")
+                        );
+
+                        Booking booking = new Booking(
+                                id, rs.getInt("beachId"), customerId,
+                                rs.getString("callerName"), rs.getString("callerPhone"),
+                                rs.getDate("date").toLocalDate(), new ArrayList<>(),
+                                rs.getInt("extraSdraio"), rs.getInt("extraLettini"),
+                                rs.getInt("extraSedie"), rs.getInt("camerini"),
+                                parking, rs.getDouble("totalPrice"),
+                                BookingStatus.valueOf(rs.getString("status"))
+                        );
+                        bookingMap.put(id, booking);
+                    }
+
+                    //aggiungo lo spot alla lista della prenotazione corrispondente
+                    int spotId = rs.getInt("spotId");
+                    if (!rs.wasNull()) {
+                        bookingMap.get(id).getSpotIds().add(spotId);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to fetch beach bookings", e);
+        }
+
+        //salvo tutto nella nuova lista, raggruppando bookings e spots
+        return new ArrayList<>(bookingMap.values());
     }
 }

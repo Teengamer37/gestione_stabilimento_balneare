@@ -12,6 +12,7 @@ import com.example.s_balneare.domain.beach.BeachInventory;
 import com.example.s_balneare.domain.beach.Parking;
 import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.booking.BookingParking;
+import com.example.s_balneare.domain.booking.PriceCalculator;
 import com.example.s_balneare.domain.common.TransactionContext;
 
 import java.time.LocalDate;
@@ -37,7 +38,6 @@ public class BookingService implements BookingUseCase {
         this.availabilityQuery = availabilityQuery;
     }
 
-    //TODO: modificare tutta la logica update per UC-05 e UC-06 lato Owner
     /**
      * Aggiorna booking nel DB con nuovi dettagli
      * @param id ID del Booking da modificare
@@ -90,6 +90,7 @@ public class BookingService implements BookingUseCase {
             booking.updateExtraSedie(newSedie);
             booking.updateCamerini(newCamerini);
             booking.updateSpotsAndParking(newSpotIds, newParking);
+            booking.updateTotalPrice(PriceCalculator.calculateTotal(booking, beach));
             bookingRepository.update(booking, context);
         });
     }
@@ -151,6 +152,35 @@ public class BookingService implements BookingUseCase {
             booking.cancelBooking();
 
             bookingRepository.update(booking, context);
+        });
+    }
+
+    /**
+     * Prende dal database una lista di Booking fatti da un Customer (indipendentemente dallo stato dei singoli Booking)
+     * @param customerId ID del Customer da cercare nel DB
+     * @return Lista di Booking effettuati da quel Customer
+     */
+    @Override
+    public List<Booking> getCustomerBookings(Integer customerId) {
+        return transactionManager.executeInTransaction(context -> {
+            return bookingRepository.findByCustomerId(customerId, context);
+        });
+    }
+
+    /**
+     * Prende dal database una lista di Booking fatti per una determinata Beach (indipendentemente dallo stato dei singoli Booking)
+     * @param ownerId ID dell'Owner per poi cercare la spiaggia associata
+     * @return Lista di Booking registrati nella spiaggia
+     */
+    @Override
+    public List<Booking> getBeachBookings(Integer ownerId) {
+        return transactionManager.executeInTransaction(context -> {
+            //cerco la spiaggia dell'Owner
+            Beach beach = beachRepository.findByOwnerId(ownerId, context)
+                    .orElseThrow(() -> new IllegalArgumentException("Owner has no beach"));
+
+            //cerco tutti i Booking di quella spiaggia
+            return bookingRepository.findByBeachId(beach.getId(), context);
         });
     }
 

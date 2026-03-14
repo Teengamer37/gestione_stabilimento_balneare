@@ -207,9 +207,9 @@
 	{UC-05}
 	{Create Booking}
 	{Customer, Owner}
-	{Permette ad un Customer di prenotare posti, servizi extra e parcheggi presso una spiaggia in una certa data. Permette inoltre a un Owner di registrare manualmente una prenotazione per un cliente telefonico.}
+	{Permette ad un Customer di prenotare posti, servizi extra e parcheggi presso una spiaggia in una certa data. Permette inoltre ad un Owner di registrare manualmente una prenotazione per un cliente telefonico.}
 	{L'utente deve aver effettuato il login. Se l'utente è un Customer, non deve essere bannato dalla spiaggia selezionata. Se l'utente è un Owner, deve possedere una spiaggia attiva. La spiaggia selezionata (o posseduta dall'Owner) deve essere nello stato ATTIVO.}
-	{Viene creato un nuovo record di prenotazione nel database con un prezzo totale calcolato e uno stato iniziale (PENDING per i Customer, APPROVED per gli Owner).}
+	{Viene creato un nuovo record di prenotazione nel database con un prezzo totale calcolato e uno stato iniziale (PENDING per i Customer, CONFIRMED per gli Owner).}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item Il Customer seleziona una spiaggia (partendo da UC-04) e sceglie una data;
@@ -217,8 +217,8 @@
 			\item Il sistema mostra la mappa o la lista delle disponibilità per la data scelta;
 			\item Il Customer seleziona i posti spiaggia desiderati (es. ombrelloni, lettini);
 			\item Il Customer seleziona eventuali extra (lettini, sdraio, sedie);
-			\item Il Customer inserisce il numero di posti auto (parcheggi) desiderati;
-			\item Il sistema calcola in tempo reale e mostra il prezzo totale riepilogativo;
+			\item Il Customer inserisce il numero di parcheggi desiderati;
+			\item Il sistema calcola e mostra il prezzo totale riepilogativo;
 			\item Il Customer conferma la prenotazione;
 			\item Il sistema salva la prenotazione e le assegna lo stato "PENDING", mostrando un messaggio di successo.
 		\end{enumerate}
@@ -232,7 +232,7 @@
 				\item[iii.] L'Owner inserisce obbligatoriamente il Nome e il Numero di Telefono del cliente chiamante;
 				\item[iv.] Il sistema calcola e mostra il totale;
 				\item[v.] L'Owner conferma la prenotazione;
-				\item[vi.] Il sistema salva la prenotazione assegnandole automaticamente lo stato "APPROVED".
+				\item[vi.] Il sistema salva la prenotazione assegnandole automaticamente lo stato "CONFIRMED".
 			\end{enumerate}
 			\item[\textbf{2a-e.}] \textbf{Utente Bannato:} Il sistema rileva che il Customer è nella blacklist della spiaggia e blocca l'operazione mostrando il messaggio: "Non sei autorizzato a prenotare in questa struttura.".
 			\item[\textbf{4/6a-e.}] \textbf{Disponibilità Esaurita:} Se durante la selezione i posti o i parcheggi scelti vengono esauriti (es. prenotati da un altro utente nello stesso istante), il sistema avvisa l'utente e lo invita a modificare la scelta.
@@ -241,7 +241,7 @@
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item[•] Le prenotazioni dei Customer partono sempre dallo stato PENDING e richiedono un passaggio a CONFIRMED da parte dell'Owner.
-			\item[•] Le prenotazioni create dall'Owner sono considerate già confermate (APPROVED). 
+			\item[•] Le prenotazioni create dall'Owner sono considerate già confermate (CONFIRMED). 
 			\item[•] L'Owner non può selezionare la spiaggia: il sistema forza la prenotazione solo sullo stabilimento di sua proprietà.
 			\item[•] Il calcolo del totale si basa sul tariffario (Season/Zone) impostato per quella data.
 		\end{enumerate}
@@ -686,7 +686,7 @@
 	
 	\usecasetable
 	{UC-18}
-	{Review Reports}
+	{Manage Reports}
 	{Admin}
 	{Permette all'Admin di esaminare i Report in sospeso (creati da Customer o Owner) e decidere se approvarli o rifiutarli in base allo storico degli utenti coinvolti e alla descrizione del report.}
 	{L'Admin ha effettuato il login al sistema. Esiste almeno un report in stato PENDING.}
@@ -722,7 +722,7 @@
 	{Apply Ban}
 	{Admin}
 	{Permette all'Admin di sanzionare in via definitiva un utente (Customer o Owner) o di interdirgli l'accesso a una specifica spiaggia, come conseguenza diretta di un report approvato.}
-	{L'Admin sta eseguendo UC-18 (Revisione Segnalazioni) ed ha appena approvato un report a carico dell'utente. L'utente non ha già subito la sanzione massima (App Ban).}
+	{L'Admin sta eseguendo UC-18 (Manage Reports) ed ha appena approvato un report a carico dell'utente. L'utente non ha già subito la sanzione massima (App Ban).}
 	{L'utente (o la spiaggia) viene bannato permanentemente. Le prenotazioni future coinvolte vengono cancellate in automatico.}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]

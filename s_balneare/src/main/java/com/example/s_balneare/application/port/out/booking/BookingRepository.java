@@ -23,4 +23,10 @@ public interface BookingRepository {
 
     //trova spot occupati per una data specifica
     List<Integer> findOccupiedSpots(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context);
+
+    //trova tutte le prenotazioni fatte dal customer
+    List<Booking> findByCustomerId(Integer customerId, TransactionContext context);
+
+    //trova tutte le prenotazioni fatte in una spiaggia
+    List<Booking> findByBeachId(Integer beachId, TransactionContext context);
 }
