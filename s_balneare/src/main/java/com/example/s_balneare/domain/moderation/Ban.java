@@ -2,8 +2,6 @@ package com.example.s_balneare.domain.moderation;
 
 import java.time.Instant;
 
-//TODO: da implementarla nel pattern DDD-lite
-
 public class Ban {
     private final Integer id;
     private final Integer bannedId;
@@ -14,22 +12,12 @@ public class Ban {
     private final String reason;
     private final Instant createdAt;
 
-    //TODO: crea 2 costruttori: uno con createdAt e uno senza
-
-    // 1. Costruttore per NUOVI BAN, senza il parametro createdAt
-    //delega la costruzione al costruttore completo
-    public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason) {
-        this(id, bannedId, banType, bannedFromBeachId, adminId, reason, Instant.now());
-    }
-
-    // 2. Costruttore COMPLETO (usato dal Repository per ricostruire l'oggetto dal DB), necessita del parametro createAt
     public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason, Instant createdAt) {
         checkBannedId(bannedId);
+        checkBannedFromBeachId(bannedFromBeachId, banType);
         checkAdminId(adminId);
         checkReason(reason);
         checkCreatedAt(createdAt);
-        checkBannedFromBeachId(bannedFromBeachId, banType);
-
         this.id = id;
         this.bannedId = bannedId;
         this.banType = banType;
@@ -38,7 +26,6 @@ public class Ban {
         this.reason = reason;
         this.createdAt = createdAt;
     }
-
 
     public Integer getId() {
         return id;

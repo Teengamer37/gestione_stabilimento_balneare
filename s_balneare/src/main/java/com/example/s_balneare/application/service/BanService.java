@@ -6,6 +6,8 @@ import com.example.s_balneare.application.port.out.BanRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.moderation.Ban;
 
+import java.time.Instant;
+
 public class BanService implements BanUseCase {
     private final BanRepository banRepository;
     private final TransactionManager transactionManager;
@@ -19,7 +21,7 @@ public class BanService implements BanUseCase {
     public Integer createBan(CreateBanCommand command) {
         return  transactionManager.executeInTransaction(context -> {
             return banRepository.save(
-                    new Ban(0, command.bannedId(), command.banType(), command.bannedFromBeachId(), command.adminId(), command.reason()), context);
+                    new Ban(0, command.bannedId(), command.banType(), command.bannedFromBeachId(), command.adminId(), command.reason(), Instant.now()), context);
         });
     }
 

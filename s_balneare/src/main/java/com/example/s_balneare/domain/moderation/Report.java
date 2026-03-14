@@ -4,8 +4,6 @@ import com.example.s_balneare.domain.user.Role;
 
 import java.time.Instant;
 
-//TODO: controlla costruttori (ne basta uno), delega assegnazione createdAt ai service
-
 public class Report {
     private final Integer id;
     private final Integer reporterId;
@@ -15,12 +13,6 @@ public class Report {
     private final Instant createdAt;
     private ReportStatus status;
 
-    //Costruttore per nuovi report, delega l'operazione al costruttore completo
-    public Report(Integer id, Integer reporterId, Integer reportedId, ReportTargetType reportedType , String description, Instant createdAt){
-        this(id, reporterId, reportedId, reportedType, description, createdAt, ReportStatus.PENDING );
-    }
-
-    //Costruttore completo, utile per prelevare dati dal db
     public Report(Integer id, Integer reporterId, Integer reportedId, ReportTargetType reportedType, String description, Instant createdAt, ReportStatus status) {
         checkReporterReported(reporterId, reportedId);
         checkDescription(description);
@@ -33,6 +25,7 @@ public class Report {
         this.createdAt = createdAt;
         this.status = status;
     }
+
 
     public Integer getId() {
         return id;
