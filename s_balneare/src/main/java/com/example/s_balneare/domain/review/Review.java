@@ -2,9 +2,6 @@ package com.example.s_balneare.domain.review;
 
 import java.time.Instant;
 
-//TODO: Per il DDD lite raiting viene consigliato di farlo diventare un value object , in modo da poterlo usare in altri costrutti coi voti.
-// Decidi te cosa vuoi fare io te lo segnalo per dovere di cronaca
-
 public class Review {
     private final Integer id;
     private final Integer beachId;
@@ -22,7 +19,7 @@ public class Review {
         this.beachId = beachId;
         this.customerId = customerId;
         this.rating = rating;
-        this.comment = formatComment(comment);
+        this.comment = checkComment(comment);
         this.createdAt = createdAt;
     }
 
@@ -67,11 +64,9 @@ public class Review {
         if (createdAt == null) throw new IllegalArgumentException("ERROR: createdAt must not be null");
     }
 
-    private String formatComment(String comment) {
-        if (comment == null) {
-            return "";
-        }
-        return comment.trim(); // Esempio: in DDD è utile anche pulire gli spazi
+    private String checkComment(String comment) {
+        if (comment == null) throw new IllegalArgumentException("ERROR: comment must not be null");
+        return comment.trim(); // utile per pulire gli spazi
     }
 
 }
