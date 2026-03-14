@@ -39,7 +39,6 @@ public class ManageUserService<T extends User> {
         return new LoginResult(user.getId(), user.isOTP());
     }
 
-    //FIXME: fare funzione updateOTP? (consigliato per non fare un findById e poi un update, anche se sticazzi)
     public void updatePassword(Integer id, String oldPassword, String newPassword, boolean OTP) {
         transactionManager.executeInTransaction(context -> {
             //cerco password vecchia

@@ -12,7 +12,6 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
-//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Booking tramite
  * libreria JDBC.
@@ -476,5 +475,37 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //salvo tutto nella nuova lista, raggruppando bookings e spots
         return new ArrayList<>(bookingMap.values());
+    }
+
+    /**
+     * Controlla se l'utente in questione ha avuto prenotazioni passate in stato CONFIRMED ad una determinata Beach
+     * @param customerId ID del customer
+     * @param beachId ID della spiaggia
+     * @param referenceDate Data di riferimento
+     * @param context Connessione JDBC
+     * @return TRUE se ci sono Booking passati con stato CONFIRMED a quella spiaggia; FALSE altrimenti
+     */
+    @Override
+    public boolean hasPastConfirmedBooking(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection conn = getConnection(context);
+
+        //check validità parametri
+        if (customerId == null || customerId <= 0 || beachId == null || beachId <= 0)
+            throw new IllegalArgumentException("ERROR: invalid customerId and/or beachId");
+        if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
+
+        String sql = "SELECT 1 FROM bookings WHERE customerId = ? AND beachId = ? AND status = 'CONFIRMED' AND date < ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, beachId);
+            ps.setDate(3, java.sql.Date.valueOf(referenceDate));
+            try (ResultSet rs = ps.executeQuery()) {
+                //TRUE se la query mi restituisce almeno una riga, FALSE altrimenti
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to check past bookings", e);
+        }
     }
 }

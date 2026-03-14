@@ -296,11 +296,11 @@
 	
 	\usecasetable
 	{UC-07}
-	{Write Review}
+	{Manage Reviews}
 	{Customer}
-	{Permette ad un Customer di valutare e commentare la propria esperienza presso una spiaggia in cui ha effettivamente soggiornato.}
+	{Permette ad un Customer di valutare e commentare la propria esperienza presso una spiaggia in cui ha effettivamente soggiornato, oppure di eliminare una propria recensione precedentemente pubblicata.}
 	{L'utente è loggato. La spiaggia è in stato ATTIVO. L'utente non ha un Ban per quella spiaggia. Deve esistere almeno una prenotazione per quella spiaggia con data nel passato (rispetto a quando viene applicato lo Use Case) e in stato CONFIRMED.}
-	{La recensione viene salvata nel database, associata alla spiaggia e all'utente.}
+	{La recensione viene salvata o rimossa dal database, associata alla spiaggia e all'utente.}
 	{
 		\begin{enumerate}[nosep, leftmargin=*]
 			\item L'utente naviga nella sezione "Le mie prenotazioni" o sulla pagina della spiaggia;
@@ -314,6 +314,13 @@
 	}
 	{
 		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{2a.}] \textbf{Eliminazione Recensione:} 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'utente seleziona una recensione che ha già pubblicato in passato e clicca su "Elimina";
+				\item[ii.] Il sistema chiede conferma dell'operazione ("Sei sicuro di voler eliminare questa recensione?");
+				\item[iii.] L'utente conferma;
+				\item[iv.] Il sistema rimuove il record dal database e mostra un messaggio di successo.
+			\end{enumerate}
 			\item[\textbf{3a-e.}] \textbf{Mancanza Requisiti:} Se l'utente tenta di accedere all'URL della recensione senza averne diritto (es. prenotazione futura, prenotazione CANCELLED/REJECTED o mai stato in quella spiaggia), il sistema blocca l'azione mostrando: "Devi aver completato un soggiorno in questa struttura per poter lasciare una recensione.".
 			\item[\textbf{3b-e.}] \textbf{Spiaggia Disattivata/Ban:} Se la spiaggia non è più attiva o l'utente è stato bannato da quella struttura dopo il soggiorno, il sistema inibisce la funzione di recensione.
 			\item[\textbf{6a-e.}] \textbf{Recensione non completata:} Se l'utente non compila entrambi i campi, il sistema evidenzia i campi da compilare obbligatoriamente.

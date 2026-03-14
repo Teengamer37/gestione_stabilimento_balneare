@@ -43,6 +43,10 @@ public class JdbcReviewRepository implements ReviewRepository {
                 }
             }
         } catch (SQLException e) {
+            //SQLState "23000" indica errore di integrità referenziale
+            if ("23000".equals(e.getSQLState())) {
+                throw new IllegalArgumentException("ERROR: the beach was already reviewed by this customer");
+            }
             throw new RuntimeException("ERROR: unable to save review", e);
         }
     }

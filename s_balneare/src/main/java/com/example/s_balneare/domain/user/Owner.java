@@ -1,7 +1,5 @@
 package com.example.s_balneare.domain.user;
 
-
-//TODO: implementare flag primo login per cambio password obbligatorio
 public final class Owner extends User {
     private boolean OTP;
 

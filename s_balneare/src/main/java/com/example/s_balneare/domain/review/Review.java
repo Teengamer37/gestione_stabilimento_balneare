@@ -15,6 +15,8 @@ public class Review {
         checkBeachId(beachId);
         checkCustomerId(customerId);
         checkRating(rating);
+        checkCreatedAt(createdAt);
+
         this.id = id;
         this.beachId = beachId;
         this.customerId = customerId;
@@ -23,26 +25,21 @@ public class Review {
         this.createdAt = createdAt;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-
-    public int getBeachId() {
+    public Integer getBeachId() {
         return beachId;
     }
-
-    public int getCustomerId() {
+    public Integer getCustomerId() {
         return customerId;
     }
-
     public int getRating() {
         return rating;
     }
-
     public String getComment() {
         return comment;
     }
-
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -51,22 +48,18 @@ public class Review {
     private void checkBeachId(Integer beachId) {
         if (beachId == null || beachId <= 0 ) throw new IllegalArgumentException("ERROR: beachId is not valid");
     }
-
     private void checkCustomerId(Integer customerId) {
         if (customerId == null || customerId <= 0 ) throw new IllegalArgumentException("ERROR: customerId is not valid");
     }
-
     private void checkRating(int rating) {
         if (rating < 1 || rating > 5) throw new IllegalArgumentException("ERROR: rating must be between 1 and 5");
     }
-
     private void checkCreatedAt(Instant createdAt) {
         if (createdAt == null) throw new IllegalArgumentException("ERROR: createdAt must not be null");
     }
-
     private String checkComment(String comment) {
-        if (comment == null) throw new IllegalArgumentException("ERROR: comment must not be null");
+        if (comment == null || comment.isBlank()) throw new IllegalArgumentException("ERROR: comment must not be null/blank");
+        if (comment.length() > 1024) throw new IllegalArgumentException("ERROR: comment cannot exceed 1024 characters");
         return comment.trim(); // utile per pulire gli spazi
     }
-
 }

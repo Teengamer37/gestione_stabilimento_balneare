@@ -18,11 +18,10 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import java.time.LocalDate;
 import java.util.List;
 
-//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
  * @see BookingUseCase BookingUseCase
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class BookingService implements BookingUseCase {
     private final BookingRepository bookingRepository;

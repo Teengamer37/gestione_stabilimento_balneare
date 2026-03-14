@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-//TODO: aggiungere possibilità di far prenotazioni da parte della balneazione per persone che telefonano allo stabilimento
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Booking.
  * Implementata in:
@@ -29,4 +28,7 @@ public interface BookingRepository {
 
     //trova tutte le prenotazioni fatte in una spiaggia
     List<Booking> findByBeachId(Integer beachId, TransactionContext context);
+
+    //controlla se l'utente ha booking passati in stato CONFIRMED in una determinata spiaggia
+    boolean hasPastConfirmedBooking(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context);
 }
