@@ -3,6 +3,7 @@ package com.example.s_balneare.application.service.user;
 import com.example.s_balneare.application.port.out.AddressRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.user.CustomerRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.user.Customer;
@@ -12,12 +13,14 @@ import java.time.LocalDate;
 public class ManageCustomerService extends ManageUserService<Customer> {
     private final AddressRepository addressRepository;
     private final BookingRepository bookingRepository;
+    private final CustomerRepository customerRepository;
 
     public ManageCustomerService(UserRepository<Customer> userRepository, AddressRepository addressRepository,
-                                 BookingRepository bookingRepository, TransactionManager transactionManager) {
+                                 BookingRepository bookingRepository, TransactionManager transactionManager, CustomerRepository customerRepository) {
         super(userRepository, transactionManager);
         this.addressRepository = addressRepository;
         this.bookingRepository = bookingRepository;
+        this.customerRepository = customerRepository;
     }
 
     //cambio numero di telefono transazione unica, gestire lato applicazione eventuali messaggi di conferma
@@ -56,15 +59,6 @@ public class ManageCustomerService extends ManageUserService<Customer> {
             //passo 3: aggiorno tutto nel DB
             addressRepository.update(updatedAddress, context);
             userRepository.update(customer, context);
-        });
-    }
-
-    //transazione unica disattivazione utente che può essere effettuato sia dall'utente che dall'admin
-    public void setCustomerActive(Integer id, boolean active) {
-        transactionManager.executeInTransaction(context -> {
-            Customer user = getUserOrThrow(id, context);
-            user.setActive();
-            userRepository.update(user, context);
         });
     }
 

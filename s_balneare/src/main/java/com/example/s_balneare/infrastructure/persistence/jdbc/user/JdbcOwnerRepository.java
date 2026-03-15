@@ -4,7 +4,6 @@ import com.example.s_balneare.application.port.out.user.OwnerRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Owner;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -98,4 +97,5 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
                 rs.getBoolean("OTP")
         );
     }
+
 }

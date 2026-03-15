@@ -59,7 +59,6 @@ public class BanService<T extends User> implements BanUseCase {
                 //Chiudi spiaggia
                 beach.closeBeach();
                 beachRepository.update(beach, context);
-
             }
             //Flusso di operazioni se l'utente è un customer
             else if (user instanceof Customer customer) {
