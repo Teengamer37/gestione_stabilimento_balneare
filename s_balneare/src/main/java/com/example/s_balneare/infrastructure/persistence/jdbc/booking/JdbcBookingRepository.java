@@ -579,7 +579,7 @@ public class JdbcBookingRepository implements BookingRepository {
         Connection connection = getConnection(context);
 
         //check validità parametri
-        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
         if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
 
         String sql = "UPDATE bookings SET status = 'CANCELLED' " +
@@ -591,6 +591,28 @@ public class JdbcBookingRepository implements BookingRepository {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to cancel future bookings for beach", e);
+        }
+    }
+
+    @Override
+    public void cancelFutureUserBookingsFromBeach(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context) {
+        Connection connection = getConnection(context);
+
+        //check validità parametri
+        if (customerId == null || customerId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+        if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
+
+        String sql = "UPDATE bookings SET status = 'CANCELLED'" +
+                "WHERE customerId=? AND beachId= ? AND date > ? AND status IN ('PENDING', 'CONFIRMED')";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setInt(2, beachId);
+            ps.setDate(3, java.sql.Date.valueOf(referenceDate));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to cancel future bookings for beach of user: " + customerId, e);
         }
     }
 

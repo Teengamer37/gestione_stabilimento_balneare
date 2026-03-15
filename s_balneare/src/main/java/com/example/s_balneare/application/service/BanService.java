@@ -68,7 +68,8 @@ public class BanService<T extends User> implements BanUseCase {
                     //Elimino prenotazioni del singolo utente da quella spiaggia
                     Beach beach = beachRepository.findById(command.bannedFromBeachId(), context)
                             .orElseThrow(() -> new IllegalArgumentException("ERROR: beach doesn't exist"));
-                    //TODO: metodo che elimina prenotazioni utente da una singola spiaggia
+                    // metodo che elimina prenotazioni utente da una singola spiaggia
+                    bookingRepository.cancelFutureUserBookingsFromBeach(customer.getId(), beach.getId(), LocalDate.now(), context);
                 } else { //Ban dall'applicazione
                     //Elimino tutte prenotazioni utente
                     bookingRepository.cancelFutureBookingsForCustomer(customer.getId(), LocalDate.now(), context);

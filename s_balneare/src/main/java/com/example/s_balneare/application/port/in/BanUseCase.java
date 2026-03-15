@@ -6,7 +6,7 @@ import com.example.s_balneare.domain.moderation.Ban;
 import java.util.List;
 
 public interface BanUseCase {
-    public Integer createBan(CreateBanCommand command);
-    public boolean isUserBannedFromApp(Integer customerId); // COntrolla se un owner o user è bannato
-    public boolean isCustomerBannedFromBeach(Integer customerId, Integer beachId); // controlla se un customer è bannato da una spiaggia
+    Integer createBan(CreateBanCommand command);
+    boolean isUserBannedFromApp(Integer customerId); // COntrolla se un owner o user è bannato
+    boolean isCustomerBannedFromBeach(Integer customerId, Integer beachId); // controlla se un customer è bannato da una spiaggia
 }

@@ -41,6 +41,8 @@ public interface BookingRepository {
     //annulla tutte le prenotazioni future di una spiaggia (usato in caso di chiusura/ban)
     void cancelFutureBookingsForBeach(Integer beachId, LocalDate referenceDate, TransactionContext context);
 
+    void cancelFutureUserBookingsFromBeach(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context);
+
     //cerca il numero massimo di prenotazioni di posti auto per giorno (usato nel caso se in un aggiornamento dei parcheggi
     //vado a ridurre il numero di posti, lasciando quindi mezzi "vacanti")
     BookedParkingSpaces getMaxFutureParkings(Integer beachId, LocalDate referenceDate, TransactionContext context);
