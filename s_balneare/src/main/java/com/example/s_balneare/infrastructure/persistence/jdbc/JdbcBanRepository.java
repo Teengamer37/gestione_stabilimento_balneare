@@ -4,7 +4,6 @@ import com.example.s_balneare.application.port.out.BanRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.moderation.Ban;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,60 +84,34 @@ public class JdbcBanRepository implements BanRepository {
     }
 
     @Override
-    public List<Ban> findByBannedId(Integer bannedId, TransactionContext context) {
+    public boolean isBannedFromBeach(Integer customerId, Integer beachId, TransactionContext context) {
         Connection connection = getConnection(context);
+        String sql = "SELECT * FROM bans WHERE bannedId = ? AND bannedFromBeachId = ? AND banType = 'BEACH' LIMIT 1";
 
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE bannedId = ?";
-        List<Ban> bans = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, bannedId);
-            try (ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
-                    bans.add(mapToEntity(rs));
-                }
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setInt(1, customerId);
+            statement.setInt(2, beachId);
+            try(ResultSet rs = statement.executeQuery()) {
+                return rs.next();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find bans by BannedID", e);
+        }catch (SQLException e){
+            throw new RuntimeException("ERROR: unable to find bans for this user", e);
         }
-        return bans;
     }
 
     @Override
-    public List<Ban> findByBannedFromBeachId(Integer bannedFromBeachId, TransactionContext context) {
+    public boolean isBannedFromApp(Integer customerId, TransactionContext context) {
         Connection connection = getConnection(context);
+        String sql = "SELECT * FROM bans WHERE bannedId = ? AND banType = 'APP' LIMIT 1";
 
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE bannedFromBeachId = ?";
-        List<Ban> bans = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, bannedFromBeachId);
-            try (ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
-                    bans.add(mapToEntity(rs));
-                }
+        try(PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setInt(1, customerId);
+            try(ResultSet rs = statement.executeQuery()) {
+                return rs.next();
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find bans by bannedFromBeachID", e);
+        }catch (SQLException e){
+            throw new RuntimeException("ERROR: unable to find bans for this user", e);
         }
-        return bans;
-    }
-
-    @Override
-    public List<Ban> findByBanType(Integer banType, TransactionContext context) {
-        Connection connection = getConnection(context);
-
-        String sql =  "SELECT id, bannedId, banType, bannedFromBeachId, adminId, reason, createdAt FROM bans WHERE banType = ?";
-        List<Ban> bans = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, banType);
-            try (ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
-                    bans.add(mapToEntity(rs));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find bans by banType", e);
-        }
-        return bans;
     }
 
     private Ban mapToEntity(ResultSet rs) throws SQLException{
