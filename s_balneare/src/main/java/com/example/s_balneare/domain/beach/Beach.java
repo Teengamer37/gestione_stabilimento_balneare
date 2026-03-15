@@ -2,6 +2,7 @@ package com.example.s_balneare.domain.beach;
 
 import com.example.s_balneare.domain.layout.Zone;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -252,12 +253,47 @@ public class Beach {
      * @return TRUE se possiede tutti i campi completati, FALSE altrimenti
      */
     public boolean isFullyConfigured() {
-        return beachGeneral != null &&
-                beachInventory != null &&
-                beachServices != null &&
-                parking != null &&
-                seasons != null && !seasons.isEmpty() &&
-                zones != null && !zones.isEmpty();
+        try {
+            validateActivationRequirements();
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Helper privato che raccoglie esattamente i dati mancanti
+     * e lancia il messaggio dettagliato
+     */
+    private void validateActivationRequirements() {
+        List<String> missing = new ArrayList<>();
+
+        //verifico dati generici/inventario/servizi/parcheggio
+        if (beachGeneral == null) missing.add("general info");
+        if (beachInventory == null) missing.add("inventory");
+        if (beachServices == null) missing.add("services");
+        if (parking == null) missing.add("parking");
+
+        //verifico zone
+        if (zones == null || zones.isEmpty()) {
+            missing.add("at least one zone");
+        }
+
+        //verifico che ci sia almeno una stagione futura o in corso
+        boolean hasValidSeason = false;
+        if (seasons != null && !seasons.isEmpty()) {
+            LocalDate today = LocalDate.now();
+            hasValidSeason = seasons.stream().anyMatch(s -> !s.endDate().isBefore(today));
+        }
+        if (!hasValidSeason) {
+            missing.add("at least one upcoming or current season");
+        }
+
+        //se la lista di errori non è vuota, lancio eccezione
+        if (!missing.isEmpty()) {
+            String missingList = String.join(", ", missing);
+            throw new IllegalStateException("ERROR: cannot activate the Beach. Missing data: " + missingList);
+        }
     }
 
     /**
@@ -266,8 +302,8 @@ public class Beach {
      * @param active nuovo stato di attività
      */
     public void setActive(boolean active) {
-        if (active && !isFullyConfigured()) {
-            throw new IllegalStateException("ERROR: beach can be set to active only if fully configured");
+        if (active) {
+            validateActivationRequirements();
         }
         this.active = active;
     }
