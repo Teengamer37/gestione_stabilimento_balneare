@@ -24,4 +24,5 @@ module com.example.s_balneare {
     exports com.example.s_balneare.application.port.out.booking;
     exports com.example.s_balneare.application.port.in.booking;
     exports com.example.s_balneare.application.port.out.beach;
+    exports com.example.s_balneare.application.port.in.report;
 }
