@@ -1,6 +1,5 @@
 package com.example.s_balneare.domain.user;
 
-//TODO: aggiungere attributo closed (booleana) che serve a chiudere definitivamente un account utente, cancellando tutte le sue future prenotazioni
 public final class Customer extends User {
     private String phoneNumber;
     private final Integer addressId;
@@ -28,7 +27,13 @@ public final class Customer extends User {
         this.phoneNumber = newPhone;
     }
 
-    public void setActive(boolean active) {this.active = active;}
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void closeAccount() {
+        this.active = false;
+    }
 
     public String getPhoneNumber() { return phoneNumber; }
     public int getAddressId() { return addressId; }

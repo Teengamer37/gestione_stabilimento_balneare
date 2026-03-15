@@ -502,4 +502,32 @@ public class JdbcBookingRepository implements BookingRepository {
             throw new RuntimeException("ERROR: unable to check past bookings", e);
         }
     }
+
+    /**
+     * Cancella tutte le prenotazioni future di un utente (usato in caso di chiusura/ban account)
+     * @param customerId ID del customer
+     * @param referenceDate Data di riferimento (data di chiusura/ban account di solito)
+     * @param context Connessione JDBC
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     */
+    @Override
+    public void cancelFutureBookingsForCustomer(Integer customerId, LocalDate referenceDate, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
+        //check validità parametri
+        if (customerId == null || customerId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
+        if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
+
+        String sql = "UPDATE bookings SET status = 'CANCELLED' " +
+                "WHERE customerId = ? AND date > ? AND status IN ('PENDING', 'CONFIRMED')";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, customerId);
+            ps.setDate(2, java.sql.Date.valueOf(referenceDate));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to cancel future bookings for customer", e);
+        }
+    }
 }
