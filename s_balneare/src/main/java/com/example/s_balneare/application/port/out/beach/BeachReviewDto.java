@@ -4,6 +4,9 @@ import java.time.Instant;
 
 /**
  * Record che rappresenta una recensione da parte di un utente ad una determinata spiaggia.
+ * <p>Usata in:
+ *
+ * @see BeachReviewsQuery BeachReviewsQuery
  */
 public record BeachReviewDto(
         Integer reviewId,

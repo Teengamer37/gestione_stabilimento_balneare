@@ -114,8 +114,9 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
      * Metodo privato che va a fare questo calcolo:
      * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
      * Questa operazione viene fatta per ciascuna categoria di parcheggio.
-     * @param capacity Parcheggio della spiaggia
-     * @param booked Parcheggi prenotati in quella data
+     *
+     * @param capacity  Parcheggio della spiaggia
+     * @param booked    Parcheggi prenotati in quella data
      * @param requested Parcheggi richiesti
      * @return una booleana che risponde alla domanda "ci sono parcheggi disponibili per questa prenotazione?"
      */

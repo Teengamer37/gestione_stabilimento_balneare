@@ -4,10 +4,10 @@ import com.example.s_balneare.application.service.user.AuthenticationService;
 
 /**
  * Interfaccia che definisce metodi per l'autenticazione di un utente nella piattaforma (eseguendo vari controlli).
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see AuthenticationService JdbcAuthenticationUseCase
  */
 public interface AuthenticationUseCase {
-    LoginResult logIn(String identifier, String rawPassword);
+    LoginResult login(String identifier, String rawPassword);
 }

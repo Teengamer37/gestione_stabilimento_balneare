@@ -4,8 +4,8 @@ import com.example.s_balneare.domain.common.TransactionContext;
 
 /**
  * Interfaccia che ha il compito di semplificare l'interazione tra i Service e il DB.
- * Permette di avviare una SQL Transaction senza però sapere che libreria viene usata per l'interazione (JDBC, Spring...)
- * Implementata in:
+ * <p>Permette di avviare una SQL Transaction senza però sapere che libreria viene usata per l'interazione (JDBC, Spring...)
+ * <p>Implementata in:
  *
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager JdbcTransactionManager
  */

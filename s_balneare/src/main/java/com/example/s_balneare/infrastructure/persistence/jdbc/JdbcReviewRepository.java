@@ -108,13 +108,13 @@ public class JdbcReviewRepository implements ReviewRepository {
     }
 
     @Override
-    public List<Review> findByBeachIdAndRating(Integer beachId, Integer raitingId, TransactionContext context) {
+    public List<Review> findByBeachIdAndRating(Integer beachId, Integer ratingId, TransactionContext context) {
         Connection conn = getConnection(context);
         String sql = "SELECT id, beachId, customerId, rating, comment, createdAt FROM reviews WHERE beachId = ? AND rating = ?";
         List<Review> reviews = new ArrayList<>();
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, beachId);
-            statement.setInt(2, raitingId);
+            statement.setInt(2, ratingId);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     reviews.add(mapToEntity(rs));

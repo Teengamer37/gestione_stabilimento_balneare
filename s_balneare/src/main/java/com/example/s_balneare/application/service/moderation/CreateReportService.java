@@ -1,12 +1,12 @@
-package com.example.s_balneare.application.service.report;
+package com.example.s_balneare.application.service.moderation;
 
 import com.example.s_balneare.application.port.in.moderation.CreateReportCommand;
 import com.example.s_balneare.application.port.in.moderation.CreateReportUseCase;
-import com.example.s_balneare.application.port.out.moderation.BanRepository;
-import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
+import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.booking.Booking;
@@ -41,12 +41,13 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
     }
 
     /**
-     *Aggiunge un nuovo report al DB
+     * Aggiunge un nuovo report al DB
+     *
      * @param command, parametri necessari alla creazione di un nuovo report
      * @return id del report appena creato
      * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
-     * @throws SecurityException se si prova a lasciare un report in una spiaggia non attiva/bannata/chiusa
-     * @throws IllegalStateException se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
+     * @throws SecurityException        se si prova a lasciare un report in una spiaggia non attiva/bannata/chiusa
+     * @throws IllegalStateException    se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
      * @see TransactionManager TransactionManager per le transazioni SQL
      */
     @Override
@@ -56,7 +57,7 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
             Booking booking = bookingRepository.findById(command.bookingId(), context)
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: This booking does not exist"));
 
-            if (booking.getStatus() != BookingStatus.CONFIRMED){
+            if (booking.getStatus() != BookingStatus.CONFIRMED) {
                 throw new IllegalStateException("ERROR: This booking does not exist");
             }
 
@@ -70,7 +71,7 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
             //3: Identificazione reporter
             T reporterUser = userRepository.findById(command.reporterId(), context)
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: Invalid user"));
-            if(reporterUser.getRole() == Role.ADMIN) {
+            if (reporterUser.getRole() == Role.ADMIN) {
                 throw new IllegalStateException("ERROR: Invalid type user");
             }
             //Controllo l'utente non sia bannato dall'app, identico che controllare se l'utente è attivo
@@ -90,10 +91,10 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
             ReportTargetType reportedType;
             Integer reportedId;
 
-            if (reporterUser instanceof Customer customer){
+            if (reporterUser instanceof Customer customer) {
                 //Customer segnala la spiaggia
                 //Controllo segnali spiagge inerenti alla prenotazione
-                if(!Objects.equals(command.reporterId(), booking.getCustomerId())) {
+                if (!Objects.equals(command.reporterId(), booking.getCustomerId())) {
                     throw new IllegalStateException("ERROR: You are not the owner of this reservation");
                 }
                 //Controllo che il customer che fa il report non sia bannato dalla spiaggia
@@ -102,8 +103,8 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
                 }
                 reportedType = ReportTargetType.BEACH;
                 reportedId = beach.getOwnerId();
-            } else{ //Owner segnala il customer
-                if (!Objects.equals(command.reporterId(), beach.getOwnerId())){
+            } else { //Owner segnala il customer
+                if (!Objects.equals(command.reporterId(), beach.getOwnerId())) {
                     throw new IllegalStateException("ERROR: You can only report bookings of your own beach");
                 }
                 reportedType = ReportTargetType.USER;

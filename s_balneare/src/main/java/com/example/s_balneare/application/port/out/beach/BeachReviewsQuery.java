@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database per estrarre
  * tutte le review di una determinata spiaggia.
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see JdbcBeachReviewsQuery JdbcBeachCatalogQuery
  * @see TransactionManager TransactionManager per le transazioni SQL

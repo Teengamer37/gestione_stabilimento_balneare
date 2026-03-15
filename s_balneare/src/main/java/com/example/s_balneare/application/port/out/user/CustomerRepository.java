@@ -7,7 +7,7 @@ import java.util.Optional;
 
 /**
  * Interfaccia che gestisce la manipolazione di Customer tra l'app e il Database.
- * Estende:
+ * <p>Estende:
  *
  * @see UserRepository UserRepository
  */

@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Interfaccia che definisce le funzioni utili per implementare lo Use Case di ricerca spiagge.
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see BrowseBeachService BrowseBeachService
  */

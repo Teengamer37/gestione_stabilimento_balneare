@@ -1,8 +1,8 @@
 package com.example.s_balneare.application.service.user;
 
-import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.application.port.out.user.CustomerRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.Address;
@@ -28,8 +28,8 @@ public class ManageCustomerService extends ManageUserService<Customer> {
         transactionManager.executeInTransaction(context -> {
             Customer user = getUserOrThrow(id, context);
 
-            String currentHashedPassword =userRepository.findPassword(id, context)
-                            .orElseThrow(() -> new IllegalArgumentException("ERROR: Password not found"));
+            String currentHashedPassword = userRepository.findPassword(id, context)
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: Password not found"));
             verifyPassword(currentPassword, currentHashedPassword);
 
             user.changePhoneNumber(phoneNumber);
@@ -65,7 +65,8 @@ public class ManageCustomerService extends ManageUserService<Customer> {
     /**
      * Chiude l'account di un Customer:
      * Verifica la password, annulla tutte le prenotazioni future, disattiva l'account
-     * @param customerId ID del Customer da chiudere
+     *
+     * @param customerId      ID del Customer da chiudere
      * @param currentPassword Password attuale dell'account del Customer
      */
     public void closeCustomerAccount(Integer customerId, String currentPassword) {

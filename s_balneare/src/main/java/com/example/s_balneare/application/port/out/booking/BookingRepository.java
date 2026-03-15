@@ -1,5 +1,6 @@
 package com.example.s_balneare.application.port.out.booking;
 
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.infrastructure.persistence.jdbc.booking.JdbcBookingRepository;
@@ -10,10 +11,10 @@ import java.util.Optional;
 
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Booking.
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see JdbcBookingRepository JdbcBookingRepository
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public interface BookingRepository {
     //manipolazione

@@ -4,8 +4,8 @@ import com.example.s_balneare.application.service.booking.CreateManualBookingSer
 
 /**
  * Interfaccia che definisce le funzioni utili per implementare lo Use Case di creazione Booking da parte dell'Owner.
- * Essa ha bisogno di un oggetto Parking e di un oggetto Beach.
- * Implementata in:
+ * <p>Essa ha bisogno di un oggetto Parking e di un oggetto Beach.
+ * <p>Implementata in:
  *
  * @see CreateManualBookingService CreateManualBookingService
  */

@@ -1,8 +1,8 @@
 package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.in.beach.ManageBeachUseCase;
-import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
@@ -16,6 +16,7 @@ import java.util.Optional;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Beach tra l'app Java e il Database.
+ *
  * @see ManageBeachUseCase ManageBeachUseCase
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
@@ -32,8 +33,9 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiornamento info generali spiaggia:
-     * Prendo spiaggia da DB -> modifico parametro -> update nel DB
-     * @param id Identificatore spiaggia da cercare nel DB
+     * <p>Prendo spiaggia da DB -> modifico parametro -> update nel DB
+     *
+     * @param id         Identificatore spiaggia da cercare nel DB
      * @param newGeneral Nuovo oggetto BeachGeneral da salvare
      */
     @Override
@@ -47,7 +49,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiornamento inventario spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id           Identificatore spiaggia da cercare nel DB
      * @param newInventory Nuovo oggetto BeachInventory da salvare
      */
     @Override
@@ -73,7 +76,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiornamento servizi spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id          Identificatore spiaggia da cercare nel DB
      * @param newServices Nuovo oggetto BeachServices da salvare
      */
     @Override
@@ -87,7 +91,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiornamento parcheggio spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id         Identificatore spiaggia da cercare nel DB
      * @param newParking Nuovo oggetto Parking da salvare
      */
     @Override
@@ -113,7 +118,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiornamento info extra spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id        Identificatore spiaggia da cercare nel DB
      * @param extraInfo Stringa da sostituire ad extraInfo
      */
     @Override
@@ -127,7 +133,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Manipolazione stato attività spiaggia: i metodi chiamati applicheranno le Business Rules definite
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id     Identificatore spiaggia da cercare nel DB
      * @param active Booleana che specifica il nuovo stato della spiaggia
      */
     @Override
@@ -151,7 +158,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiunta stagione in una determinata spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id     Identificatore spiaggia da cercare nel DB
      * @param season Nuova stagione da aggiungere
      */
     @Override
@@ -165,7 +173,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiunta lista di stagioni in una determinata spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id      Identificatore spiaggia da cercare nel DB
      * @param seasons Lista di stagioni da aggiungere (Business Rules sul parametro applicati nei metodi di Beach)
      */
     @Override
@@ -179,7 +188,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiornamento di una stagione (Estensione data fine)
-     * @param beachId ID della spiaggia
+     *
+     * @param beachId    ID della spiaggia
      * @param seasonName Nome della stagione da aggiornare
      * @param newEndDate Nuova data di fine stagione
      */
@@ -193,7 +203,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Eliminazione di una stagione (con controlli)
-     * @param beachId ID della spiaggia
+     *
+     * @param beachId    ID della spiaggia
      * @param seasonName Nome della stagione da eliminare
      */
     public void removeSeason(Integer beachId, String seasonName) {
@@ -223,7 +234,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiunta zona in una determinata spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id   Identificatore spiaggia da cercare nel DB
      * @param zone Nuova zona da aggiungere
      */
     @Override
@@ -237,7 +249,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Aggiunta lista di zone in una determinata spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id    Identificatore spiaggia da cercare nel DB
      * @param zones Lista di zone da aggiungere (Business Rules sul parametro applicati nei metodi di Beach)
      */
     @Override
@@ -251,7 +264,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Rinomina una zona
-     * @param beachId ID della spiaggia
+     *
+     * @param beachId     ID della spiaggia
      * @param oldZoneName Nome vecchio della zona
      * @param newZoneName Nome nuovo della zona
      */
@@ -271,7 +285,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Rimozione zona da una determinata spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id   Identificatore spiaggia da cercare nel DB
      * @param zone Zona da rimuovere
      */
     @Override
@@ -285,7 +300,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Rimozione lista di zone da una determinata spiaggia
-     * @param id Identificatore spiaggia da cercare nel DB
+     *
+     * @param id    Identificatore spiaggia da cercare nel DB
      * @param zones Lista di zone da rimuovere (Business Rules sul parametro applicati nei metodi di Beach)
      */
     @Override
@@ -299,6 +315,7 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Ricerca spiaggia
+     *
      * @param id Identificatore spiaggia da cercare nel DB
      * @return oggetto Beach o eccezione in caso di errore
      * @see #getBeachOrThrow(Integer, TransactionContext) getBeachOrThrow
@@ -312,6 +329,7 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Ricerca spiaggia tramite ID del proprietario
+     *
      * @param ownerId Identificatore proprietario
      * @return oggetto Optional che restituisce Beach se trovato; se non trovato, possono essere usati metodi come
      * Optional.isEmpty() per non rischiare manipolazioni con oggetti null
@@ -325,7 +343,8 @@ public class ManageBeachService implements ManageBeachUseCase {
 
     /**
      * Metodo privato che serve nelle operazioni sensibili (in questo caso negli update):
-     * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     * <p>Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     *
      * @param id Identificativo spiaggia da cercare
      * @return oggetto Beach con quell'ID
      * @throws IllegalArgumentException se la spiaggia non è stata trovata nel DB

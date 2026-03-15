@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Booking.
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see BookingService BookingService
  */

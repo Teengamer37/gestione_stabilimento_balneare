@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * Interfaccia che racchiude tutti i metodi che un Service deve avere per mostrare i vari Reviews di una Beach.
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see ViewBeachReviewsService ViewBeachReviewsService
  */

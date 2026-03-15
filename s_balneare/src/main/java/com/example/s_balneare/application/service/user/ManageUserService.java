@@ -65,7 +65,7 @@ public class ManageUserService<T extends User> {
     }
 
     //transazione unica eliminazione email, da gestire per controlli lato applicazione
-    public void updateEmail (Integer id, String email, String currentPassword) {
+    public void updateEmail(Integer id, String email, String currentPassword) {
         transactionManager.executeInTransaction(context -> {
             T user = getUserOrThrow(id, context);
 
@@ -78,8 +78,8 @@ public class ManageUserService<T extends User> {
         });
     }
 
-    protected T getUserOrThrow(Integer id, TransactionContext context){
-        return userRepository.findById(id,context)
+    protected T getUserOrThrow(Integer id, TransactionContext context) {
+        return userRepository.findById(id, context)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: user not found with id: " + id));
     }
 }

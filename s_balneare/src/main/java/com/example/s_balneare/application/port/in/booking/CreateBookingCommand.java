@@ -5,7 +5,7 @@ import java.util.List;
 
 /**
  * Record che prende come parametri tutti gli attributi di Booking e BookingParking per la creazione di un Booking da parte del Customer.
- * Usato in:
+ * <p>Usato in:
  *
  * @see CreateBookingUseCase CreateBookingUseCase
  */

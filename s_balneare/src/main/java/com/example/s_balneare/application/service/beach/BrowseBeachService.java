@@ -7,6 +7,15 @@ import com.example.s_balneare.application.port.out.beach.BeachSummary;
 
 import java.util.List;
 
+/**
+ * Servizio che implementa lo Use Case per la visualizzazione e la ricerca degli stabilimenti balneari attivi nel sistema.
+ * <p>Usa BeachCatalogQuery per la ricerca delle spiagge nel DB.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ *
+ * @see BrowseBeachUseCase BrowseBeachUseCase
+ * @see BeachCatalogQuery BeachCatalogQuery
+ * @see TransactionManager TransactionManager
+ */
 public class BrowseBeachService implements BrowseBeachUseCase {
     private final BeachCatalogQuery beachCatalogQuery;
     private final TransactionManager transactionManager;
@@ -16,6 +25,11 @@ public class BrowseBeachService implements BrowseBeachUseCase {
         this.transactionManager = transactionManager;
     }
 
+    /**
+     * Cerca nel database tutte le spiagge attive
+     *
+     * @return lista di spiagge attive
+     */
     @Override
     public List<BeachSummary> getActiveBeaches() {
         return transactionManager.executeInTransaction(context -> {
@@ -23,6 +37,12 @@ public class BrowseBeachService implements BrowseBeachUseCase {
         });
     }
 
+    /**
+     * Cerca nel database spiagge attive che rispettino il parametro di ricerca
+     *
+     * @param keyword Parametro di ricerca (città o paese)
+     * @return lista di spiagge attive che rispettano il parametro di ricerca
+     */
     @Override
     public List<BeachSummary> searchActiveBeaches(String keyword) {
         return transactionManager.executeInTransaction(context -> {

@@ -1,14 +1,15 @@
 package com.example.s_balneare.application.port.in.common;
 
+import com.example.s_balneare.application.service.common.AddressService;
 import com.example.s_balneare.domain.common.Address;
 
 import java.util.List;
 
 /**
  * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Address.
- * Implementata in:
+ * <p>Implementata in:
  *
- * @see com.example.s_balneare.application.service.AddressService AddressService
+ * @see AddressService AddressService
  */
 public interface AddressUseCase {
     //manipolazione

@@ -4,7 +4,7 @@ import com.example.s_balneare.domain.user.Admin;
 
 /**
  * Interfaccia che gestisce la manipolazione di Admin tra l'app e il Database.
- * Estende:
+ * <p>Estende:
  *
  * @see UserRepository UserRepository
  */

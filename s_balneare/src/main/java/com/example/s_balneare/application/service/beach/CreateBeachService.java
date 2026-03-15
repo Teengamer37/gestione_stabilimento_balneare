@@ -2,20 +2,20 @@ package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.in.beach.CreateBeachCommand;
 import com.example.s_balneare.application.port.in.beach.CreateBeachUseCase;
-import com.example.s_balneare.application.port.out.common.AddressRepository;
-import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
+import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.common.Address;
 
 /**
  * Implementazione dello Use Case di aggiunta spiaggia nel DB:
- * Interagisce con AddressRepository per salvare l'indirizzo della nuova spiaggia;
- * Successivamente con BeachRepository per salvare la nuova spiaggia con riferimento alla nuova Address.
- * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata
+ * <p>Interagisce con AddressRepository per salvare l'indirizzo della nuova spiaggia;
+ * <p>Successivamente con BeachRepository per salvare la nuova spiaggia con riferimento alla nuova Address.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see CreateBeachUseCase CreateBeachUseCase
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager
+ * @see TransactionManager TransactionManager
  * @see AddressRepository AddressRepository
  * @see BeachRepository BeachRepository
  */
@@ -31,7 +31,12 @@ public class CreateBeachService implements CreateBeachUseCase {
         this.transactionManager = transactionManager;
     }
 
-    //crea spiaggia date address e info su beach
+    /**
+     * Crea una nuova spiaggia, aggiornando tutte le tabelle necessarie
+     *
+     * @param command Oggetto contenente tutti i dettagli di una spiaggia
+     * @return ID della spiaggia appena salvata (assegnato dal DB)
+     */
     @Override
     public Integer createBeach(CreateBeachCommand command) {
         //transactionManager pensa in automatico all'apertura transazione, commit e rollback
@@ -73,12 +78,8 @@ public class CreateBeachService implements CreateBeachUseCase {
             //senza lanciare errori/eccezioni
             //se activeState è false, allora procedo normalmente
             if (finalActiveState) {
-                if (beach.isFullyConfigured()) {
-                    beach.setActive(true);
-                } else {
-                    // UC-10 Step 10a: Save as Draft
-                    beach.setActive(false);
-                }
+                // UC-10 Step 10a: Save as Draft
+                beach.setActive(beach.isFullyConfigured());
             }
 
             //passo 4: fine transaction e ritorno il nuovo ID della spiaggia

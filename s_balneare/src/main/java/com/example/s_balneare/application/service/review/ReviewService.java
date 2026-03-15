@@ -3,11 +3,11 @@ package com.example.s_balneare.application.service.review;
 import com.example.s_balneare.application.port.in.booking.BookingUseCase;
 import com.example.s_balneare.application.port.in.review.CreateReviewCommand;
 import com.example.s_balneare.application.port.in.review.ReviewUseCase;
-import com.example.s_balneare.application.port.out.moderation.BanRepository;
-import com.example.s_balneare.application.port.out.review.ReviewRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
+import com.example.s_balneare.application.port.out.review.ReviewRepository;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.review.Review;
 
@@ -16,6 +16,7 @@ import java.time.LocalDate;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Review tra l'app Java e il Database.
+ *
  * @see BookingUseCase BookingUseCase
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
@@ -40,11 +41,12 @@ public class ReviewService implements ReviewUseCase {
 
     /**
      * Aggiunge una nuova recensione nel DB
+     *
      * @param command parametri necessari per la creazione di una nuova recensione
      * @return ID della recensione appena creata
      * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
-     * @throws SecurityException se si prova a lasciare una recensione ad una spiaggia non attiva/bannata/chiusa
-     * @throws IllegalStateException se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
+     * @throws SecurityException        se si prova a lasciare una recensione ad una spiaggia non attiva/bannata/chiusa
+     * @throws IllegalStateException    se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
      */
     @Override
     public Integer addReview(CreateReviewCommand command) {
@@ -58,7 +60,7 @@ public class ReviewService implements ReviewUseCase {
             }
 
             //Controllo che l'utente non sia bannato dalla spiaggia e dall'app
-            if(banRepository.isBannedFromApp(command.customerId(), context)){
+            if (banRepository.isBannedFromApp(command.customerId(), context)) {
                 throw new SecurityException("ERROR: cannot review, you are banned from the app");
             }
             if (banRepository.isBannedFromBeach(command.customerId(), command.beachId(), context)) {
@@ -94,10 +96,11 @@ public class ReviewService implements ReviewUseCase {
 
     /**
      * Elimina una recensione dal DB
-     * @param reviewId ID della recensione da eliminare
+     *
+     * @param reviewId   ID della recensione da eliminare
      * @param customerId ID del Customer creatore della recensione
      * @throws IllegalArgumentException se la recensione non esiste nel DB
-     * @throws SecurityException se si prova a cancellare una recensione di un altro Customer
+     * @throws SecurityException        se si prova a cancellare una recensione di un altro Customer
      */
     @Override
     public void deleteReview(Integer reviewId, Integer customerId) {

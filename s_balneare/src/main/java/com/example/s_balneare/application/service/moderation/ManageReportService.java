@@ -1,8 +1,8 @@
-package com.example.s_balneare.application.service.report;
+package com.example.s_balneare.application.service.moderation;
 
 import com.example.s_balneare.application.port.in.moderation.ManageReportUseCase;
-import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.domain.moderation.Report;
 import com.example.s_balneare.domain.moderation.ReportStatus;
 
@@ -10,6 +10,7 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette la navigazione dell'admin sui report
+ *
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ManageReportService implements ManageReportUseCase {
@@ -25,7 +26,7 @@ public class ManageReportService implements ManageReportUseCase {
     public Report getReport(Integer reportId) {
         return transactionManager.executeInTransaction(context -> {
             return reportRepository.findById(reportId, context)
-                    .orElseThrow(()->new IllegalArgumentException("ERROR: This report does not exist"));
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: This report does not exist"));
         });
     }
 

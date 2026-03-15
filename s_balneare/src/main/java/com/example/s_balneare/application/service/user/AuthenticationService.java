@@ -1,9 +1,9 @@
 package com.example.s_balneare.application.service.user;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.application.port.out.user.AuthenticationUseCase;
 import com.example.s_balneare.application.port.out.user.LoginResult;
 import com.example.s_balneare.application.port.out.user.UserRepository;
@@ -12,6 +12,7 @@ import com.example.s_balneare.domain.user.User;
 
 /**
  * Implementazione dell'interfaccia che permette l'autenticazione dell'utente facendo collaborare l'app Java e il Database
+ *
  * @see AuthenticationUseCase AuthenticationUseCase
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
@@ -33,7 +34,7 @@ public class AuthenticationService<T extends User> implements AuthenticationUseC
     }
 
     @Override
-    public LoginResult logIn(String identifier, String rawPassword) {
+    public LoginResult login(String identifier, String rawPassword) {
         return transactionManager.executeInTransaction(context -> {
             //passo 1: verifico username e password
             String hashedPassword = userRepository.findPassword(identifier, context)

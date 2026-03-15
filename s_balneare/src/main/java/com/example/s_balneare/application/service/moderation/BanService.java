@@ -1,11 +1,11 @@
-package com.example.s_balneare.application.service;
+package com.example.s_balneare.application.service.moderation;
 
 import com.example.s_balneare.application.port.in.moderation.BanUseCase;
 import com.example.s_balneare.application.port.in.moderation.CreateBanCommand;
-import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.moderation.Ban;

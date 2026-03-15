@@ -1,13 +1,13 @@
 package com.example.s_balneare.application.port.in.moderation;
 
-import com.example.s_balneare.application.service.report.ManageReportService;
+import com.example.s_balneare.application.service.moderation.ManageReportService;
 import com.example.s_balneare.domain.moderation.Report;
 
 import java.util.List;
 
 /**
  * Interfaccia che definisce le funzioni utili per implementare lo Use Case di manipolazione Report.
- * Implementata in:
+ * <p>Implementata in:
  *
  * @see ManageReportService CreateReportService
  */

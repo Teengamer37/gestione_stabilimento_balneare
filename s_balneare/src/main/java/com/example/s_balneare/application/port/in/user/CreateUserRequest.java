@@ -2,7 +2,7 @@ package com.example.s_balneare.application.port.in.user;
 
 /**
  * Rappresenta una richiesta astratta per la creazione di un User.
- * Contiene attributi e metodi comuni per la creazione di diversi tipi di User.
+ * <p>Contiene attributi e metodi comuni per la creazione di diversi tipi di User.
  *
  * @see CreateCustomerRequest CreateCustomerRequest
  * @see CreateOwnerRequest CreateOwnerRequest

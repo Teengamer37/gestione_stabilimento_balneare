@@ -10,7 +10,7 @@ import java.util.Optional;
 
 /**
  * Interfaccia che gestisce la manipolazione di vari User tra l'app e il Database.
- * Interfaccia estesa in:
+ * <p>Interfaccia estesa in:
  *
  * @see CustomerRepository CustomerRepository
  * @see OwnerRepository OwnerRepository

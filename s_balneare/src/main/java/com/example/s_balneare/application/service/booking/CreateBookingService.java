@@ -2,13 +2,13 @@ package com.example.s_balneare.application.service.booking;
 
 import com.example.s_balneare.application.port.in.booking.CreateBookingCommand;
 import com.example.s_balneare.application.port.in.booking.CreateBookingUseCase;
-import com.example.s_balneare.application.port.out.moderation.BanRepository;
-import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.beach.BeachRepository;
+import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
-import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.beach.BeachInventory;
 import com.example.s_balneare.domain.beach.Parking;
@@ -61,7 +61,7 @@ public class CreateBookingService implements CreateBookingUseCase {
                 throw new IllegalStateException("ERROR: cannot create bookings for an inactive beach.");
             }
             //controllo utente  non sia bannato dalla spiaggia o dall'app
-            if (banRepository.isBannedFromApp(command.customerId(), context)){
+            if (banRepository.isBannedFromApp(command.customerId(), context)) {
                 throw new IllegalStateException("ERROR: customer banned from the app");
             }
             if (banRepository.isBannedFromBeach(command.customerId(), command.beachId(), context)) {
@@ -124,8 +124,9 @@ public class CreateBookingService implements CreateBookingUseCase {
      * Metodo privato che va a fare questo calcolo:
      * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
      * Questa operazione viene fatta per ciascuna categoria di parcheggio.
-     * @param capacity Parcheggio della spiaggia
-     * @param booked Parcheggi prenotati in quella data
+     *
+     * @param capacity  Parcheggio della spiaggia
+     * @param booked    Parcheggi prenotati in quella data
      * @param requested Parcheggi richiesti
      * @return una booleana che risponde alla domanda "ci sono parcheggi disponibili per questa prenotazione?"
      */

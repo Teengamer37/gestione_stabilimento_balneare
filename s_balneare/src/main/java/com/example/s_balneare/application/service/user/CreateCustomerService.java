@@ -1,9 +1,9 @@
 package com.example.s_balneare.application.service.user;
 
 import com.example.s_balneare.application.port.in.user.CreateCustomerRequest;
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
-import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Customer;

@@ -1,12 +1,12 @@
 package com.example.s_balneare.application.service.booking;
 
 import com.example.s_balneare.application.port.in.booking.BookingUseCase;
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
-import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.beach.BeachInventory;
 import com.example.s_balneare.domain.beach.Parking;
@@ -20,6 +20,7 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
+ *
  * @see BookingUseCase BookingUseCase
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
@@ -39,12 +40,13 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Aggiorna booking nel DB con nuovi dettagli
-     * @param id ID del Booking da modificare
-     * @param newSpotIds Spot prenotati da aggiornare nel Booking
-     * @param newParking Parcheggi da aggiornare al Booking
-     * @param newSdraio Extra sdraio da aggiornare al Booking
-     * @param newLettini Extra lettini da aggiornare al Booking
-     * @param newSedie Extra sedie da aggiornare al Booking
+     *
+     * @param id          ID del Booking da modificare
+     * @param newSpotIds  Spot prenotati da aggiornare nel Booking
+     * @param newParking  Parcheggi da aggiornare al Booking
+     * @param newSdraio   Extra sdraio da aggiornare al Booking
+     * @param newLettini  Extra lettini da aggiornare al Booking
+     * @param newSedie    Extra sedie da aggiornare al Booking
      * @param newCamerini Extra camerini da aggiornare al Booking
      */
     @Override
@@ -96,6 +98,7 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Ricerca, aggiorna stato in CONFIRMED e salva booking nel DB
+     *
      * @param id Identificatore booking da manipolare nel DB
      */
     @Override
@@ -116,6 +119,7 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Ricerca, aggiorna stato in REJECTED e salva booking nel DB
+     *
      * @param id Identificatore booking da manipolare nel DB
      */
     @Override
@@ -136,6 +140,7 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Ricerca, aggiorna stato in CANCELLED e salva booking nel DB
+     *
      * @param id Identificatore booking da manipolare nel DB
      */
     @Override
@@ -156,6 +161,7 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Prende dal database una lista di Booking fatti da un Customer (indipendentemente dallo stato dei singoli Booking)
+     *
      * @param customerId ID del Customer da cercare nel DB
      * @return Lista di Booking effettuati da quel Customer
      */
@@ -168,6 +174,7 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Prende dal database una lista di Booking fatti per una determinata Beach (indipendentemente dallo stato dei singoli Booking)
+     *
      * @param ownerId ID dell'Owner per poi cercare la spiaggia associata
      * @return Lista di Booking registrati nella spiaggia
      */
@@ -186,7 +193,8 @@ public class BookingService implements BookingUseCase {
     /**
      * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
      * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
-     * @param id Identificativo booking da cercare
+     *
+     * @param id      Identificativo booking da cercare
      * @param context Connessione JDBC
      * @return oggetto Booking con quell'ID
      * @throws IllegalArgumentException se il booking non è stato trovato nel DB
@@ -200,8 +208,9 @@ public class BookingService implements BookingUseCase {
      * Metodo privato che va a fare questo calcolo:
      * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
      * Questa operazione viene fatta per ciascuna categoria di parcheggio.
-     * @param capacity Parcheggio della spiaggia
-     * @param booked Parcheggi prenotati in quella data
+     *
+     * @param capacity  Parcheggio della spiaggia
+     * @param booked    Parcheggi prenotati in quella data
      * @param requested Parcheggi richiesti
      * @return una booleana che risponde alla domanda "ci sono parcheggi disponibili per questa prenotazione?"
      */

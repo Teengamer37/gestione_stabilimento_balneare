@@ -4,9 +4,8 @@ import com.example.s_balneare.domain.user.Owner;
 
 /**
  * Interfaccia che gestisce la manipolazione di Owner tra l'app e il Database.
- * Estende:
+ * <p>Estende:
  *
  * @see UserRepository UserRepository
  */
-public interface OwnerRepository extends UserRepository<Owner> {
-}
+public interface OwnerRepository extends UserRepository<Owner> {}

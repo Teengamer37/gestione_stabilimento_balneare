@@ -4,7 +4,7 @@ import com.example.s_balneare.domain.moderation.BanType;
 
 /**
  * Record che prende come parametri tutti gli attributi di Ban per la creazione di un nuovo ban.
- * Usato in:
+ * <p>Usato in:
  *
  * @see BanUseCase BanUseCase
  */
