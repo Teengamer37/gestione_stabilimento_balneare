@@ -3,28 +3,33 @@ package com.example.s_balneare.application.service.beach;
 import com.example.s_balneare.application.port.in.beach.ManageBeachUseCase;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.booking.BookedInventory;
+import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
+import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.layout.Zone;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Beach tra l'app Java e il Database.
  * @see ManageBeachUseCase ManageBeachUseCase
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ManageBeachService implements ManageBeachUseCase {
     private final BeachRepository beachRepository;
+    private final BookingRepository bookingRepository;
     private final TransactionManager transactionManager;
 
-    public ManageBeachService(BeachRepository beachRepository, TransactionManager transactionManager) {
+    public ManageBeachService(BeachRepository beachRepository, BookingRepository bookingRepository, TransactionManager transactionManager) {
         this.beachRepository = beachRepository;
+        this.bookingRepository = bookingRepository;
         this.transactionManager = transactionManager;
     }
 
-    //TODO: verificare che la spiaggia sia active = FALSE
     /**
      * Aggiornamento info generali spiaggia:
      * Prendo spiaggia da DB -> modifico parametro -> update nel DB
@@ -40,8 +45,6 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
-    //TODO: verificare che la spiaggia sia active = FALSE
-    //TODO: aggiungere controllo nel rispettare inventario per le stagioni in corso e future
     /**
      * Aggiornamento inventario spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -51,12 +54,23 @@ public class ManageBeachService implements ManageBeachUseCase {
     public void updateInventory(Integer id, BeachInventory newInventory) {
         transactionManager.executeInTransaction(context -> {
             Beach beach = getBeachOrThrow(id, context);
+
+            //ricavo il numero più grande di oggetti extra prenotati in un giorno futuro a quello odierno
+            BookedInventory maxInv = bookingRepository.getMaxFutureInventory(id, LocalDate.now(), context);
+            //check se le nuove modifiche vanno a soddisfare tutte le richieste delle prenotazioni future
+            if (newInventory.countExtraSdraio() < maxInv.sdraio() ||
+                    newInventory.countExtraLettini() < maxInv.lettini() ||
+                    newInventory.countExtraSedie() < maxInv.sedie() ||
+                    newInventory.countCamerini() < maxInv.camerini()) {
+                throw new IllegalStateException("ERROR: new inventory does not satisfy all future bookings");
+            }
+
+            //se tutto va bene, salvo
             beach.updateInventory(newInventory);
             beachRepository.update(beach, context);
         });
     }
 
-    //TODO: verificare che la spiaggia sia active = FALSE
     /**
      * Aggiornamento servizi spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -71,8 +85,6 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
-    //TODO: verificare che la spiaggia sia active = FALSE
-    //TODO: aggiungere controllo nel rispettare parcheggi per prenotazioni odierne o in futuro
     /**
      * Aggiornamento parcheggio spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -82,12 +94,23 @@ public class ManageBeachService implements ManageBeachUseCase {
     public void updateParking(Integer id, Parking newParking) {
         transactionManager.executeInTransaction(context -> {
             Beach beach = getBeachOrThrow(id, context);
+
+            //ricavo il numero più grande di parcheggi prenotati in un giorno futuro a quello odierno
+            BookedParkingSpaces maxParked = bookingRepository.getMaxFutureParkings(id, LocalDate.now(), context);
+            //check se le nuove modifiche vanno a lasciare o meno posti "vacanti" a certe prenotazioni
+            if (newParking.nAutoPark() < maxParked.bookedAuto() ||
+                    newParking.nMotoPark() < maxParked.bookedMoto() ||
+                    newParking.nBikePark() < maxParked.bookedBike() ||
+                    newParking.nElectricPark() < maxParked.bookedElectric()) {
+                throw new IllegalStateException("ERROR: new parking capacity leaves some bookings with vacant parking spaces");
+            }
+
+            //se tutto va bene, salvo
             beach.updateParking(newParking);
             beachRepository.update(beach, context);
         });
     }
 
-    //TODO: verificare che la spiaggia sia active = FALSE
     /**
      * Aggiornamento info extra spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -126,7 +149,6 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
-    //TODO: verificare che le stagioni non si sovrappongano con le date
     /**
      * Aggiunta stagione in una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -141,7 +163,6 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
-    //TODO: verificare che le stagioni non si sovrappongano con le date
     /**
      * Aggiunta lista di stagioni in una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB

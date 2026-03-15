@@ -34,4 +34,12 @@ public interface BookingRepository {
 
     //annulla tutte le prenotazioni future di un utente (usato in caso di chiusura/ban account)
     void cancelFutureBookingsForCustomer(Integer customerId, LocalDate referenceDate, TransactionContext context);
+
+    //cerca il numero massimo di prenotazioni di posti auto per giorno (usato nel caso se in un aggiornamento dei parcheggi
+    //vado a ridurre il numero di posti, lasciando quindi mezzi "vacanti")
+    BookedParkingSpaces getMaxFutureParkings(Integer beachId, LocalDate referenceDate, TransactionContext context);
+
+    //cerca il numero massimo di prenotazioni di oggetti extra per giorno (usato nel caso se in un aggiornamento dell'inventario
+    //vado a ridurre il numero di oggetti, lasciando quindi prenotazioni senza gli oggetti prenotati)
+    BookedInventory getMaxFutureInventory(Integer beachId, LocalDate referenceDate, TransactionContext context);
 }

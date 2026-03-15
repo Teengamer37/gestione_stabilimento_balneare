@@ -91,6 +91,7 @@ public class Beach {
      * @param info nuova sezione di extraInfo
      */
     public void updateExtraInfo(String info) {
+        checkNotActive("update extra info");
         if (info == null) extraInfo = "";
         else {
             checkExtraInfo(info);
@@ -103,6 +104,7 @@ public class Beach {
      * @param ownerId nuovo proprietario
      */
     public void updateOwnerId(Integer ownerId) {
+        checkNotActive("update owner info");
         checkOwnerId(ownerId);
         this.ownerId = ownerId;
     }
@@ -113,6 +115,7 @@ public class Beach {
      */
     public void addSeason(Season season) {
         checkSeason(season);
+        checkSeasonOverlap(season);
         seasons.add(season);
         
         //aggiunge automaticamente le zone definite nella stagione se non esistono già
@@ -134,7 +137,10 @@ public class Beach {
      */
     public void addSeasons(List<Season> seasons) {
         checkSeasons(seasons);
-        this.seasons.addAll(seasons);
+        for (Season s : seasons) {
+            checkSeasonOverlap(s);
+            this.seasons.add(s);
+        }
 
         //aggiunge automaticamente le zone definite nella stagione se non esistono già
         for (Season season : seasons) {
@@ -268,21 +274,25 @@ public class Beach {
 
     //metodi update per vari attributi
     public void updateGeneralInfo(BeachGeneral newGeneral) {
+        checkNotActive("update general info");
         checkGeneralInfo(newGeneral);
         this.beachGeneral = newGeneral;
     }
 
     public void updateInventory(BeachInventory newInventory) {
+        checkNotActive("update inventory");
         checkInventory(newInventory);
         this.beachInventory = newInventory;
     }
 
     public void updateServices(BeachServices newServices) {
+        checkNotActive("update services");
         checkServices(newServices);
         this.beachServices = newServices;
     }
 
     public void updateParking(Parking newParking) {
+        checkNotActive("update parking");
         checkParking(newParking);
         this.parking = newParking;
     }
@@ -331,5 +341,18 @@ public class Beach {
     }
     private void checkParking(Parking newParking) {
         if (newParking == null) throw new IllegalArgumentException("ERROR: Parking cannot be reverted to null");
+    }
+    private void checkNotActive(String action) {
+        if (this.active) {
+            throw new IllegalStateException("ERROR: cannot " + action + " while the beach is ACTIVE");
+        }
+    }
+    private void checkSeasonOverlap(Season newSeason) {
+        for (Season existing : this.seasons) {
+            if (!newSeason.endDate().isBefore(existing.startDate()) &&
+                    !newSeason.startDate().isAfter(existing.endDate())) {
+                throw new IllegalArgumentException("ERROR: Season dates overlap with existing season: " + existing.name());
+            }
+        }
     }
 }

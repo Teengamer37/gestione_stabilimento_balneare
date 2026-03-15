@@ -1,5 +1,7 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.booking;
 
+import com.example.s_balneare.application.port.out.booking.BookedInventory;
+import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.booking.BookingParking;
@@ -529,5 +531,109 @@ public class JdbcBookingRepository implements BookingRepository {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to cancel future bookings for customer", e);
         }
+    }
+
+    /**
+     * Trova il numero massimo di prenotazioni di posti auto per giorno
+     * @param beachId ID della spiaggia
+     * @param referenceDate Data di riferimento
+     * @param context Connessione JDBC
+     * @return un record del più grande numero di parcheggi prenotati di un giorno futuro a referenceDate
+     */
+    @Override
+    public BookedParkingSpaces getMaxFutureParkings(Integer beachId, LocalDate referenceDate, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection conn = getConnection(context);
+
+        //check integrità parametri
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+        if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
+
+        //query "divertente" dove all'inizio cerco i posti prenotati per giorno e dopo seleziono i numeri più grandi
+        String sql = "SELECT " +
+                "COALESCE(MAX(dailyAuto), 0) as maxAuto, " +
+                "COALESCE(MAX(dailyMoto), 0) as maxMoto, " +
+                "COALESCE(MAX(dailyBike), 0) as maxBike, " +
+                "COALESCE(MAX(dailyElec), 0) as maxElec " +
+                "FROM (" +
+                "SELECT date, " +
+                "SUM(autoPark) as dailyAuto, " +
+                "SUM(motoPark) as dailyMoto, " +
+                "SUM(bikePark) as dailyBike, " +
+                "SUM(electricPark) as dailyElec " +
+                "FROM bookings " +
+                "WHERE beachId = ? AND date >= ? AND status IN ('PENDING', 'CONFIRMED') " +
+                "GROUP BY date" +
+                ") as DailyTotals";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setDate(2, java.sql.Date.valueOf(referenceDate));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new BookedParkingSpaces(
+                            rs.getInt("maxAuto"), rs.getInt("maxMoto"),
+                            rs.getInt("maxBike"), rs.getInt("maxElec")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to check max future parkings", e);
+        }
+
+        //in caso di nessun posto prenotato, passo un record di default
+        return new BookedParkingSpaces(0, 0, 0, 0);
+    }
+
+    /**
+     * Trova il numero massimo di prenotazioni di oggetti extra per giorno
+     * @param beachId ID della spiaggia
+     * @param referenceDate Data di riferimento
+     * @param context Connessione JDBC
+     * @return un record del più grande numero di oggetti extra prenotati di un giorno futuro a referenceDate
+     */
+    @Override
+    public BookedInventory getMaxFutureInventory(Integer beachId, LocalDate referenceDate, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection conn = getConnection(context);
+
+        //check integrità parametri
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+        if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
+
+        //query "divertente" dove all'inizio cerco gli oggetti extra prenotati per giorno e dopo seleziono i numeri più grandi
+        String sql = "SELECT " +
+                "COALESCE(MAX(dailySdraio), 0) as maxSdraio, " +
+                "COALESCE(MAX(dailyLettini), 0) as maxLettini, " +
+                "COALESCE(MAX(dailySedie), 0) as maxSedie, " +
+                "COALESCE(MAX(dailyCamerini), 0) as maxCamerini " +
+                "FROM (" +
+                "SELECT date, " +
+                "SUM(extraSdraio) as dailySdraio, " +
+                "SUM(extraLettini) as dailyLettini, " +
+                "SUM(extraSedie) as dailySedie, " +
+                "SUM(camerini) as dailyCamerini " +
+                "FROM bookings " +
+                "WHERE beachId = ? AND date >= ? AND status IN ('PENDING', 'CONFIRMED') " +
+                "GROUP BY date" +
+                ") as DailyTotals";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setDate(2, java.sql.Date.valueOf(referenceDate));
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new BookedInventory(
+                            rs.getInt("maxSdraio"), rs.getInt("maxLettini"),
+                            rs.getInt("maxSedie"), rs.getInt("maxCamerini")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to check max future inventory", e);
+        }
+
+        //in caso di nessun extra prenotato, passo un record di default
+        return new BookedInventory(0, 0, 0, 0);
     }
 }
