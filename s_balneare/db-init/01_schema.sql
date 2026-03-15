@@ -241,8 +241,9 @@ ALTER TABLE reviews -- Per evitare che un utente possa lasciare più review ad u
 ALTER TABLE seasons -- Per impedire la creazione di stagioni duplicate
     ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId,startDate,endDate);
 
-ALTER TABLE reports -- Minimizza report giornalieri
-    ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt);
+ALTER TABLE reports -- Minimizza report giornalieri, impedisce inserimento più report per lo stesso booking
+    ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt),
+    ADD CONSTRAINT uq_reporter_booking UNIQUE (reporterId, bookingId);
 
 -- CHECK >= 0
 ALTER TABLE parkings
@@ -287,5 +288,5 @@ ALTER TABLE spots
 ALTER TABLE seasons -- Integrità date stagioni
     ADD CONSTRAINT chk_season_dates_valid CHECK (startDate < endDate);
 
-ALTER TABLE reports -- Impedisce di fare report su se stessi
+ALTER TABLE reports -- Impedisce di fare report su se stessi, e di fare più report su un booking
     ADD CONSTRAINT chk_reporter_not_reported CHECK (reporterId <> reportedId);
