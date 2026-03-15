@@ -505,6 +505,39 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
+     * Cerca se ci sono prenotazioni registrate per una stagione
+     * @param beachId ID della spiaggia
+     * @param seasonStart Data di inizio stagione
+     * @param seasonEnd Data di fine stagione
+     * @param context Connessione JDBC
+     * @return TRUE se ci sono prenotazioni registrate per quella stagione, FALSE altrimenti
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
+    @Override
+    public boolean hasBookingsForSeason(Integer beachId, LocalDate seasonStart, LocalDate seasonEnd, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection conn = getConnection(context);
+
+        //check validità parametri
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
+        if (seasonStart == null || seasonEnd == null) throw new IllegalArgumentException("ERROR: invalid seasonStart and/or seasonEnd");
+        if (seasonStart.isAfter(seasonEnd)) throw new IllegalArgumentException("ERROR: seasonStart must be < seasonEnd");
+
+        //SELECT 1 prende il primo booking trovato per quella stagione
+        String sql = "SELECT 1 FROM bookings WHERE beachId = ? AND date >= ? AND date <= ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+            ps.setDate(2, java.sql.Date.valueOf(seasonStart));
+            ps.setDate(3, java.sql.Date.valueOf(seasonEnd));
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to check bookings for season", e);
+        }
+    }
+
+    /**
      * Cancella tutte le prenotazioni future di un utente (usato in caso di chiusura/ban account)
      * @param customerId ID del customer
      * @param referenceDate Data di riferimento (data di chiusura/ban account di solito)

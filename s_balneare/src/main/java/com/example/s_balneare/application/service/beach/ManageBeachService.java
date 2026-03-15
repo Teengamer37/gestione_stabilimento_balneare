@@ -178,6 +178,50 @@ public class ManageBeachService implements ManageBeachUseCase {
     }
 
     /**
+     * Aggiornamento di una stagione (Estensione data fine)
+     * @param beachId ID della spiaggia
+     * @param seasonName Nome della stagione da aggiornare
+     * @param newEndDate Nuova data di fine stagione
+     */
+    public void updateSeasonEndDate(Integer beachId, String seasonName, LocalDate newEndDate) {
+        transactionManager.executeInTransaction(context -> {
+            Beach beach = getBeachOrThrow(beachId, context);
+            beach.updateSeason(seasonName, newEndDate);
+            beachRepository.update(beach, context);
+        });
+    }
+
+    /**
+     * Eliminazione di una stagione (con controlli)
+     * @param beachId ID della spiaggia
+     * @param seasonName Nome della stagione da eliminare
+     */
+    public void removeSeason(Integer beachId, String seasonName) {
+        transactionManager.executeInTransaction(context -> {
+            //prendo la spiaggia dal DB
+            Beach beach = getBeachOrThrow(beachId, context);
+
+            //trovo la stagione per estrarre le date
+            Season seasonToRemove = beach.getSeasons().stream()
+                    .filter(s -> s.name().equals(seasonName))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: season not found"));
+
+            //controllo se la stagione ha delle prenotazioni già registrate
+            boolean hasBookings = bookingRepository.hasBookingsForSeason(
+                    beachId, seasonToRemove.startDate(), seasonToRemove.endDate(), context
+            );
+            if (hasBookings) {
+                throw new IllegalStateException("ERROR: season has associated one or more bookings");
+            }
+
+            //rimuovo la stagione e aggiorno
+            beach.removeSeason(seasonName);
+            beachRepository.update(beach, context);
+        });
+    }
+
+    /**
      * Aggiunta zona in una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
      * @param zone Nuova zona da aggiungere

@@ -32,6 +32,9 @@ public interface BookingRepository {
     //controlla se l'utente ha booking passati in stato CONFIRMED in una determinata spiaggia
     boolean hasPastConfirmedBooking(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context);
 
+    //cerca se ci sono prenotazioni registrate per una stagione
+    boolean hasBookingsForSeason(Integer beachId, LocalDate seasonStart, LocalDate seasonEnd, TransactionContext context);
+
     //annulla tutte le prenotazioni future di un customer (usato in caso di chiusura/ban account)
     void cancelFutureBookingsForCustomer(Integer customerId, LocalDate referenceDate, TransactionContext context);
 

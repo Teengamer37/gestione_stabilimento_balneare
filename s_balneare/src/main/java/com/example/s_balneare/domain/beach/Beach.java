@@ -50,7 +50,7 @@ public class Beach {
         if (closed) {
             this.active = false;
         } else {
-            setActive(active);
+            this.active = active;
         }
     }
 
@@ -124,7 +124,7 @@ public class Beach {
      */
     public void addSeason(Season season) {
         checkSeason(season);
-        checkSeasonOverlap(season);
+        checkSeasonOverlap(season, null);
         seasons.add(season);
         
         //aggiunge automaticamente le zone definite nella stagione se non esistono già
@@ -147,7 +147,7 @@ public class Beach {
     public void addSeasons(List<Season> seasons) {
         checkSeasons(seasons);
         for (Season s : seasons) {
-            checkSeasonOverlap(s);
+            checkSeasonOverlap(s, null);
             this.seasons.add(s);
         }
 
@@ -167,27 +167,68 @@ public class Beach {
     }
 
     /**
-     * Rimuove una stagione
-     * @param season stagione da rimuovere
+     * Aggiorna una stagione esistente rispettando i vincoli di immutabilità finanziaria e temporale
+     * @param targetSeasonName nome della stagione da aggiornare
+     * @param newEndDate nuova data di fine
+     * @throws IllegalArgumentException se ci sono parametri non validi
      */
-    public void removeSeason(Season season) {
-        checkSeason(season);
-        //tentativo eliminazione
-        if (seasons.contains(season)) seasons.remove(season);
-        else throw new IllegalArgumentException("ERROR: seasonId not found in seasons");
+    public void updateSeason(String targetSeasonName, LocalDate newEndDate) {
+        checkNotActive("update season");
+
+        //trovo la stagione
+        Season existingSeason = seasons.stream()
+                .filter(s -> s.name().equals(targetSeasonName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("ERROR: season not found: " + targetSeasonName));
+
+        //check nuova data di fine
+        if (newEndDate.isBefore(existingSeason.endDate())) {
+            throw new IllegalArgumentException("ERROR: cannot shorten an existing season");
+        }
+
+        //creo una nuova stagione con la nuova data di fine
+        Season updatedSeason = existingSeason.withDates(existingSeason.startDate(), newEndDate);
+
+        //controllo se la stagione va a interpolarsi con le altre
+        checkSeasonOverlap(updatedSeason, existingSeason);
+
+        //sostituisco la vecchia stagione con la nuova
+        seasons.remove(existingSeason);
+        seasons.add(updatedSeason);
+    }
+
+    /**
+     * Rimuove una stagione
+     * @param seasonName nome della stagione da rimuovere
+     */
+    public void removeSeason(String seasonName) {
+        checkNotActive("remove season");
+
+        boolean removed = seasons.removeIf(s -> s.name().equals(seasonName));
+        if (!removed) {
+            throw new IllegalArgumentException("ERROR: Season not found");
+        }
     }
 
     /**
      * Rimuove una lista di stagioni
-     * @param seasons stagioni da rimuovere
+     * @param seasonNames nome delle stagioni da rimuovere
      */
-    public void removeSeasons(List<Season> seasons) {
-        checkSeasons(seasons);
-        //mi assicuro che TUTTE le stagioni nella lista siano presenti nella spiaggia
-        for (Season season : seasons) {
-            if (!this.seasons.contains(season)) throw new IllegalArgumentException("ERROR: at least one seasonId in the list is not found in seasons");
+    public void removeSeasons(List<String> seasonNames) {
+        checkNotActive("remove seasons");
+
+        //trovo le stagioni da rimuovere
+        List<Season> seasonsToDelete = this.seasons.stream()
+                .filter(season -> seasonNames.contains(season.name()))
+                .toList();
+
+        //controllo se ho trovato tutte le stagioni da rimuovere
+        if (seasonsToDelete.size() != seasonNames.size()) {
+            throw new IllegalArgumentException("ERROR: at least one season name in the list was not found");
         }
-        this.seasons.removeAll(seasons);
+
+        //rimuovo
+        this.seasons.removeAll(seasonsToDelete);
     }
 
     /**
@@ -291,7 +332,7 @@ public class Beach {
         boolean hasValidSeason = false;
         if (seasons != null && !seasons.isEmpty()) {
             LocalDate today = LocalDate.now();
-            hasValidSeason = seasons.stream().anyMatch(s -> !s.endDate().isBefore(today));
+            hasValidSeason = seasons.stream().anyMatch(s -> s.endDate().isAfter(today));
         }
         if (!hasValidSeason) {
             missing.add("at least one upcoming or current season");
@@ -405,11 +446,13 @@ public class Beach {
             throw new IllegalStateException("ERROR: cannot " + action + " while the beach is ACTIVE");
         }
     }
-    private void checkSeasonOverlap(Season newSeason) {
+    private void checkSeasonOverlap(Season newSeason, Season seasonToIgnore) {
         for (Season existing : this.seasons) {
+            if (seasonToIgnore != null && existing.name().equals(seasonToIgnore.name())) continue;
+
             if (!newSeason.endDate().isBefore(existing.startDate()) &&
                     !newSeason.startDate().isAfter(existing.endDate())) {
-                throw new IllegalArgumentException("ERROR: Season dates overlap with existing season: " + existing.name());
+                throw new IllegalArgumentException("ERROR: Il periodo selezionato si sovrappone a una stagione esistente: " + existing.name());
             }
         }
     }
