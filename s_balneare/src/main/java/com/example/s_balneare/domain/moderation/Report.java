@@ -12,11 +12,13 @@ public class Report {
     private final String description;
     private final Instant createdAt;
     private ReportStatus status;
+    private final Integer bookingId;
 
-    public Report(Integer id, Integer reporterId, Integer reportedId, ReportTargetType reportedType, String description, Instant createdAt, ReportStatus status) {
+    public Report(Integer id, Integer reporterId, Integer reportedId, ReportTargetType reportedType, String description, Instant createdAt, ReportStatus status, Integer bookingId) {
         checkReporterReported(reporterId, reportedId);
         checkDescription(description);
         checkCreatedAt(createdAt);
+        checkBookingId(bookingId);
         this.id = id;
         this.reporterId = reporterId;
         this.reportedId = reportedId;
@@ -24,6 +26,7 @@ public class Report {
         this.description = description;
         this.createdAt = createdAt;
         this.status = status;
+        this.bookingId = bookingId;
     }
 
 
@@ -55,6 +58,8 @@ public class Report {
         return status;
     }
 
+    public Integer getBookingId() {return bookingId;}
+
     public void approve() {
         if (this.status != ReportStatus.PENDING) {
             throw new IllegalStateException("ERROR: report cannot be approved, it is in: " + this.status);
@@ -80,5 +85,9 @@ public class Report {
 
     private void checkCreatedAt(Instant createdAt) {
         if (createdAt == null) throw new IllegalArgumentException("ERROR: createdAt must not be null");
+    }
+
+    private void checkBookingId(Integer bookingId) {
+        if (bookingId == null) throw new IllegalArgumentException("ERROR: no booking selected");
     }
 }

@@ -216,8 +216,10 @@ CREATE TABLE reports (
     description VARCHAR(512) NOT NULL,
     createdAt DATETIME NOT NULL,
     status ENUM('PENDING', 'RESOLVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    bookingId INT NOT NULL,
     FOREIGN KEY (reportedId) REFERENCES users(id),
-    FOREIGN KEY (reporterId) REFERENCES users(id)
+    FOREIGN KEY (reporterId) REFERENCES users(id),
+    FOREIGN KEY (bookingId) REFERENCES bookings(id)
 );
 
 -- Controlli

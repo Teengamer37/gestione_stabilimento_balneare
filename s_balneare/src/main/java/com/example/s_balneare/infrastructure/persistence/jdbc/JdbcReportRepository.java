@@ -22,7 +22,7 @@ public class JdbcReportRepository implements ReportRepository {
     public Integer save(Report report, TransactionContext context){
         Connection connection = getConnection(context);
 
-        String sql = "INSERT INTO reports(reporterId, reportedId, reportedType, description, createdAt, status) VALUES (?, ?, ?, ?, ?, ?) ";
+        String sql = "INSERT INTO reports(reporterId, reportedId, reportedType, description, createdAt, status, bookingId) VALUES (?, ?, ?, ?, ?, ?, ?) ";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, report.getReporterId());
@@ -31,6 +31,7 @@ public class JdbcReportRepository implements ReportRepository {
             statement.setString(4, report.getDescription());
             statement.setTimestamp(5, java.sql.Timestamp.from(report.getCreatedAt()));
             statement.setString(6, report.getStatus().name());
+            statement.setInt(7, report.getBookingId());
             statement.executeUpdate();
             try (ResultSet rs = statement.getGeneratedKeys()) {
                 if(rs.next()) {
@@ -48,7 +49,7 @@ public class JdbcReportRepository implements ReportRepository {
     public Optional<Report> findById(Integer id, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports WHERE id = ?";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
@@ -67,7 +68,7 @@ public class JdbcReportRepository implements ReportRepository {
     public List<Report> findAll(TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports";
         List<Report> reports = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             try (ResultSet rs = statement.executeQuery()) {
@@ -85,7 +86,7 @@ public class JdbcReportRepository implements ReportRepository {
     public List<Report> findByReporterId(Integer reporterId, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports WHERE reporterId=?";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE reporterId=?";
         List<Report> reports = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, reporterId);
@@ -104,7 +105,7 @@ public class JdbcReportRepository implements ReportRepository {
     public List<Report> findByReporterIdAndStatus(Integer reporterId, ReportStatus status, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports WHERE reporterId=? AND status=?";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE reporterId=? AND status=?";
         List<Report> reports = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, reporterId);
@@ -124,7 +125,7 @@ public class JdbcReportRepository implements ReportRepository {
     public List<Report> findByReportedId(Integer reportedId, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports WHERE reportedId=?";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE reportedId=?";
         List<Report> reports = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, reportedId);
@@ -143,7 +144,7 @@ public class JdbcReportRepository implements ReportRepository {
     public List<Report> findByReportedIdAndStatus(Integer reportedId, ReportStatus status, TransactionContext context) {
         Connection connection = getConnection(context);
 
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports WHERE reportedId=? AND status=?";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE reportedId=? AND status=?";
         List<Report> reports = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, reportedId);
@@ -161,7 +162,7 @@ public class JdbcReportRepository implements ReportRepository {
     @Override
     public List<Report> findByStatus(ReportStatus status, TransactionContext context) {
         Connection connection = getConnection(context);
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status FROM reports WHERE status=?";
+        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE status=?";
         List<Report> reports = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, status.name());
@@ -197,7 +198,8 @@ public class JdbcReportRepository implements ReportRepository {
                 com.example.s_balneare.domain.moderation.ReportTargetType.valueOf(rs.getString("reportedType")),
                 rs.getString("description"),
                 rs.getTimestamp("createdAt").toInstant(),
-                com.example.s_balneare.domain.moderation.ReportStatus.valueOf(rs.getString("status"))
+                com.example.s_balneare.domain.moderation.ReportStatus.valueOf(rs.getString("status")),
+                rs.getInt("bookingId")
         );
     }
 }
