@@ -249,7 +249,26 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
-    //TODO: verificare che non faccia parte di nessuna stagione
+    /**
+     * Rinomina una zona
+     * @param beachId ID della spiaggia
+     * @param oldZoneName Nome vecchio della zona
+     * @param newZoneName Nome nuovo della zona
+     */
+    @Override
+    public void renameZone(Integer beachId, String oldZoneName, String newZoneName) {
+        transactionManager.executeInTransaction(context -> {
+            //passo 1: ricavo la spiaggia dal DB
+            Beach beach = getBeachOrThrow(beachId, context);
+
+            //passo 2: rinomino la zona usando la Domain Logic
+            beach.renameZone(oldZoneName, newZoneName);
+
+            //passo 3: aggiorno nel DB
+            beachRepository.renameZone(beachId, oldZoneName, newZoneName, context);
+        });
+    }
+
     /**
      * Rimozione zona da una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB
@@ -264,7 +283,6 @@ public class ManageBeachService implements ManageBeachUseCase {
         });
     }
 
-    //TODO: verificare che non facciano parte di nessuna stagione
     /**
      * Rimozione lista di zone da una determinata spiaggia
      * @param id Identificatore spiaggia da cercare nel DB

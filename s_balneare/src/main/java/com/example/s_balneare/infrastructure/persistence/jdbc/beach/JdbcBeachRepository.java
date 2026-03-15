@@ -526,14 +526,46 @@ public class JdbcBeachRepository implements BeachRepository {
      */
     @Override
     public boolean doSpotsBelongToBeach(Integer beachId, List<Integer> spotIds, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
         if (spotIds == null || spotIds.isEmpty()) return false;
 
-        Connection connection = getConnection(context);
         try {
             return spotDao.doSpotsBelongToBeach(beachId, spotIds, connection);
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to verify spot ownership", e);
+        }
+    }
+
+    /**
+     * Rinomina una zona della spiaggia
+     * @param beachId ID della spiaggia
+     * @param oldZoneName Nome della zona da rinominare
+     * @param newZoneName Nuovo nome da applicare
+     * @param context Connessione JDBC
+     * @throws IllegalArgumentException se i parametri passati non sono validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
+    @Override
+    public void renameZone(Integer beachId, String oldZoneName, String newZoneName, TransactionContext context) {
+        //estraggo la connessione JDBC
+        Connection connection = getConnection(context);
+
+        //check validità parametri
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("Invalid beachId");
+        if (oldZoneName == null || oldZoneName.isEmpty() || newZoneName == null || newZoneName.isEmpty())
+            throw new IllegalArgumentException("Invalid zone names");
+
+        try {
+            zoneDao.renameZone(beachId, oldZoneName, newZoneName, connection);
+        } catch (SQLException e) {
+            //SQLState "23000" indica errore di integrità referenziale
+            if ("23000".equals(e.getSQLState())) {
+                throw new IllegalArgumentException("ERROR: zone name already exists");
+            }
+            throw new RuntimeException("ERROR: unable to rename zone", e);
         }
     }
 }

@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-//TODO: aggiungere metodi updateZone, updateZones (solo quando active = FALSE e zona/e non fa(nno) parte di nessuna stagione)
 /**
  * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach
  * Implementata in:
@@ -34,6 +33,7 @@ public interface ManageBeachUseCase {
     //elementi Zone
     void addZone(Integer id, Zone zone);
     void addZones(Integer id, List<Zone> zones);
+    void renameZone(Integer beachId, String oldZoneName, String newZoneName);
     void removeZone(Integer id, Zone zoneName);
     void removeZones(Integer id, List<Zone> zones);
 

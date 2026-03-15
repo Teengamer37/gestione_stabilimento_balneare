@@ -34,4 +34,7 @@ public interface BeachRepository {
 
     //verifica se gli spot appartengono alla spiaggia
     boolean doSpotsBelongToBeach(Integer beachId, List<Integer> spotIds, TransactionContext context);
+
+    //rinomina una zona della spiaggia
+    void renameZone(Integer beachId, String oldZoneName, String newZoneName, TransactionContext context);
 }
