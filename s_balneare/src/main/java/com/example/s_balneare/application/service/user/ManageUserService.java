@@ -2,7 +2,6 @@ package com.example.s_balneare.application.service.user;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import com.example.s_balneare.application.port.out.TransactionManager;
-import com.example.s_balneare.application.port.out.user.LoginResult;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Admin;
@@ -24,19 +23,6 @@ public class ManageUserService<T extends User> {
         if (!result.verified) {
             throw new IllegalArgumentException("ERROR: wrong Password");
         }
-    }
-
-    //TODO: spostare funzione in una nuova AuthenticationService!
-    //TODO: in fase di login, il sistema deve controllare vari ban: utente bannato, o un Owner con un ban o con una Beach in stato CLOSED
-    //TODO: Fare prima BanRepository in modo che possa collaborare con AuthenticationService!!!
-    public LoginResult logIn(String identifier, String rawPassword, TransactionContext context) {
-        String hashedPassword = userRepository.findPassword(identifier, context)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: invalid password or user"));
-        //verifico la password
-        verifyPassword(rawPassword, hashedPassword);
-        T user = userRepository.findByIdentifier(identifier, context)
-                .orElseThrow(() -> new IllegalArgumentException("ERROR: invalid user"));
-        return new LoginResult(user.getId(), user.isOTP());
     }
 
     public void updatePassword(Integer id, String oldPassword, String newPassword, boolean OTP) {

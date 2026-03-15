@@ -102,7 +102,7 @@ public class JdbcBanRepository implements BanRepository {
     @Override
     public boolean isBannedFromApp(Integer customerId, TransactionContext context) {
         Connection connection = getConnection(context);
-        String sql = "SELECT * FROM bans WHERE bannedId = ? AND banType = 'APP' LIMIT 1";
+        String sql = "SELECT * FROM bans WHERE bannedId = ? AND banType = 'APPLICATION' LIMIT 1";
 
         try(PreparedStatement statement = connection.prepareStatement(sql)){
             statement.setInt(1, customerId);
