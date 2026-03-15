@@ -32,8 +32,11 @@ public interface BookingRepository {
     //controlla se l'utente ha booking passati in stato CONFIRMED in una determinata spiaggia
     boolean hasPastConfirmedBooking(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context);
 
-    //annulla tutte le prenotazioni future di un utente (usato in caso di chiusura/ban account)
+    //annulla tutte le prenotazioni future di un customer (usato in caso di chiusura/ban account)
     void cancelFutureBookingsForCustomer(Integer customerId, LocalDate referenceDate, TransactionContext context);
+
+    //annulla tutte le prenotazioni future di una spiaggia (usato in caso di chiusura/ban)
+    void cancelFutureBookingsForBeach(Integer ownerId, LocalDate referenceDate, TransactionContext context);
 
     //cerca il numero massimo di prenotazioni di posti auto per giorno (usato nel caso se in un aggiornamento dei parcheggi
     //vado a ridurre il numero di posti, lasciando quindi mezzi "vacanti")

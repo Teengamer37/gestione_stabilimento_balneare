@@ -9,7 +9,6 @@ import com.example.s_balneare.domain.booking.BookingStatus;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -530,6 +529,28 @@ public class JdbcBookingRepository implements BookingRepository {
             ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to cancel future bookings for customer", e);
+        }
+    }
+
+    @Override
+    public void cancelFutureBookingsForBeach(Integer ownerId, LocalDate referenceDate, TransactionContext context) {
+        Connection connection = getConnection(context);
+
+        //check validità parametri
+        if (ownerId == null || ownerId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
+        if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
+
+        String sql = "UPDATE bookings bo " +
+                "INNER JOIN beaches b ON bo.beachId = b.id " +
+                "SET bo.status = 'CANCELLED' " +
+                "WHERE b.ownerId = ? AND bo.date > ? AND bo.status IN ('PENDING', 'CONFIRMED')";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, ownerId);
+            ps.setDate(2, java.sql.Date.valueOf(referenceDate));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("ERROR: unable to cancel future bookings for beach", e);
         }
     }
 
