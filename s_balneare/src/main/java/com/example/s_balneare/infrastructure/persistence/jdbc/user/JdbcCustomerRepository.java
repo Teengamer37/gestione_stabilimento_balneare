@@ -4,7 +4,6 @@ import com.example.s_balneare.application.port.out.user.CustomerRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.*;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 import java.util.Optional;

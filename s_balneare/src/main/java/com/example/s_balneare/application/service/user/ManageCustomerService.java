@@ -2,16 +2,23 @@ package com.example.s_balneare.application.service.user;
 
 import com.example.s_balneare.application.port.out.AddressRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
+import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.user.CustomerRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.user.Customer;
 
+import java.time.LocalDate;
+
 public class ManageCustomerService extends ManageUserService<Customer> {
     private final AddressRepository addressRepository;
+    private final BookingRepository bookingRepository;
 
-    public ManageCustomerService(UserRepository<Customer> userRepository, AddressRepository addressRepository, TransactionManager transactionManager) {
+    public ManageCustomerService(UserRepository<Customer> userRepository, AddressRepository addressRepository,
+                                 BookingRepository bookingRepository, TransactionManager transactionManager) {
         super(userRepository, transactionManager);
         this.addressRepository = addressRepository;
+        this.bookingRepository = bookingRepository;
     }
 
     //cambio numero di telefono transazione unica, gestire lato applicazione eventuali messaggi di conferma
@@ -24,7 +31,6 @@ public class ManageCustomerService extends ManageUserService<Customer> {
             verifyPassword(currentPassword, currentHashedPassword);
 
             user.changePhoneNumber(phoneNumber);
-            userRepository.update(user, context);
         });
     }
 
@@ -60,6 +66,31 @@ public class ManageCustomerService extends ManageUserService<Customer> {
             Customer user = getUserOrThrow(id, context);
             user.setActive(active);
             userRepository.update(user, context);
+        });
+    }
+
+    /**
+     * Chiude l'account di un Customer:
+     * Verifica la password, annulla tutte le prenotazioni future, disattiva l'account
+     * @param customerId ID del Customer da chiudere
+     * @param currentPassword Password attuale dell'account del Customer
+     */
+    public void closeCustomerAccount(Integer customerId, String currentPassword) {
+        transactionManager.executeInTransaction(context -> {
+            //passo 1: prendo il Customer dal DB
+            Customer customer = getUserOrThrow(customerId, context);
+
+            //passo 2: verifico la password
+            String currentHashedPassword = userRepository.findPassword(customerId, context)
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: password not found"));
+            verifyPassword(currentPassword, currentHashedPassword);
+
+            //passo 3: annullo tutte le prenotazioni future (se e solo se prenotazioni in PENDING e CONFIRMED)
+            bookingRepository.cancelFutureBookingsForCustomer(customerId, LocalDate.now(), context);
+
+            //passo 4: disattivo l'account (metto active = false)
+            customer.closeAccount();
+            userRepository.update(customer, context);
         });
     }
 }
