@@ -236,9 +236,16 @@ public class Beach {
      * @param zone zona da aggiungere/aggiornare
      */
     public void addZone(Zone zone) {
+        checkNotActive("add/update zone");
         checkZone(zone);
+
         //rimuove la zona esistente se presente, per poi aggiungerla (aggiornamento)
-        zones.removeIf(z -> z.name().equals(zone.name()));
+        boolean zoneExists = zones.stream().anyMatch(z -> z.name().equals(zone.name()));
+        if (zoneExists) {
+            checkIfZoneIsLockedBySeason(zone.name());
+            zones.removeIf(z -> z.name().equals(zone.name()));
+        }
+
         zones.add(zone);
     }
 
@@ -247,12 +254,52 @@ public class Beach {
      * @param newZones zone da aggiungere/aggiornare
      */
     public void addZones(List<Zone> newZones) {
+        checkNotActive("add/update zones");
         checkZones(newZones);
+
         for (Zone newZone : newZones) {
             //rimuove la zona esistente se presente, per poi aggiungerla (aggiornamento)
-            this.zones.removeIf(z -> z.name().equals(newZone.name()));
+            boolean zoneExists = zones.stream().anyMatch(z -> z.name().equals(newZone.name()));
+            if (zoneExists) {
+                checkIfZoneIsLockedBySeason(newZone.name());
+                this.zones.removeIf(z -> z.name().equals(newZone.name()));
+            }
             this.zones.add(newZone);
         }
+    }
+
+    /**
+     * Rinomina una zona esistente
+     * @param oldName Il nome attuale della zona
+     * @param newName Il nuovo nome desiderato
+     */
+    public void renameZone(String oldName, String newName) {
+        checkNotActive("rename zone");
+
+        //controllo parametro
+        if (newName == null || newName.isBlank() || newName.length() > 50) {
+            throw new IllegalArgumentException("ERROR: Invalid new zone name.");
+        }
+
+        //passo 1: verifico unicità nuovo nome
+        boolean newNameExists = zones.stream().anyMatch(z -> z.name().equals(newName));
+        if (newNameExists) {
+            throw new IllegalArgumentException("ERROR: zone with the name '" + newName + "' already exists in DB");
+        }
+
+        //passo 2: ricavo zona da modificare dal DB
+        Zone oldZone = zones.stream()
+                .filter(z -> z.name().equals(oldName))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("ERROR: zone '" + oldName + "' not found."));
+
+        //passo 3: controllo che la zona non sia usata da una stagione
+        checkIfZoneIsLockedBySeason(oldName);
+
+        //passo 4: aggiorno il nome e salvo
+        Zone updatedZone = oldZone.withName(newName);
+        zones.remove(oldZone);
+        zones.add(updatedZone);
     }
 
     /**
@@ -260,16 +307,13 @@ public class Beach {
      * @param zone zona da rimuovere
      */
     public void removeZone(Zone zone) {
+        checkNotActive("remove zone");
         checkZone(zone);
-        //controlla se la zona è presente in una qualsiasi stagione
-        boolean isZoneInSeason = seasons.stream()
-                .anyMatch(s -> s.zoneTariffs().stream()
-                        .anyMatch(zt -> zt.zoneName().equals(zone.name())));
-        if (isZoneInSeason) {
-            throw new IllegalStateException("ERROR: cannot remove a zZone that is part of a Season");
-        }
+
+        checkIfZoneIsLockedBySeason(zone.name());
+
         if (!zones.remove(zone)) {
-            throw new IllegalArgumentException("ERROR: Zone not found in Zones");
+            throw new IllegalArgumentException("ERROR: zone not found in zones list");
         }
     }
 
@@ -278,16 +322,13 @@ public class Beach {
      * @param zonesToRemove zone da rimuovere
      */
     public void removeZones(List<Zone> zonesToRemove) {
+        checkNotActive("remove zones");
         checkZones(zonesToRemove);
+
         for (Zone zone : zonesToRemove) {
-            //controlla se la zona è presente in una qualsiasi stagione
-            boolean isZoneInSeason = seasons.stream()
-                    .anyMatch(s -> s.zoneTariffs().stream()
-                            .anyMatch(zt -> zt.zoneName().equals(zone.name())));
-            if (isZoneInSeason) {
-                throw new IllegalStateException("ERROR: cannot remove a Zone that is part of a Season");
-            }
+            checkIfZoneIsLockedBySeason(zone.name());
         }
+
         //mi assicuro che tutte le Zone siano riferiti alla Beach
         for (Zone zone : zonesToRemove) {
             if (!this.zones.contains(zone)) {
@@ -454,6 +495,14 @@ public class Beach {
                     !newSeason.startDate().isAfter(existing.endDate())) {
                 throw new IllegalArgumentException("ERROR: Il periodo selezionato si sovrappone a una stagione esistente: " + existing.name());
             }
+        }
+    }
+    private void checkIfZoneIsLockedBySeason(String zoneName) {
+        boolean isZoneInSeason = seasons.stream()
+                .anyMatch(s -> s.zoneTariffs().stream()
+                        .anyMatch(zt -> zt.zoneName().equals(zoneName)));
+        if (isZoneInSeason) {
+            throw new IllegalStateException("ERROR: zone is part of one or more seasons");
         }
     }
 }
