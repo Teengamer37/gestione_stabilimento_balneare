@@ -16,10 +16,11 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, Owner user) throws SQLException {
         //Scrivere qui il salvataggio di attributi aggiuntivi di Owner
-        String sql = "INSERT INTO owners(id, OTP) VALUES(?, ?)";
+        String sql = "INSERT INTO owners(id, active,OTP) VALUES(?,?,?)";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
             statement.setInt(1, newId);
-            statement.setBoolean(2, user.isOTP());
+            statement.setBoolean(2, user.isActive());
+            statement.setBoolean(3, user.isOTP());
             statement.executeUpdate();
         }
     }
@@ -27,17 +28,18 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
     @Override
     protected void updateSpecificData(Connection conn, Owner user) throws SQLException {
         //Scrivere qui l'aggiornamento di attributi aggiuntivi di Owner
-        String sql = "UPDATE owners SET OTP = ? WHERE id = ?";
+        String sql = "UPDATE owners SET active = ?, OTP = ?  WHERE id = ?";
         try (PreparedStatement statement = conn.prepareStatement(sql)) {
-            statement.setBoolean(1, user.isOTP());
-            statement.setInt(2, user.getId());
+            statement.setBoolean(1, user.isActive());
+            statement.setBoolean(2, user.isOTP());
+            statement.setInt(3, user.getId());
             statement.executeUpdate();
         }
     }
 
     @Override
     public Optional<Owner> findById(Integer id, TransactionContext context) {
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.OTP " +
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.active, o.OTP " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.id = ?";
@@ -47,7 +49,7 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
 
     @Override
     public Optional<Owner> findByIdentifier(String identifier, TransactionContext context) {
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.OTP " +
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.active, o.OTP " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.username = ? OR u.email = ?";
@@ -58,7 +60,7 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
 
     @Override
     public Optional<Owner> findByUsername(String username, TransactionContext context) {
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.OTP " +
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.active, o.OTP " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.username = ?";
@@ -68,7 +70,7 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
 
     @Override
     public Optional<Owner> findByEmail(String email, TransactionContext context) {
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.OTP " +
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email,o.active, o.OTP " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id " +
                 "WHERE u.email = ?";
@@ -78,7 +80,7 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
 
     @Override
     public List<Owner> findAll(TransactionContext context) {
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.OTP " +
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, o.active, o.OTP " +
                 "FROM users u " +
                 "INNER JOIN owners o ON u.id = o.id ";
 
