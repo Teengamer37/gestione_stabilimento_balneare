@@ -533,20 +533,18 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     @Override
-    public void cancelFutureBookingsForBeach(Integer ownerId, LocalDate referenceDate, TransactionContext context) {
+    public void cancelFutureBookingsForBeach(Integer beachId, LocalDate referenceDate, TransactionContext context) {
         Connection connection = getConnection(context);
 
         //check validità parametri
-        if (ownerId == null || ownerId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid customerId");
         if (referenceDate == null) throw new IllegalArgumentException("ERROR: invalid referenceDate");
 
-        String sql = "UPDATE bookings bo " +
-                "INNER JOIN beaches b ON bo.beachId = b.id " +
-                "SET bo.status = 'CANCELLED' " +
-                "WHERE b.ownerId = ? AND bo.date > ? AND bo.status IN ('PENDING', 'CONFIRMED')";
+        String sql = "UPDATE bookings SET status = 'CANCELLED' " +
+                "WHERE beachId = ? AND date > ? AND status IN ('PENDING', 'CONFIRMED')";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setInt(1, ownerId);
+            ps.setInt(1, beachId);
             ps.setDate(2, java.sql.Date.valueOf(referenceDate));
             ps.executeUpdate();
         } catch (SQLException e) {
