@@ -81,10 +81,12 @@ public class Report {
 
     private void checkDescription(String description) {
         if (description.isBlank()) throw new IllegalArgumentException("ERROR: description cannot be empty");
+        if(description.length() >1024) throw new IllegalArgumentException("ERROR: description cannot be longer than 1024 characters");
     }
 
     private void checkCreatedAt(Instant createdAt) {
         if (createdAt == null) throw new IllegalArgumentException("ERROR: createdAt must not be null");
+        if(createdAt.isAfter(Instant.now())) throw new IllegalArgumentException("ERROR: It can't be a future date");
     }
 
     private void checkBookingId(Integer bookingId) {
