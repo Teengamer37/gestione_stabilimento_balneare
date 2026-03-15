@@ -1,7 +1,7 @@
 package com.example.s_balneare.application.service.report;
 
-import com.example.s_balneare.application.port.in.report.ManageReportUseCase;
-import com.example.s_balneare.application.port.out.ReportRepository;
+import com.example.s_balneare.application.port.in.moderation.ManageReportUseCase;
+import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.moderation.Report;
 import com.example.s_balneare.domain.moderation.ReportStatus;

@@ -10,6 +10,7 @@ import java.util.List;
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database per estrarre
  * tutte le review di una determinata spiaggia.
  * Implementata in:
+ *
  * @see JdbcBeachReviewsQuery JdbcBeachCatalogQuery
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
@@ -17,6 +18,6 @@ public interface BeachReviewsQuery {
     //prende tutte le recensioni di una spiaggia, con aggiunta di nome e cognome dell'utente
     List<BeachReviewDto> getReviewsByBeachId(Integer beachId, TransactionContext context);
 
-    //calcola il rating medio della spiaggia
+    //calcola la valutazione media della spiaggia
     double getAverageRating(Integer beachId, TransactionContext context);
 }

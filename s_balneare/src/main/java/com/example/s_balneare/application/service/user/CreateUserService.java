@@ -1,7 +1,7 @@
 package com.example.s_balneare.application.service.user;
 
 import com.example.s_balneare.application.port.in.user.CreateUserRequest;
-import com.example.s_balneare.application.port.in.user.UserRegistrationCase;
+import com.example.s_balneare.application.port.in.user.UserRegistrationUseCase;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.TransactionContext;
@@ -9,7 +9,7 @@ import com.example.s_balneare.domain.user.User;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 
 public abstract class CreateUserService<T extends User, R extends CreateUserRequest>
-        implements UserRegistrationCase<R> {
+        implements UserRegistrationUseCase<R> {
     private final UserRepository<T> userRepository;
     private final TransactionManager transactionManager;
 

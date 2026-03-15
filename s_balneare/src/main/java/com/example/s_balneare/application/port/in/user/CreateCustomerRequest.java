@@ -1,5 +1,11 @@
 package com.example.s_balneare.application.port.in.user;
 
+/**
+ * Rappresenta una richiesta per la creazione di un Customer.
+ * Estende la classe astratta CreateUserRequest e aggiunge gli attributi specifici di un Customer.
+ *
+ * @see CreateUserRequest CreateUserRequest
+ */
 public class CreateCustomerRequest extends CreateUserRequest {
     private final String phoneNumber;
     private final Boolean active;
@@ -20,8 +26,7 @@ public class CreateCustomerRequest extends CreateUserRequest {
             String streetNumber,
             String city,
             String zipCode,
-            String country)
-    {
+            String country) {
         super(email, username, name, surname);
         this.phoneNumber = phoneNumber;
         this.active = active;

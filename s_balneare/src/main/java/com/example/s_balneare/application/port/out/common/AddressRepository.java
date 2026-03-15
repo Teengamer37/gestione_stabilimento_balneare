@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.port.out;
+package com.example.s_balneare.application.port.out.common;
 
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;

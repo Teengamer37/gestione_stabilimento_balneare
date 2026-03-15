@@ -11,13 +11,17 @@ import java.util.Optional;
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Booking.
  * Implementata in:
+ *
  * @see JdbcBookingRepository JdbcBookingRepository
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public interface BookingRepository {
+    //manipolazione
     Integer save(Booking booking, TransactionContext context);
     void delete(Integer id, TransactionContext context);
     void update(Booking booking, TransactionContext context);
+
+    //cerca prenotazione per ID
     Optional<Booking> findById(Integer id, TransactionContext context);
 
     //trova spot occupati per una data specifica
@@ -41,6 +45,7 @@ public interface BookingRepository {
     //annulla tutte le prenotazioni future di una spiaggia (usato in caso di chiusura/ban)
     void cancelFutureBookingsForBeach(Integer beachId, LocalDate referenceDate, TransactionContext context);
 
+    //annulla tutte le prenotazioni future di un utente (usato in caso di chiusura/ban)
     void cancelFutureUserBookingsFromBeach(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context);
 
     //cerca il numero massimo di prenotazioni di posti auto per giorno (usato nel caso se in un aggiornamento dei parcheggi

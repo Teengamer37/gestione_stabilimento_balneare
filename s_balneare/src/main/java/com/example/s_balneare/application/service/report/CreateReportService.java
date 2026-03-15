@@ -1,9 +1,9 @@
 package com.example.s_balneare.application.service.report;
 
-import com.example.s_balneare.application.port.in.report.CreateReportCommand;
-import com.example.s_balneare.application.port.in.report.CreateReportUseCase;
-import com.example.s_balneare.application.port.out.BanRepository;
-import com.example.s_balneare.application.port.out.ReportRepository;
+import com.example.s_balneare.application.port.in.moderation.CreateReportCommand;
+import com.example.s_balneare.application.port.in.moderation.CreateReportUseCase;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
+import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;

@@ -1,6 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
-import com.example.s_balneare.application.port.out.BanRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.moderation.Ban;
 

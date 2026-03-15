@@ -1,5 +1,13 @@
 package com.example.s_balneare.application.port.in.user;
 
+/**
+ * Rappresenta una richiesta astratta per la creazione di un User.
+ * Contiene attributi e metodi comuni per la creazione di diversi tipi di User.
+ *
+ * @see CreateCustomerRequest CreateCustomerRequest
+ * @see CreateOwnerRequest CreateOwnerRequest
+ * @see CreateAdminRequest CreateAdminRequest
+ */
 public abstract class CreateUserRequest {
     private final String email;
     private final String username;

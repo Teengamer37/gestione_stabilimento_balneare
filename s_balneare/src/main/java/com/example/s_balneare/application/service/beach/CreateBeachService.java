@@ -2,7 +2,7 @@ package com.example.s_balneare.application.service.beach;
 
 import com.example.s_balneare.application.port.in.beach.CreateBeachCommand;
 import com.example.s_balneare.application.port.in.beach.CreateBeachUseCase;
-import com.example.s_balneare.application.port.out.AddressRepository;
+import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.beach.Beach;
@@ -16,7 +16,7 @@ import com.example.s_balneare.domain.common.Address;
  *
  * @see CreateBeachUseCase CreateBeachUseCase
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager
- * @see com.example.s_balneare.application.port.out.AddressRepository AddressRepository
+ * @see AddressRepository AddressRepository
  * @see BeachRepository BeachRepository
  */
 public class CreateBeachService implements CreateBeachUseCase {

@@ -2,7 +2,7 @@ package com.example.s_balneare.application.service.booking;
 
 import com.example.s_balneare.application.port.in.booking.CreateBookingCommand;
 import com.example.s_balneare.application.port.in.booking.CreateBookingUseCase;
-import com.example.s_balneare.application.port.out.BanRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;

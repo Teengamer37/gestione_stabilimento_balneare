@@ -1,6 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
-import com.example.s_balneare.application.port.out.ReportRepository;
+import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.moderation.Report;
 import com.example.s_balneare.domain.moderation.ReportStatus;

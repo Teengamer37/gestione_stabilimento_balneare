@@ -15,8 +15,6 @@ module com.example.s_balneare {
     exports com.example.s_balneare.domain.common;
 
     exports com.example.s_balneare.application.service.user;
-    exports com.example.s_balneare.application.factory;
-    exports com.example.s_balneare.application.port.in;
     exports com.example.s_balneare.application.port.out;
     exports com.example.s_balneare.application.port.in.user;
     exports com.example.s_balneare.application.port.out.user;
@@ -24,5 +22,9 @@ module com.example.s_balneare {
     exports com.example.s_balneare.application.port.out.booking;
     exports com.example.s_balneare.application.port.in.booking;
     exports com.example.s_balneare.application.port.out.beach;
-    exports com.example.s_balneare.application.port.in.report;
+    exports com.example.s_balneare.application.port.in.moderation;
+    exports com.example.s_balneare.application.port.out.common;
+    exports com.example.s_balneare.application.port.in.common;
+    exports com.example.s_balneare.application.port.out.moderation;
+    exports com.example.s_balneare.application.port.out.review;
 }

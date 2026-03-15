@@ -1,7 +1,7 @@
 package com.example.s_balneare.application.service;
 
-import com.example.s_balneare.application.port.in.AddressUseCase;
-import com.example.s_balneare.application.port.out.AddressRepository;
+import com.example.s_balneare.application.port.in.common.AddressUseCase;
+import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
- * @see com.example.s_balneare.application.port.in.AddressUseCase AddressUseCase
+ * @see AddressUseCase AddressUseCase
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class AddressService implements AddressUseCase {

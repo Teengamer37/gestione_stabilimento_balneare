@@ -1,15 +1,13 @@
 package com.example.s_balneare.application.service.user;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import com.example.s_balneare.application.port.out.BanRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.user.AuthenticationUseCase;
 import com.example.s_balneare.application.port.out.user.LoginResult;
 import com.example.s_balneare.application.port.out.user.UserRepository;
-import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.user.Customer;
-import com.example.s_balneare.domain.user.Owner;
 import com.example.s_balneare.domain.user.User;
 
 /**

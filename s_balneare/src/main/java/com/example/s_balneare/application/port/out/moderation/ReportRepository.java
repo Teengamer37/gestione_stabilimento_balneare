@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.port.out;
+package com.example.s_balneare.application.port.out.moderation;
 
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.moderation.Report;

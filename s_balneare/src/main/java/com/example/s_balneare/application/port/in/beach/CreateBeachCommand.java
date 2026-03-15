@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * Record che prende come parametri tutti gli attributi di Beach e Address.
  * Usato in:
+ *
  * @see CreateBeachUseCase CreateBeachUseCase
  */
 public record CreateBeachCommand(

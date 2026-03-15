@@ -1,14 +1,17 @@
-package com.example.s_balneare.application.port.in;
+package com.example.s_balneare.application.port.in.moderation;
 
 import com.example.s_balneare.domain.moderation.BanType;
 
-import java.time.Instant;
-
+/**
+ * Record che prende come parametri tutti gli attributi di Ban per la creazione di un nuovo ban.
+ * Usato in:
+ *
+ * @see BanUseCase BanUseCase
+ */
 public record CreateBanCommand(
         Integer bannedId,
         BanType banType,
         Integer bannedFromBeachId,
         Integer adminId,
         String reason
-) {
-}
+) {}

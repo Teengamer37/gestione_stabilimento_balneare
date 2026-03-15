@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach.
  * Implementata in:
+ *
  * @see ManageBeachService ManageBeachService
  */
 public interface ManageBeachUseCase {
-    //updates a Beach
+    //update di Beach
     void updateGeneralInfo(Integer id, BeachGeneral newGeneral);
     void updateInventory(Integer id, BeachInventory newInventory);
     void updateServices(Integer id, BeachServices newServices);
@@ -24,7 +25,7 @@ public interface ManageBeachUseCase {
     //update attributo active di Beach
     void setBeachActive(Integer id, boolean active);
 
-    //elementi Season (solo con add, business logic)
+    //elementi Season
     void addSeason(Integer id, Season season);
     void addSeasons(Integer id, List<Season> seasons);
     void updateSeasonEndDate(Integer beachId, String seasonName, LocalDate newEndDate);

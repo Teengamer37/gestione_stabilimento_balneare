@@ -10,14 +10,17 @@ import java.util.Optional;
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Beach.
  * Implementata in JdbcBeachRepository
+ *
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
-//interfacce per manipolazione oggetti di tipo Beach
 public interface BeachRepository {
+    //manipolazione
     Integer save(Beach beach, TransactionContext context);
     void update(Beach beach, TransactionContext context);
     void delete(Integer id, TransactionContext context);
+
+    //cerca spiaggia per ID
     Optional<Beach> findById(Integer id, TransactionContext context);
 
     //trova tutte le stagioni di una spiaggia

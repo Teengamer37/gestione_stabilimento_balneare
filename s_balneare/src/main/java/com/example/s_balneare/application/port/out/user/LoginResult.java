@@ -5,4 +5,5 @@ import com.example.s_balneare.domain.user.Role;
 public record LoginResult(
         Integer userId,
         boolean requiresPasswordChange,
-        Role userRole) {}
+        Role userRole) {
+}

@@ -1,10 +1,9 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
-import com.example.s_balneare.application.port.out.ReviewRepository;
+import com.example.s_balneare.application.port.out.review.ReviewRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.review.Review;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

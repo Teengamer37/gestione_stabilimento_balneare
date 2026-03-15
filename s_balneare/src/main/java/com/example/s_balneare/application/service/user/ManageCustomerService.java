@@ -1,6 +1,6 @@
 package com.example.s_balneare.application.service.user;
 
-import com.example.s_balneare.application.port.out.AddressRepository;
+import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
 import com.example.s_balneare.application.port.out.user.CustomerRepository;

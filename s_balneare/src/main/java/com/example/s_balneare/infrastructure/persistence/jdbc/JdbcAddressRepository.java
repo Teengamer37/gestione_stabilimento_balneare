@@ -1,10 +1,9 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc;
 
-import com.example.s_balneare.application.port.out.AddressRepository;
+import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.Optional;
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Address tramite
  * libreria JDBC.
- * @see com.example.s_balneare.application.port.out.AddressRepository AddressRepository
+ * @see AddressRepository AddressRepository
  * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcAddressRepository implements AddressRepository {
