@@ -23,15 +23,18 @@ public class ReviewService implements ReviewUseCase {
     private final ReviewRepository reviewRepository;
     private final BeachRepository beachRepository;
     private final BookingRepository bookingRepository;
+    private final BanRepository banRepository;
     private final TransactionManager transactionManager;
 
     public ReviewService(ReviewRepository reviewRepository,
                          BeachRepository beachRepository,
                          BookingRepository bookingRepository,
+                         BanRepository banRepository,
                          TransactionManager transactionManager) {
         this.reviewRepository = reviewRepository;
         this.beachRepository = beachRepository;
         this.bookingRepository = bookingRepository;
+        this.banRepository = banRepository;
         this.transactionManager = transactionManager;
     }
 
@@ -54,7 +57,14 @@ public class ReviewService implements ReviewUseCase {
                 throw new SecurityException("ERROR: cannot review an inactive beach");
             }
 
-            //TODO: aggiungere controllo se utente bannato
+            //Controllo che l'utente non sia bannato dalla spiaggia e dall'app
+            if(banRepository.isBannedFromApp(command.customerId(), context)){
+                throw new SecurityException("ERROR: cannot review, you are banned from the app");
+            }
+            if (banRepository.isBannedFromBeach(command.customerId(), command.beachId(), context)) {
+                throw new SecurityException("ERROR: cannot review, you are banned from the beach");
+            }
+
 
             //passo 2: controllo che l'utente abbia effettivamente visitato la spiaggia con un booking confermato nel passato
             boolean hasCompletedStay = bookingRepository.hasPastConfirmedBooking(

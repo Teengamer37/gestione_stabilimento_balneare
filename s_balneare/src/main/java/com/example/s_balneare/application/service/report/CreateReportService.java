@@ -109,7 +109,7 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
                 reportedType = ReportTargetType.USER;
                 reportedId = booking.getCustomerId();
             }
-            
+
             Report newReport = new Report(
                     0,
                     command.reporterId(),
