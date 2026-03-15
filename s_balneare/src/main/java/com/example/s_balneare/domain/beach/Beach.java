@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: aggiungere attributo closed (booleana) che serve a chiudere definitivamente una spiaggia, cancellando tutte le future prenotazioni
 public class Beach {
     //attributi
     private final Integer id;
@@ -22,11 +21,12 @@ public class Beach {
 
     private String extraInfo;
     private boolean active;
+    private boolean closed;
 
 
     //costruttore
     public Beach(Integer id, Integer ownerId, Integer addressId, BeachGeneral beachGeneral, BeachInventory beachInventory,
-                 BeachServices beachServices, Parking parking, String extraInfo, List<Season> seasons, List<Zone> zones, boolean active) {
+                 BeachServices beachServices, Parking parking, String extraInfo, List<Season> seasons, List<Zone> zones, boolean active, boolean closed) {
         this.id = id;
         updateOwnerId(ownerId);
         if (addressId == null) throw new IllegalArgumentException("ERROR: addressId cannot be null");
@@ -46,7 +46,12 @@ public class Beach {
             addSeasons(seasons);
         }
 
-        setActive(active);
+        this.closed = closed;
+        if (closed) {
+            this.active = false;
+        } else {
+            setActive(active);
+        }
     }
 
 
@@ -83,6 +88,9 @@ public class Beach {
     }
     public boolean isActive() {
         return active;
+    }
+    public boolean isClosed() {
+        return closed;
     }
 
 
@@ -308,6 +316,17 @@ public class Beach {
         this.active = active;
     }
 
+    /**
+     * Chiude definitivamente una spiaggia
+     */
+    public void closeBeach() {
+        if (this.closed) {
+            throw new IllegalStateException("ERROR: Beach is already closed.");
+        }
+        this.closed = true;
+        this.active = false;
+    }
+
     //metodi update per vari attributi
     public void updateGeneralInfo(BeachGeneral newGeneral) {
         checkNotActive("update general info");
@@ -379,6 +398,9 @@ public class Beach {
         if (newParking == null) throw new IllegalArgumentException("ERROR: Parking cannot be reverted to null");
     }
     private void checkNotActive(String action) {
+        if (this.closed) {
+            throw new IllegalStateException("ERROR: Cannot " + action + " because the beach is permanently CLOSED.");
+        }
         if (this.active) {
             throw new IllegalStateException("ERROR: cannot " + action + " while the beach is ACTIVE");
         }

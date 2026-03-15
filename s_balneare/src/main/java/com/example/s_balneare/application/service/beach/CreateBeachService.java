@@ -66,6 +66,7 @@ public class CreateBeachService implements CreateBeachUseCase {
                     command.extraInfo(),
                     command.seasons(),
                     command.zones(),
+                    false,
                     false
             );
             //verifico activeState: se è messo a true, ma la spiaggia non è configurata completamente, metto active a false,

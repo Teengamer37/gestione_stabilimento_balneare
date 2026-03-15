@@ -60,6 +60,7 @@ CREATE TABLE beaches (
     addressId INT UNIQUE NOT NULL,
     extraInfo VARCHAR(512),
     active BOOLEAN NOT NULL DEFAULT FALSE,
+    closed BOOLEAN NOT NULL DEFAULT FALSE,
     ownerId INT UNIQUE NOT NULL,
     FOREIGN KEY (ownerId) REFERENCES owners(id),
     FOREIGN KEY (addressId) REFERENCES addresses(id)

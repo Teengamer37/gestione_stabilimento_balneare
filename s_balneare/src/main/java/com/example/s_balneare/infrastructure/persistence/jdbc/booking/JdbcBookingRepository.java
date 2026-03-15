@@ -510,6 +510,7 @@ public class JdbcBookingRepository implements BookingRepository {
      * @param referenceDate Data di riferimento (data di chiusura/ban account di solito)
      * @param context Connessione JDBC
      * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
      */
     @Override
     public void cancelFutureBookingsForCustomer(Integer customerId, LocalDate referenceDate, TransactionContext context) {
@@ -532,6 +533,14 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
+    /**
+     * Cancella tutte le prenotazioni future di una spiaggia (usato in caso di chiusura/ban spiaggia)
+     * @param beachId ID della spiaggia
+     * @param referenceDate Data di riferimento (data di chiusura/ban spiaggia di solito)
+     * @param context Connessione JDBC
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     */
     @Override
     public void cancelFutureBookingsForBeach(Integer beachId, LocalDate referenceDate, TransactionContext context) {
         Connection connection = getConnection(context);

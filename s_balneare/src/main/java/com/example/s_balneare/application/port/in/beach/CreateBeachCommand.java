@@ -21,6 +21,7 @@ public record CreateBeachCommand(
         List<Zone> zones,
         String extraInfo,
         boolean active,
+        boolean closed,
 
         //attributi address
         String street,

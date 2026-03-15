@@ -72,7 +72,7 @@ public class JdbcBeachRepository implements BeachRepository {
         //estraggo la connessione JDBC
         Connection connection = getConnection(context);
 
-        String sqlBeach = "INSERT INTO beaches (name, description, phoneNumber, addressId, extraInfo, active, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlBeach = "INSERT INTO beaches (name, description, phoneNumber, addressId, extraInfo, active, closed, ownerId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             Integer newId;
@@ -88,7 +88,8 @@ public class JdbcBeachRepository implements BeachRepository {
                 statement.setInt(4, beach.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());
-                statement.setInt(7, beach.getOwnerId());
+                statement.setBoolean(7, beach.isClosed());
+                statement.setInt(8, beach.getOwnerId());
                 statement.executeUpdate();
 
                 try (ResultSet rs = statement.getGeneratedKeys()) {
@@ -142,7 +143,7 @@ public class JdbcBeachRepository implements BeachRepository {
         if (beach.getId() == null || beach.getId() <= 0)
             throw new IllegalArgumentException("ERROR: beach must have a valid ID");
 
-        String sqlBeach = "UPDATE beaches SET name = ?, description = ?, phoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, ownerId = ? WHERE id = ?";
+        String sqlBeach = "UPDATE beaches SET name = ?, description = ?, phoneNumber = ?, addressId = ?, extraInfo = ?, active = ?, closed = ?, ownerId = ? WHERE id = ?";
 
         try {
             //passo 1: aggiorno dati generali da Beach e BeachGeneral
@@ -157,8 +158,9 @@ public class JdbcBeachRepository implements BeachRepository {
                 statement.setInt(4, beach.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());
-                statement.setInt(7, beach.getOwnerId());
-                statement.setInt(8, beach.getId());
+                statement.setBoolean(7, beach.isClosed());
+                statement.setInt(8, beach.getOwnerId());
+                statement.setInt(9, beach.getId());
                 statement.executeUpdate();
             }
 
@@ -305,9 +307,10 @@ public class JdbcBeachRepository implements BeachRepository {
                     if (rs.wasNull()) ownerId = 0;
                     String extraInfo = rs.getString("extraInfo");
                     boolean active = rs.getBoolean("active");
+                    boolean closed = rs.getBoolean("closed");
 
                     //passo 5: aggiungo alla lista
-                    beaches.add(new Beach(id, ownerId, addressId, general, null, services, parking, extraInfo, null, null, active));
+                    beaches.add(new Beach(id, ownerId, addressId, general, null, services, parking, extraInfo, null, null, active, closed));
                 }
             }
         } catch (SQLException e) {
@@ -407,9 +410,10 @@ public class JdbcBeachRepository implements BeachRepository {
                 if (rs.wasNull()) ownerId = 0;
                 String extraInfo = rs.getString("extraInfo");
                 boolean active = rs.getBoolean("active");
+                boolean closed = rs.getBoolean("closed");
 
                 //passo 7: creo oggetto Beach e faccio il return
-                Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, zones, active);
+                Beach beach = new Beach(id, ownerId, addressId, general, inventory, services, parking, extraInfo, seasons, zones, active, closed);
                 return Optional.of(beach);
             }
         } catch (SQLException e) {
