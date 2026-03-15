@@ -6,9 +6,13 @@ import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.moderation.Report;
 import com.example.s_balneare.domain.moderation.ReportStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementazione dell'interfaccia che permette la navigazione dell'admin sui report
+ * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
+ * @see TransactionManager TransactionManager per le transazioni SQL
+ */
 public class ManageReportService implements ManageReportUseCase {
     private final ReportRepository reportRepository;
     private final TransactionManager transactionManager;
@@ -34,10 +38,10 @@ public class ManageReportService implements ManageReportUseCase {
     }
 
     @Override
-    public List<Report> getUserReports(Integer userId, ReportStatus status) {
+    public List<Report> getUserReports(Integer userId) {
         transactionManager.executeInTransaction(context -> {
-            List<Report> reported = reportRepository.findByReportedIdAndStatus(userId, status, context);
-            List<Report> reporter = reportRepository.findByReporterIdAndStatus(userId, status, context);
+            List<Report> reported = reportRepository.findByReportedId(userId, context);
+            List<Report> reporter = reportRepository.findByReporterId(userId, context);
             reported.addAll(reporter);
             return reported;
         });

@@ -101,26 +101,6 @@ public class JdbcReportRepository implements ReportRepository {
     }
 
     @Override
-    public List<Report> findByReporterIdAndStatus(Integer reporterId, ReportStatus status, TransactionContext context) {
-        Connection connection = getConnection(context);
-
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE reporterId=? AND status=?";
-        List<Report> reports = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, reporterId);
-            statement.setString(2, status.name());
-            try (ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
-                    reports.add(mapToEntity(rs));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find report by reporterId", e);
-        }
-        return reports;
-    }
-
-    @Override
     public List<Report> findByReportedId(Integer reportedId, TransactionContext context) {
         Connection connection = getConnection(context);
 
@@ -138,25 +118,6 @@ public class JdbcReportRepository implements ReportRepository {
         }
         return reports;
     }
-
-    @Override
-    public List<Report> findByReportedIdAndStatus(Integer reportedId, ReportStatus status, TransactionContext context) {
-        Connection connection = getConnection(context);
-
-        String sql =  "SELECT id,reporterId, reportedId, reportedType, description, createdAt, status, bookingId FROM reports WHERE reportedId=? AND status=?";
-        List<Report> reports = new ArrayList<>();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, reportedId);
-            statement.setString(2, status.name());
-            try (ResultSet rs = statement.executeQuery()) {
-                while (rs.next()) {
-                    reports.add(mapToEntity(rs));
-                }
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException("ERROR: unable to find report by reportedId", e);
-        }
-        return reports;    }
 
     @Override
     public List<Report> findByStatus(ReportStatus status, TransactionContext context) {

@@ -43,6 +43,7 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
      * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
      * @throws SecurityException se si prova a lasciare un report in una spiaggia non attiva/bannata/chiusa
      * @throws IllegalStateException se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
+     * @see TransactionManager TransactionManager per le transazioni SQL
      */
     @Override
     public Integer createReport(CreateReportCommand command) {
