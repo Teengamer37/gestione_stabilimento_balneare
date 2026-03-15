@@ -20,6 +20,7 @@ public class CreateOwnerService extends CreateUserService<Owner, CreateOwnerRequ
                 request.getUsername(),
                 request.getName(),
                 request.getSurname(),
+                true,
                 true
         );
     }

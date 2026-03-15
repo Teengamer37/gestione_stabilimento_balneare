@@ -92,6 +92,7 @@ public class JdbcOwnerRepository extends JdbcUserRepository<Owner> implements Ow
                 rs.getString("username"),
                 rs.getString("name"),
                 rs.getString("surname"),
+                rs.getBoolean("active"),
                 rs.getBoolean("OTP")
         );
     }

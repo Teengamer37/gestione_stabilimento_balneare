@@ -40,6 +40,7 @@ CREATE TABLE customers (
 
 CREATE TABLE owners (
     id INT PRIMARY KEY,
+    active B
     OTP BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (id) REFERENCES users(id)
 );
