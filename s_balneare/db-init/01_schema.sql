@@ -60,13 +60,13 @@ CREATE TABLE beaches (
 );
 
 CREATE TABLE parkings (
-  beachId INT PRIMARY KEY,
-  nAutoPark INT NOT NULL,
-  nMotoPark INT NOT NULL,
-  nBikePark INT NOT NULL,
-  nElectricPark INT NOT NULL,
-  CCTV BOOLEAN NOT NULL,
-  FOREIGN KEY (beachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE
+    beachId INT PRIMARY KEY,
+    nAutoPark INT NOT NULL,
+    nMotoPark INT NOT NULL,
+    nBikePark INT NOT NULL,
+    nElectricPark INT NOT NULL,
+    CCTV BOOLEAN NOT NULL,
+    FOREIGN KEY (beachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE beach_services (
@@ -108,7 +108,7 @@ CREATE TABLE seasons (
     name VARCHAR(50) NOT NULL,
     beachId  INT NOT NULL,
     pricingsId INT UNIQUE NOT NULL,
-    PRIMARY KEY (beachId,name),
+    PRIMARY KEY (beachId, name),
     FOREIGN KEY (beachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (pricingsId) REFERENCES pricings(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -126,9 +126,9 @@ CREATE TABLE zone_tariffs (
     zoneName VARCHAR(50) NOT NULL,
     priceOmbrellone INT NOT NULL,
     priceTenda INT NOT NULL,
-    PRIMARY KEY (seasonName,beachId,zoneName),
-    FOREIGN KEY (beachId,seasonName) REFERENCES seasons(beachId,name) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (seasonName, beachId, zoneName),
+    FOREIGN KEY (beachId, seasonName) REFERENCES seasons(beachId, name) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (zoneName, beachId) REFERENCES zones(name, beachId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE spots (
@@ -138,8 +138,8 @@ CREATE TABLE spots (
     `column` INT NOT NULL,
     zoneName VARCHAR(50) NOT NULL,
     beachId INT NOT NULL,
-    UNIQUE (`row`,`column`,zoneName, beachId),
-    FOREIGN KEY (zoneName,beachId) REFERENCES zones(name,beachId) ON DELETE CASCADE ON UPDATE CASCADE
+    UNIQUE (`row`, `column`, zoneName, beachId),
+    FOREIGN KEY (zoneName, beachId) REFERENCES zones(name, beachId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- GESTIONE APP
@@ -150,10 +150,10 @@ CREATE TABLE bookings (
     callerName VARCHAR(100),
     callerPhone VARCHAR(50),
     date DATE NOT NULL,
-    extraSdraio INT NOT NULL,
-    extraLettini INT NOT NULL,
-    extraSedie INT NOT NULL,
-    camerini INT NOT NULL,
+    extraSdraio INT NOT NULL DEFAULT 0,
+    extraLettini INT NOT NULL DEFAULT 0,
+    extraSedie INT NOT NULL DEFAULT 0,
+    camerini INT NOT NULL DEFAULT 0,
     autoPark INT NOT NULL DEFAULT 0,
     motoPark INT NOT NULL DEFAULT 0,
     bikePark INT NOT NULL DEFAULT 0,
@@ -162,18 +162,18 @@ CREATE TABLE bookings (
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (beachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (customerId) REFERENCES customers(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    UNIQUE (beachId,customerId,date),
-    UNIQUE (id,date)
+    UNIQUE (beachId, customerId, date),
+    UNIQUE (id, date)
 );
 
 CREATE TABLE booking_spots (
     bookingId INT NOT NULL,
     date DATE NOT NULL,
     spotId INT NOT NULL,
-    PRIMARY KEY (bookingId,spotId),
-    FOREIGN KEY (bookingId,date) REFERENCES bookings(id,date) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY (bookingId, spotId),
+    FOREIGN KEY (bookingId) REFERENCES bookings(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (spotId) REFERENCES spots(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE (spotId,date)
+    UNIQUE (spotId, date)
 );
 
 CREATE TABLE bans (
@@ -184,7 +184,7 @@ CREATE TABLE bans (
     adminId INT NOT NULL,
     reason VARCHAR(512) NOT NULL,
     createdAt DATETIME NOT NULL,
-    FOREIGN KEY (bannedId) REFERENCES customers(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (bannedId) REFERENCES users(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (bannedFromBeachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (adminId) REFERENCES admins(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -214,19 +214,21 @@ CREATE TABLE reports (
     FOREIGN KEY (bookingId) REFERENCES bookings(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
+
 -- VINCOLI AGGIUNTIVI (CONTROLLI)
 ALTER TABLE bans
-    ADD CONSTRAINT chk_bans_beach_id_matches_type CHECK (
-        (banType = 'BEACH' AND bannedFromBeachId IS NOT NULL)
-            OR
-        (banType = 'APPLICATION' AND bannedFromBeachId IS NULL)
-        );
+    ADD CONSTRAINT uq_ban_single_active UNIQUE (bannedId,bannedFromBeachId,banType);
 
-ALTER TABLE bans ADD CONSTRAINT uq_ban_single_active UNIQUE (bannedId,bannedFromBeachId,banType);
-ALTER TABLE reviews ADD CONSTRAINT uq_review_per_customer UNIQUE (beachId,customerId);
-ALTER TABLE seasons ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId,startDate,endDate);
-ALTER TABLE reports ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt),
-                    ADD CONSTRAINT uq_reporter_booking UNIQUE (reporterId, bookingId);
+ALTER TABLE reviews
+    ADD CONSTRAINT uq_review_per_customer UNIQUE (beachId,customerId);
+
+ALTER TABLE seasons
+    ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId,startDate,endDate);
+
+ALTER TABLE reports
+    ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt),
+    ADD CONSTRAINT uq_reporter_booking UNIQUE (reporterId, bookingId);
+
 
 -- CHECK >= 0
 ALTER TABLE parkings
@@ -255,7 +257,6 @@ ALTER TABLE zone_tariffs
     ADD CONSTRAINT chk_price_tenda_nonneg CHECK (priceTenda >= 0);
 
 ALTER TABLE bookings
-    ADD CONSTRAINT chk_customer_param_nonneg CHECK (customerId IS NOT NULL OR (callerName IS NOT NULL AND callerPhone IS NOT NULL)),
     ADD CONSTRAINT chk_extra_sdraio_booking_nonneg CHECK (extraSdraio >= 0),
     ADD CONSTRAINT chk_extra_lettini_booking_nonneg CHECK (extraLettini >= 0),
     ADD CONSTRAINT chk_extra_sedie_booking_nonneg CHECK (extraSedie >= 0),
@@ -268,5 +269,5 @@ ALTER TABLE bookings
 ALTER TABLE spots
     ADD CONSTRAINT chk_spot_row_col_positive CHECK (`row` >= 0 AND `column` >= 0);
 
-ALTER TABLE seasons ADD CONSTRAINT chk_season_dates_valid CHECK (startDate < endDate);
-ALTER TABLE reports ADD CONSTRAINT chk_reporter_not_reported CHECK (reporterId <> reportedId);
+ALTER TABLE seasons
+    ADD CONSTRAINT chk_season_dates_valid CHECK (startDate < endDate);

@@ -14,4 +14,10 @@ public record CreateBanCommand(
         Integer bannedFromBeachId,
         Integer adminId,
         String reason
-) {}
+) {
+    public CreateBanCommand {
+        if (banType == BanType.BEACH && bannedFromBeachId == null) {
+            throw new IllegalArgumentException("ERROR: beachId required for BEACH ban");
+        }
+    }
+}

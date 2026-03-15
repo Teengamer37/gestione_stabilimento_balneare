@@ -60,8 +60,10 @@ public class Ban {
     }
 
     private void checkBannedFromBeachId(Integer bannedFromBeachId, BanType banType) {
-        if (banType == BanType.BEACH && (bannedFromBeachId == null || bannedFromBeachId <= 0)) throw new IllegalArgumentException("ERROR: bannedFromBeachID not valid");
-        if (banType == BanType.APPLICATION && bannedFromBeachId != null) throw new IllegalArgumentException("ERROR: bannedFromBeachID not valid");
+        if (banType == BanType.BEACH && (bannedFromBeachId == null || bannedFromBeachId <= 0))
+            throw new IllegalArgumentException("ERROR: BEACH ban must have a valid beachId");
+        if (banType == BanType.APPLICATION && bannedFromBeachId != null)
+            throw new IllegalArgumentException("ERROR: APPLICATION ban must not have a beachId");
     }
 
     private void checkAdminId(Integer adminId) {
