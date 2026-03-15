@@ -3,7 +3,6 @@ package com.example.s_balneare.application.service.user;
 import com.example.s_balneare.application.port.out.AddressRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
-import com.example.s_balneare.application.port.out.user.CustomerRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.user.Customer;
@@ -64,7 +63,7 @@ public class ManageCustomerService extends ManageUserService<Customer> {
     public void setCustomerActive(Integer id, boolean active) {
         transactionManager.executeInTransaction(context -> {
             Customer user = getUserOrThrow(id, context);
-            user.setActive(active);
+            user.setActive();
             userRepository.update(user, context);
         });
     }

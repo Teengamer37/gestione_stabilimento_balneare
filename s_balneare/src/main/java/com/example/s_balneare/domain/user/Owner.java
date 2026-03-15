@@ -26,8 +26,6 @@ public final class Owner extends User {
 
     public boolean isActive() {return active;}
 
-    public void disable() {
-        this.active = false;
-    }
+    public void closeAccount() {this.active = false;}
 
 }

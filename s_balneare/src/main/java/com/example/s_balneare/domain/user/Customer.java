@@ -27,8 +27,8 @@ public final class Customer extends User {
         this.phoneNumber = newPhone;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setActive() {
+        this.active = false;
     }
 
     public void closeAccount() {

@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette la navigazione dell'admin sui report
- * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ManageReportService implements ManageReportUseCase {
