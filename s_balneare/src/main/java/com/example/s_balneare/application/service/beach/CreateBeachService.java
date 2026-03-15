@@ -34,19 +34,54 @@ public class CreateBeachService implements CreateBeachUseCase {
     //crea spiaggia date address e info su beach
     @Override
     public Integer createBeach(CreateBeachCommand command) {
-
         //transactionManager pensa in automatico all'apertura transazione, commit e rollback
         return transactionManager.executeInTransaction(context -> {
-            Address address = new Address(0, command.street(), command.streetNumber(), command.city(), command.zipCode(), command.country());
+            //passo 1: controllo se l'Owner non ha una Beach associata
+            if (beachRepository.findByOwnerId(command.ownerId(), context).isPresent()) {
+                throw new IllegalStateException("ERROR: owner already has a beach");
+            }
+
+            //passo 2: creazione indirizzo e salvataggio nel DB
+            Address address = new Address(
+                    0,
+                    command.street(),
+                    command.streetNumber(),
+                    command.city(),
+                    command.zipCode(),
+                    command.country()
+            );
             //addressId serve per recuperare l'ID generato dal DB
             Integer addressId = addressRepository.save(address, context);
 
-            //passo 2: creazione spiaggia e salvataggio nel DB
-            Beach beach = new Beach(0, command.ownerId(), addressId, command.beachGeneral(), command.beachInventory(), command.beachServices(), command.parking(), command.extraInfo(), command.seasons(), command.zones(), command.active());
-            Integer beachId = beachRepository.save(beach, context);
+            //passo 3: creazione spiaggia e salvataggio nel DB
+            //salvo lo stato di active, passato da command
+            boolean finalActiveState = command.active();
+            Beach beach = new Beach(0,
+                    command.ownerId(),
+                    addressId,
+                    command.beachGeneral(),
+                    command.beachInventory(),
+                    command.beachServices(),
+                    command.parking(),
+                    command.extraInfo(),
+                    command.seasons(),
+                    command.zones(),
+                    false
+            );
+            //verifico activeState: se è messo a true, ma la spiaggia non è configurata completamente, metto active a false,
+            //senza lanciare errori/eccezioni
+            //se activeState è false, allora procedo normalmente
+            if (finalActiveState) {
+                if (beach.isFullyConfigured()) {
+                    beach.setActive(true);
+                } else {
+                    // UC-10 Step 10a: Save as Draft
+                    beach.setActive(false);
+                }
+            }
 
-            //passo 3: fine transaction e ritorno il nuovo ID della spiaggia
-            return beachId;
+            //passo 4: fine transaction e ritorno il nuovo ID della spiaggia
+            return beachRepository.save(beach, context);
         });
     }
 }

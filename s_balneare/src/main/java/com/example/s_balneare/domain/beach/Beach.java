@@ -37,10 +37,13 @@ public class Beach {
         this.parking = parking;
         updateExtraInfo(extraInfo);
 
-        if (seasons == null || seasons.isEmpty()) this.seasons = new ArrayList<Season>();
-        else this.seasons = new ArrayList<>(seasons);
         if (zones == null || zones.isEmpty()) this.zones = new ArrayList<Zone>();
         else this.zones = new ArrayList<>(zones);
+
+        this.seasons = new ArrayList<Season>();
+        if (seasons != null && !seasons.isEmpty()) {
+            addSeasons(seasons);
+        }
 
         setActive(active);
     }
@@ -239,15 +242,26 @@ public class Beach {
     }
 
     /**
+     * Verifica se la spiaggia ha tutti gli attributi settati
+     * @return TRUE se possiede tutti i campi completati, FALSE altrimenti
+     */
+    public boolean isFullyConfigured() {
+        return beachGeneral != null &&
+                beachInventory != null &&
+                beachServices != null &&
+                parking != null &&
+                seasons != null && !seasons.isEmpty() &&
+                zones != null && !zones.isEmpty();
+    }
+
+    /**
      * Gestisce lo stato di attività della spiaggia nella piattaforma
      * (verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati)
      * @param active nuovo stato di attività
      */
     public void setActive(boolean active) {
-        if (active) {
-            if (beachGeneral == null || beachInventory == null || beachServices == null || parking == null || seasons == null || seasons.isEmpty() || zones == null || zones.isEmpty()) {
-                throw new IllegalStateException("ERROR: beach can be set to active only if owner, general, inventory, services, parking and season(s) are set");
-            }
+        if (active && !isFullyConfigured()) {
+            throw new IllegalStateException("ERROR: beach can be set to active only if fully configured");
         }
         this.active = active;
     }
