@@ -2,6 +2,7 @@ package com.example.s_balneare.application.service.booking;
 
 import com.example.s_balneare.application.port.in.booking.CreateBookingCommand;
 import com.example.s_balneare.application.port.in.booking.CreateBookingUseCase;
+import com.example.s_balneare.application.port.out.BanRepository;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
@@ -34,19 +35,21 @@ public class CreateBookingService implements CreateBookingUseCase {
     private final BeachRepository beachRepository;
     private final BookingRepository bookingRepository;
     private final AvailabilityQuery availabilityQuery;
+    private final BanRepository banRepository;
     private final TransactionManager transactionManager;
 
     public CreateBookingService(BeachRepository beachRepository,
                                 BookingRepository bookingRepository,
                                 AvailabilityQuery availabilityQuery,
+                                BanRepository banRepository,
                                 TransactionManager transactionManager) {
         this.beachRepository = beachRepository;
         this.bookingRepository = bookingRepository;
         this.availabilityQuery = availabilityQuery;
+        this.banRepository = banRepository;
         this.transactionManager = transactionManager;
     }
 
-    //TODO: aggiungere controllo se utente bannato dalla spiaggia! (dopo aver fatto BanRepository)
     @Override
     public Integer createBooking(CreateBookingCommand command) {
         return transactionManager.executeInTransaction(context -> {
@@ -56,6 +59,13 @@ public class CreateBookingService implements CreateBookingUseCase {
             //controllo se spiaggia attiva
             if (!beach.isActive()) {
                 throw new IllegalStateException("ERROR: cannot create bookings for an inactive beach.");
+            }
+            //controllo utente  non sia bannato dalla spiaggia o dall'app
+            if (banRepository.isBannedFromApp(command.customerId(), context)){
+                throw new IllegalStateException("ERROR: customer banned from the app");
+            }
+            if (banRepository.isBannedFromBeach(command.customerId(), command.beachId(), context)) {
+                throw new IllegalStateException("ERROR: customer banned from the beach");
             }
 
             //passo 2: recupero i posti parcheggio occupati in quel giorno
