@@ -5,7 +5,6 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.moderation.Report;
 import com.example.s_balneare.domain.moderation.ReportStatus;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -177,12 +176,12 @@ public class JdbcReportRepository implements ReportRepository {
         return reports;      }
 
     @Override
-    public void updateStatus(ReportStatus status, TransactionContext context, Integer Id) {
+    public void updateStatus(Report report, TransactionContext context) {
         Connection conn =  getConnection(context);
         String sql =  "UPDATE reports SET status=? WHERE id=?";
         try (PreparedStatement statement = conn.prepareStatement(sql)){
-            statement.setString(1, status.name());
-            statement.setInt(2, Id);
+            statement.setString(1, report.getStatus().name());
+            statement.setInt(2, report.getId());
             statement.executeUpdate();
         }catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to update status", e);

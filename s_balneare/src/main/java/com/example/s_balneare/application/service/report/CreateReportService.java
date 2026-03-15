@@ -1,4 +1,4 @@
-package com.example.s_balneare.application.service;
+package com.example.s_balneare.application.service.report;
 
 import com.example.s_balneare.application.port.in.report.CreateReportCommand;
 import com.example.s_balneare.application.port.in.report.CreateReportUseCase;
@@ -16,10 +16,10 @@ import com.example.s_balneare.domain.moderation.ReportTargetType;
 import com.example.s_balneare.domain.user.Role;
 import com.example.s_balneare.domain.user.User;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Objects;
-import java.util.Optional;
 
 public class CreateReportService<T extends User> implements CreateReportUseCase {
     private final ReportRepository reportRepository;
@@ -37,9 +37,12 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
     }
 
     /**
-     *
-     * @param command
-     * @return
+     *Aggiunge un nuovo report al DB
+     * @param command, parametri necessari alla creazione di un nuovo report
+     * @return id del report appena creato
+     * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
+     * @throws SecurityException se si prova a lasciare un report in una spiaggia non attiva/bannata/chiusa
+     * @throws IllegalStateException se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
      */
     @Override
     public Integer createReport(CreateReportCommand command) {
@@ -49,20 +52,21 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: This booking does not exist"));
 
             if (booking.getStatus() != BookingStatus.CONFIRMED){
-                throw new IllegalArgumentException("ERROR: This booking does not exist");
+                throw new IllegalStateException("ERROR: This booking does not exist");
             }
 
             //2: Controllo temporale booking
-            LocalDate reportDate = (command.createdAt()).atZone(ZoneId.systemDefault()).toLocalDate();
-            if (reportDate.isBefore(booking.getDate()) || reportDate.isEqual(booking.getDate())) {
-                throw new IllegalArgumentException("ERROR: Reports are available from the next day");
+            Instant createdAt = Instant.now();
+            LocalDate reportDate = (createdAt).atZone(ZoneId.systemDefault()).toLocalDate();
+            if (!reportDate.isAfter(booking.getDate())) {
+                throw new IllegalStateException("ERROR: Reports are available from the next day");
             }
 
             //3: Identificazione reporter
             T reporterUser = userRepository.findById(command.reporterId(), context)
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: Invalid user"));
             if(reporterUser.getRole() == Role.ADMIN) {
-                throw new IllegalArgumentException("ERROR: Invalid type user");
+                throw new IllegalStateException("ERROR: Invalid type user");
             }
 
             //4: Recupero dati spiaggia del booking
@@ -76,16 +80,16 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
             if (reporterUser.getRole() == Role.CUSTOMER ){
                 //Customer segnala la spiaggia
                 if(!Objects.equals(command.reporterId(), booking.getCustomerId())) {
-                    throw new IllegalArgumentException("ERROR: You are not the owner of this reservation");
+                    throw new IllegalStateException("ERROR: You are not the owner of this reservation");
                 }
                 if (!beach.isActive()) {
-                    throw new IllegalArgumentException("ERROR: Beach is not active");
+                    throw new IllegalStateException("ERROR: Beach is not active");
                 }
                 reportedType = ReportTargetType.BEACH;
                 reportedId = beach.getOwnerId();
             } else{ //Owner segnala il customer
                 if (!Objects.equals(command.reporterId(), beach.getOwnerId())){
-                    throw new IllegalArgumentException("ERROR: You can only report customers of your own beach");
+                    throw new IllegalStateException("ERROR: You can only report customers of your own beach");
                 }
                 reportedType = ReportTargetType.USER;
                 reportedId = booking.getCustomerId();
@@ -99,7 +103,7 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
                     reportedId,
                     reportedType,
                     command.description(),
-                    command.createdAt(),
+                    createdAt,
                     ReportStatus.PENDING,
                     command.bookingId()
             );

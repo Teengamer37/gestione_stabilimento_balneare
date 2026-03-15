@@ -8,7 +8,6 @@ import java.time.Instant;
 public record CreateReportCommand(
         Integer reporterId,
         String description,
-        Instant createdAt,
         Integer bookingId
 ) {
 }

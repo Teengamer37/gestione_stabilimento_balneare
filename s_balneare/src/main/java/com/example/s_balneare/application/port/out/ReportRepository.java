@@ -20,5 +20,5 @@ public interface ReportRepository {
     public List<Report> findByReportedId(Integer id, TransactionContext context);
     public List<Report> findByReportedIdAndStatus(Integer reportedId, ReportStatus status, TransactionContext context);
     public List<Report> findByStatus(ReportStatus status, TransactionContext context);
-    public void updateStatus(ReportStatus status, TransactionContext context, Integer Id);
+    public void updateStatus(Report report, TransactionContext context);
 }
