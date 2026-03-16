@@ -19,11 +19,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
- * <p>Usa BookingRepository per compiere le varie operazioni di aggiornamento sulla prenotazione;
- * <p>Usa BeachRepository per prendere riferimenti vari dalla spiaggia registrata nella prenotazione;
- * <p>Usa AvailabilityQuery per controllare le varie disponibilità sui parcheggi/oggetti extra.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.<br>
+ * Usa BookingRepository per compiere le varie operazioni di aggiornamento sulla prenotazione;<br>
+ * Usa BeachRepository per prendere riferimenti vari dalla spiaggia registrata nella prenotazione;<br>
+ * Usa AvailabilityQuery per controllare le varie disponibilità sui parcheggi/oggetti extra.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see BookingUseCase BookingUseCase
  * @see BookingRepository BookingRepository
@@ -198,8 +198,8 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
-     * <p>Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto.
+     * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):<br>
+     * Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto.
      *
      * @param id      Identificativo booking da cercare
      * @param context Connessione JDBC
@@ -213,8 +213,8 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Metodo privato che va a fare questo calcolo:
-     * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
-     * <p>Questa operazione viene fatta per ciascuna categoria di parcheggio.
+     * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.<br>
+     * Questa operazione viene fatta per ciascuna categoria di parcheggio.
      *
      * @param capacity  Parcheggio della spiaggia
      * @param booked    Parcheggi prenotati in quella data

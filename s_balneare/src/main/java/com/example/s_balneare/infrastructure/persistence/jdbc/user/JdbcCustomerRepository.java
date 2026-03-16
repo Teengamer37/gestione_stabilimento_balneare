@@ -2,13 +2,36 @@ package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
 import com.example.s_balneare.application.port.out.user.CustomerRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.domain.user.*;
+import com.example.s_balneare.domain.user.Customer;
+import com.example.s_balneare.domain.user.User;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Repository che implementa i metodi specifici che permettono di interagire con un Database su oggetti di tipo Customer tramite
+ * libreria JDBC.<br>
+ * Estende JdbcUserRepository.
+ *
+ * @see JdbcUserRepository JdbcUserRepository
+ * @see CustomerRepository CustomerRepository
+ */
 public class JdbcCustomerRepository extends JdbcUserRepository<Customer> implements CustomerRepository {
+    /**
+     * Salva dati specifici di un nuovo Customer.<br>
+     * Usata assieme al metodo save().
+     *
+     * @param conn  Connessione JDBC
+     * @param newId Nuovo ID ricavato dal salvataggio dei dati generali nel DB
+     * @param user  Oggetto Customer
+     * @throws IllegalArgumentException se provo a inserire un numero di telefono già salvato nel DB
+     * @throws SQLException             se ci sono problemi col Database
+     * @see JdbcUserRepository#save(User, String, TransactionContext) JdbcUserRepository.save()
+     */
     @Override
     protected void saveSpecificData(Connection conn, Integer newId, Customer user) throws SQLException {
         String sql = "INSERT INTO customers(id, phoneNumber, addressId, active) VALUES(?, ?, ?, ?)";
@@ -22,12 +45,22 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
         } catch (SQLException e) {
             //SQLState "23000" indica errore di integrità referenziale
             if ("23000".equals(e.getSQLState())) {
-                throw new IllegalArgumentException("ERROR: Phone Number is already in use by another account");
+                throw new IllegalArgumentException("ERROR: phoneNumber is already used by another account");
             }
             throw e;
         }
     }
 
+    /**
+     * Aggiorna dati specifici di un Customer.<br>
+     * Usata assieme al metodo update().
+     *
+     * @param conn Connessione JDBC
+     * @param user Oggetto Customer
+     * @throws IllegalArgumentException se provo a inserire un numero di telefono già salvato nel DB
+     * @throws SQLException             se ci sono problemi col Database
+     * @see JdbcUserRepository#update(User, TransactionContext) JdbcUserRepository.update()
+     */
     @Override
     protected void updateSpecificData(Connection conn, Customer user) throws SQLException {
         String sqlCustomer = "UPDATE customers SET phoneNumber = ?, addressId = ?, active = ? WHERE id = ?";
@@ -41,12 +74,21 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
         } catch (SQLException e) {
             //SQLState "23000" indica errore di integrità referenziale
             if ("23000".equals(e.getSQLState())) {
-                throw new IllegalArgumentException("ERROR: Phone Number is already in use by another account");
+                throw new IllegalArgumentException("ERROR: phoneNumber is already used by another account");
             }
             throw e;
         }
     }
 
+    /**
+     * Cerca un Customer tramite ID nel Database.<br>
+     * Usa executeFindQuery per l'avvio della query.
+     *
+     * @param id      ID del Customer da cercare
+     * @param context Connessione JDBC
+     * @return oggetto Optional da dove, se Customer trovato, si può estrarre il Customer
+     * @see JdbcUserRepository#executeFindQuery(String, TransactionContext, Object...) executeFindQuery()
+     */
     @Override
     public Optional<Customer> findById(Integer id, TransactionContext context) {
         if (id == null || id <= 0) return Optional.empty();
@@ -58,6 +100,16 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
                 "WHERE u.id = ?";
         return executeFindQuery(sql, context, id).stream().findFirst();
     }
+
+    /**
+     * Cerca un Customer tramite username o email nel Database.<br>
+     * Usa executeFindQuery per l'avvio della query.
+     *
+     * @param identifier Username/email del Customer da cercare
+     * @param context    Connessione JDBC
+     * @return oggetto Optional da dove, se Customer trovato, si può estrarre il Customer
+     * @see JdbcUserRepository#executeFindQuery(String, TransactionContext, Object...) executeFindQuery()
+     */
     @Override
     public Optional<Customer> findByIdentifier(String identifier, TransactionContext context) {
         String sql = "SELECT u.id, u.name, u.surname, u.username, u.email " +
@@ -69,42 +121,15 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
         return executeFindQuery(sql, context, identifier, identifier).stream().findFirst();
     }
 
-    @Override
-    public Optional<Customer> findByUsername(String username, TransactionContext context) {
-        if (username == null || username.isBlank()) return Optional.empty();
-
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
-                "c.phoneNumber, c.addressId, c.active " +
-                "FROM users u " +
-                "INNER JOIN customers c ON u.id = c.id " +
-                "WHERE u.username = ?";
-
-        return executeFindQuery(sql, context, username).stream().findFirst();
-    }
-
-    @Override
-    public Optional<Customer> findByEmail(String email, TransactionContext context) {
-        if (email == null || email.isBlank()) return Optional.empty();
-
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
-                "c.phoneNumber, c.addressId, c.active " +
-                "FROM users u " +
-                "INNER JOIN customers c ON u.id = c.id " +
-                "WHERE u.email = ?";
-
-        return executeFindQuery(sql, context, email).stream().findFirst();
-    }
-
-    @Override
-    public List<Customer> findAll(TransactionContext context) {
-        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
-                "c.phoneNumber, c.addressId, c.active " +
-                "FROM users u " +
-                "INNER JOIN customers c ON u.id = c.id ";
-
-        return executeFindQuery(sql,context);
-    }
-
+    /**
+     * Cerca un Customer tramite numero di telefono nel Database.<br>
+     * Usa executeFindQuery per l'avvio della query.
+     *
+     * @param phoneNumber Numero di telefono da cercare
+     * @param context     Connessione JDBC
+     * @return oggetto Optional da dove, se Customer trovato, si può estrarre il Customer
+     * @see JdbcUserRepository#executeFindQuery(String, TransactionContext, Object...) executeFindQuery()
+     */
     @Override
     public Optional<Customer> findByPhoneNumber(String phoneNumber, TransactionContext context) {
         if (phoneNumber == null || phoneNumber.isBlank()) return Optional.empty();
@@ -118,6 +143,32 @@ public class JdbcCustomerRepository extends JdbcUserRepository<Customer> impleme
         return executeFindQuery(sql, context, phoneNumber).stream().findFirst();
     }
 
+    /**
+     * Estrae tutti i Customer registrati nel DB (da usare solo per scopi di debugging).<br>
+     * Usa executeFindQuery per l'avvio della query.
+     *
+     * @param context Connessione JDBC
+     * @return una lista di tutti i Customer salvati nel Database
+     * @see JdbcUserRepository#executeFindQuery(String, TransactionContext, Object...) executeFindQuery()
+     */
+    @Override
+    public List<Customer> findAll(TransactionContext context) {
+        String sql = "SELECT u.id, u.name, u.surname, u.username, u.email, " +
+                "c.phoneNumber, c.addressId, c.active " +
+                "FROM users u " +
+                "INNER JOIN customers c ON u.id = c.id ";
+
+        return executeFindQuery(sql, context);
+    }
+
+    /**
+     * Metodo che prende l'oggetto ResultSet e restituisce un oggetto Customer creato da esso.
+     *
+     * @param rs Oggetto contenente riga di una operazione SQL
+     * @return oggetto Customer creato
+     * @throws SQLException se ci sono problemi col Database
+     * @see ResultSet ResultSet
+     */
     protected Customer mapToEntity(ResultSet rs) throws SQLException {
         return new Customer(
                 rs.getInt("id"),

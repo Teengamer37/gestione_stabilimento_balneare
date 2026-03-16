@@ -25,13 +25,13 @@ import java.time.ZoneId;
 import java.util.Objects;
 
 /**
- * Implementazione dello Use Case di aggiunta report nel DB:
- * <p>Usa ReportRepository per aggiungere il nuovo Report nel DB;
- * <p>Usa UserRepository per assicurarsi che gli utenti influenzati esistano nel DB;
- * <p>Usa BookingRepository per associare un report ad un prenotazione;
- * <p>Usa BeachRepository per assicurarsi l’esistenza nel DB della spiaggia interessata;
- * <p>Usa BanRepository per verificare se l’utente in questione possa generare il report.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dello Use Case di aggiunta report nel DB:<br>
+ * Usa ReportRepository per aggiungere il nuovo Report nel DB;<br>
+ * Usa UserRepository per assicurarsi che gli utenti influenzati esistano nel DB;<br>
+ * Usa BookingRepository per associare un report ad una prenotazione;<br>
+ * Usa BeachRepository per assicurarsi l’esistenza nel DB della spiaggia interessata;<br>
+ * Usa BanRepository per verificare se l’utente in questione possa generare il report.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see CreateReportUseCase CreateReportUseCase
  * @see ReportRepository ReportRepository

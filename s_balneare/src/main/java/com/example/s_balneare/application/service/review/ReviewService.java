@@ -15,12 +15,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /**
- * Implementazione dell'interfaccia che permette la manipolazione della collezione di Review tra l'app Java e il Database.
- * <p>Usa ReviewRepository per manipolare oggetti Review nel DB;
- * <p>Usa BeachRepository per recuperare la spiaggia interessata alla recensione;
- * <p>Usa BookingRepository per recuperare la prenotazione interessata alla recensione;
- * <p>Usa BanRepository per verificare lo stato degli attori interessati.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Review tra l'app Java e il Database.<br>
+ * Usa ReviewRepository per manipolare oggetti Review nel DB;<br>
+ * Usa BeachRepository per recuperare la spiaggia interessata alla recensione;<br>
+ * Usa BookingRepository per recuperare la prenotazione interessata alla recensione;<br>
+ * Usa BanRepository per verificare lo stato degli attori interessati.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see ReviewUseCase ReviewUseCase
  * @see ReviewRepository ReviewRepository

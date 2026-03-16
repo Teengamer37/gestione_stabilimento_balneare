@@ -6,8 +6,8 @@ import com.example.s_balneare.application.service.review.ViewBeachReviewsService
 import java.util.List;
 
 /**
- * Interfaccia che racchiude tutti i metodi che un Service deve avere per mostrare i vari Reviews di una Beach.
- * <p>Implementata in:
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per mostrare i vari Reviews di una Beach.<br>
+ * Implementata in:
  *
  * @see ViewBeachReviewsService ViewBeachReviewsService
  */

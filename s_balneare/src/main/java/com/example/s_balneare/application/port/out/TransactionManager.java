@@ -1,13 +1,14 @@
 package com.example.s_balneare.application.port.out;
 
 import com.example.s_balneare.domain.common.TransactionContext;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcTransactionManager;
 
 /**
- * Interfaccia che ha il compito di semplificare l'interazione tra i Service e il DB.
- * <p>Permette di avviare una SQL Transaction senza però sapere che libreria viene usata per l'interazione (JDBC, Spring...)
- * <p>Implementata in:
+ * Interfaccia che ha il compito di semplificare l'interazione tra i Service e il DB.<br>
+ * Permette di avviare una SQL Transaction senza però sapere che libreria viene usata per l'interazione (JDBC, Spring...).<br>
+ * Implementata in:
  *
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager JdbcTransactionManager
+ * @see JdbcTransactionManager JdbcTransactionManager
  */
 public interface TransactionManager {
     //esegue un blocco di codice all'interno di una transazione e restituisce un risultato

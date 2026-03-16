@@ -18,12 +18,12 @@ import com.example.s_balneare.domain.booking.BookingStatus;
 import com.example.s_balneare.domain.booking.PriceCalculator;
 
 /**
- * Implementazione dello Use Case di aggiunta prenotazione (fatta da un Customer) nel DB:
- * <p>Interagisce con BeachRepository per trovare la spiaggia e per verificare che gli Spot appartengono alla spiaggia stessa;
- * <p>Successivamente usa AvailabilityQuery per trovare i posti occupati di quel giorno in quella spiaggia;
- * <p>Usa BanRepository per verificare lo stato degli utenti/spiagge;
- * <p>Viene alla fine usata BookingRepository per salvare la nuova prenotazione.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dello Use Case di aggiunta prenotazione (fatta da un Customer) nel DB:<br>
+ * Interagisce con BeachRepository per trovare la spiaggia e per verificare che gli Spot appartengono alla spiaggia stessa;<br>
+ * Successivamente usa AvailabilityQuery per trovare i posti occupati di quel giorno in quella spiaggia;<br>
+ * Usa BanRepository per verificare lo stato degli utenti/spiagge;<br>
+ * Viene alla fine usata BookingRepository per salvare la nuova prenotazione.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see CreateBookingUseCase CreateBookingUseCase
  * @see BeachRepository BeachRepository
@@ -125,8 +125,8 @@ public class CreateBookingService implements CreateBookingUseCase {
 
     /**
      * Metodo privato che va a fare questo calcolo:
-     * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
-     * <p>Questa operazione viene fatta per ciascuna categoria di parcheggio.
+     * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.<br>
+     * Questa operazione viene fatta per ciascuna categoria di parcheggio.
      *
      * @param capacity  Parcheggio della spiaggia
      * @param booked    Parcheggi prenotati in quella data

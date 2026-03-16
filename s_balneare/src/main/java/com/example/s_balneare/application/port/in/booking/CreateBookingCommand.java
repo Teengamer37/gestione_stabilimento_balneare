@@ -4,8 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Record che prende come parametri tutti gli attributi di Booking e BookingParking per la creazione di un Booking da parte del Customer.
- * <p>Usato in:
+ * Record che prende come parametri tutti gli attributi di Booking e BookingParking per la creazione di un Booking da parte del Customer.<br>
+ * Usato in:
  *
  * @see CreateBookingUseCase CreateBookingUseCase
  */

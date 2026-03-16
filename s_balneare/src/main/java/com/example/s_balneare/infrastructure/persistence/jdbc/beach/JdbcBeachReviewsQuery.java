@@ -3,7 +3,7 @@ package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 import com.example.s_balneare.application.port.out.beach.BeachReviewDto;
 import com.example.s_balneare.application.port.out.beach.BeachReviewsQuery;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcTransactionManager;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,11 +12,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository che gestisce tramite SQL e JDBC metodi di recupero recensioni di una determinata spiaggia.
+ *
+ * @see BeachReviewsQuery BeachReviewsQuery
+ */
 public class JdbcBeachReviewsQuery implements BeachReviewsQuery {
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext)
      * e lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     *
      * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
@@ -25,16 +31,17 @@ public class JdbcBeachReviewsQuery implements BeachReviewsQuery {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.getConnection();
+        return jdbcContext.connection();
     }
 
     /**
-     * Cerca tutte le recensioni di una determinata spiaggia
+     * Cerca tutte le recensioni di una determinata spiaggia.
+     *
      * @param beachId ID della spiaggia
      * @param context Connessione JDBC
      * @return una lista di recensioni per quella spiaggia
      * @throws IllegalArgumentException se i parametri passati non sono validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<BeachReviewDto> getReviewsByBeachId(Integer beachId, TransactionContext context) {
@@ -71,17 +78,17 @@ public class JdbcBeachReviewsQuery implements BeachReviewsQuery {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to fetch beach reviews", e);
         }
-
         return reviews;
     }
 
     /**
-     * Calcola la valutazione media di una spiaggia
+     * Calcola la valutazione media di una spiaggia.
+     *
      * @param beachId ID della spiaggia
      * @param context Connessione JDBC
      * @return valutazione media della spiaggia
      * @throws IllegalArgumentException se i parametri passati non sono validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public double getAverageRating(Integer beachId, TransactionContext context) {
@@ -108,7 +115,6 @@ public class JdbcBeachReviewsQuery implements BeachReviewsQuery {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to calculate average rating", e);
         }
-
         //nel caso le cose vadano male, ritorno 0.0
         return 0.0;
     }

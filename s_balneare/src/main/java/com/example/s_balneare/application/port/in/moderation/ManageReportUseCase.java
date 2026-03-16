@@ -6,8 +6,8 @@ import com.example.s_balneare.domain.moderation.Report;
 import java.util.List;
 
 /**
- * Interfaccia che definisce le funzioni utili per implementare lo Use Case di manipolazione Report.
- * <p>Implementata in:
+ * Interfaccia che definisce le funzioni utili per implementare lo Use Case di manipolazione Report.<br>
+ * Implementata in:
  *
  * @see ManageReportService CreateReportService
  */

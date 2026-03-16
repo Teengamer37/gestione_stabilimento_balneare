@@ -7,15 +7,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * DAO che permette la manipolazione facilitata della tabella parkings nel Database attraverso JDBC.
+ * DAO che permette la manipolazione facilitata della tabella parkings nel Database attraverso JDBC.<br>
  * Essa è in stretta collaborazione con JdbcBeachRepository.
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ *
+ * @see JdbcBeachRepository JdbcBeachRepository
  */
 class JdbcParkingDao {
     /**
-     * Update/Insert di un oggetto Parking nel DB
-     * @param beachId ID della spiaggia
-     * @param parking oggetto Parking
+     * Update/Insert di un oggetto Parking nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param parking    oggetto Parking
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -43,9 +45,10 @@ class JdbcParkingDao {
     }
 
     /**
-     * Inserimento di un oggetto Parking nel DB
-     * @param beachId ID della spiaggia
-     * @param parking oggetto Parking
+     * Inserimento di un oggetto Parking nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param parking    oggetto Parking
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -66,8 +69,9 @@ class JdbcParkingDao {
     }
 
     /**
-     * Eliminazione di un oggetto Parking dal DB
-     * @param beachId ID della spiaggia
+     * Eliminazione di un oggetto Parking dal DB.
+     *
+     * @param beachId    ID della spiaggia
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */

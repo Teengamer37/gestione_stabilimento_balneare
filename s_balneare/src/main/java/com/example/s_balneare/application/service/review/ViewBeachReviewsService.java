@@ -9,9 +9,9 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette l'interazione per il recupero di oggetti Review collegati ad una
- * determinata Beach tra l'app Java e il Database.
- * <p>Usa BeachReviewsQuery per recuperare tutte le recensioni effettuate da una spiaggia.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * determinata Beach tra l'app Java e il Database.<br>
+ * Usa BeachReviewsQuery per recuperare tutte le recensioni effettuate da una spiaggia.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see ViewBeachReviewsUseCase ViewBeachReviewsUseCase
  * @see BeachReviewsQuery BeachReviewsQuery

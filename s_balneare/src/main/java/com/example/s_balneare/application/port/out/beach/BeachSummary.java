@@ -4,8 +4,8 @@ import com.example.s_balneare.domain.beach.BeachServices;
 import com.example.s_balneare.domain.common.Address;
 
 /**
- * Record che contiene tutti i dati necessari per mostrare all'utente i dettagli di una spiaggia.
- * <p>Usata in:
+ * Record che contiene tutti i dati necessari per mostrare all'utente i dettagli di una spiaggia.<br>
+ * Usata in:
  *
  * @see BeachCatalogQuery BeachCatalogQuery
  */

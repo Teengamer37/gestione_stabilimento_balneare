@@ -3,8 +3,8 @@ package com.example.s_balneare.application.port.in.moderation;
 import com.example.s_balneare.domain.moderation.BanType;
 
 /**
- * Record che prende come parametri tutti gli attributi di Ban per la creazione di un nuovo ban.
- * <p>Usato in:
+ * Record che prende come parametri tutti gli attributi di Ban per la creazione di un nuovo ban.<br>
+ * Usato in:
  *
  * @see BanUseCase BanUseCase
  */

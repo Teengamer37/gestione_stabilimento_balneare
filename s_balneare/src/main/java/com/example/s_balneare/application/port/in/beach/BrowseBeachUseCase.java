@@ -6,8 +6,8 @@ import com.example.s_balneare.application.service.beach.BrowseBeachService;
 import java.util.List;
 
 /**
- * Interfaccia che definisce le funzioni utili per implementare lo Use Case di ricerca spiagge.
- * <p>Implementata in:
+ * Interfaccia che definisce le funzioni utili per implementare lo Use Case di ricerca spiagge.<br>
+ * Implementata in:
  *
  * @see BrowseBeachService BrowseBeachService
  */

@@ -3,8 +3,8 @@ package com.example.s_balneare.application.port.out.user;
 import com.example.s_balneare.domain.user.Role;
 
 /**
- * Record che fornisce all'applicazione dati utili per mantenere una sessione utente-applicazione
- * <p>Usata in:
+ * Record che fornisce all'applicazione dati utili per mantenere una sessione utente-applicazione.<br>
+ * Usata in:
  *
  * @see AuthenticationUseCase AuthenticationUseCase
  */

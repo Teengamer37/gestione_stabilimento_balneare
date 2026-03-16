@@ -8,9 +8,9 @@ import com.example.s_balneare.application.port.out.beach.BeachSummary;
 import java.util.List;
 
 /**
- * Servizio che implementa lo Use Case per la visualizzazione e la ricerca degli stabilimenti balneari attivi nel sistema.
- * <p>Usa BeachCatalogQuery per la ricerca delle spiagge nel DB.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Servizio che implementa lo Use Case per la visualizzazione e la ricerca degli stabilimenti balneari attivi nel sistema.<br>
+ * Usa BeachCatalogQuery per la ricerca delle spiagge nel DB.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see BrowseBeachUseCase BrowseBeachUseCase
  * @see BeachCatalogQuery BeachCatalogQuery

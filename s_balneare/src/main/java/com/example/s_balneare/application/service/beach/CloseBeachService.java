@@ -9,10 +9,10 @@ import com.example.s_balneare.domain.beach.Beach;
 import java.time.LocalDate;
 
 /**
- * Servizio che implementa lo Use Case di chiusura di una spiaggia.
- * <p>Usa BeachRepository per prelevare la spiaggia dal database e disattivarla;
- * <p>Usa BookingRepository per annullare tutte le future prenotazioni a quella spiaggia.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Servizio che implementa lo Use Case di chiusura di una spiaggia.<br>
+ * Usa BeachRepository per prelevare la spiaggia dal database e disattivarla;<br>
+ * Usa BookingRepository per annullare tutte le future prenotazioni a quella spiaggia.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see CloseBeachUseCase CloseBeachUseCase
  * @see BeachRepository BeachRepository

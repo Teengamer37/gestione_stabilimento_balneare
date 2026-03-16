@@ -3,8 +3,8 @@ package com.example.s_balneare.application.port.out.beach;
 import java.time.Instant;
 
 /**
- * Record che rappresenta una recensione da parte di un utente ad una determinata spiaggia.
- * <p>Usata in:
+ * Record che rappresenta una recensione da parte di un utente ad una determinata spiaggia.<br>
+ * Usata in:
  *
  * @see BeachReviewsQuery BeachReviewsQuery
  */

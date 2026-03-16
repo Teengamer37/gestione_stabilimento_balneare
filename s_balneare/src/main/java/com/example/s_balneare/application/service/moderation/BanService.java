@@ -18,12 +18,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /**
- * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
- * <p>Usa BanRepository per manipolare l’oggetto Ban nel database;
- * <p>Usa BookingRepository per annullare tutte le prenotazioni future di un customer/fatte su una spiaggia;
- * <p>Usa UserRepository per recuperare e aggiornare righe di utenti partecipanti al Ban;
- * <p>Usa BeachRepository per recuperare e aggiornare righe di spiagge partecipanti al Ban.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.<br>
+ * Usa BanRepository per manipolare l’oggetto Ban nel database;<br>
+ * Usa BookingRepository per annullare tutte le prenotazioni future di un customer/fatte su una spiaggia;<br>
+ * Usa UserRepository per recuperare e aggiornare righe di utenti partecipanti al Ban;<br>
+ * Usa BeachRepository per recuperare e aggiornare righe di spiagge partecipanti al Ban.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see BanUseCase BanUseCase
  * @see BanRepository BanRepository

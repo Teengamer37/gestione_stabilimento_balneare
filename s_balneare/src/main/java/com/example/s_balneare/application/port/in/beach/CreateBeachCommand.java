@@ -6,8 +6,8 @@ import com.example.s_balneare.domain.layout.Zone;
 import java.util.List;
 
 /**
- * Record che prende come parametri tutti gli attributi di Beach e Address.
- * <p>Usato in:
+ * Record che prende come parametri tutti gli attributi di Beach e Address.<br>
+ * Usato in:
  *
  * @see CreateBeachUseCase CreateBeachUseCase
  */

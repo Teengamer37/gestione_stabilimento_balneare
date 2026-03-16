@@ -1,8 +1,8 @@
 package com.example.s_balneare.application.port.out.booking;
 
 /**
- * Record che rappresenta il numero di parcheggi prenotati in un giorno specifico ad una specifica spiaggia.
- * <p>Usata in:
+ * Record che rappresenta il numero di parcheggi prenotati in un giorno specifico ad una specifica spiaggia.<br>
+ * Usata in:
  *
  * @see AvailabilityQuery AvailabilityQuery
  */

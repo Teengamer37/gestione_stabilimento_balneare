@@ -9,10 +9,10 @@ import com.example.s_balneare.domain.user.Owner;
 import com.example.s_balneare.domain.user.User;
 
 /**
- * Implementazione astratta dell'interfaccia che permette la manipolazione dell'utente facendo collaborare l'app Java e il Database.
- * <p>Usa UserRepository per il recupero e la modifica dei dati dell’utente;
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
- * <p>Estesa nelle classi: ManageCustomerService, ManageOwnerService, ManageAdminService.
+ * Implementazione astratta dell'interfaccia che permette la manipolazione dell'utente facendo collaborare l'app Java e il Database.<br>
+ * Usa UserRepository per il recupero e la modifica dei dati dell’utente;<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.<br>
+ * Estesa nelle classi: ManageCustomerService, ManageOwnerService, ManageAdminService.
  *
  * @see UserRepository UserRepositry
  * @see TransactionManager TransactionManager per le transazioni SQL
@@ -42,8 +42,8 @@ public class ManageUserService<T extends User> {
     }
 
     /**
-     * Aggiorna la password di un utente.
-     * <p>Disattiva il flag OTP se primo accesso all’account.
+     * Aggiorna la password di un utente.<br>
+     * Disattiva il flag OTP se primo accesso all’account.
      *
      * @param id ID dell‘utente
      * @param oldPassword Vecchia password (per convalida)
@@ -80,8 +80,8 @@ public class ManageUserService<T extends User> {
     }
 
     /**
-     * Aggiorna i dati di un utente (nome, cognome, username).
-     * <p>DA NON USARE CON CUSTOMER!
+     * Aggiorna i dati di un utente (nome, cognome, username).<br>
+     * DA NON USARE CON CUSTOMER!
      *
      * @param id       ID dell‘utente da aggiornare
      * @param name     Nuovo nome

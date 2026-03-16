@@ -1,23 +1,29 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.booking;
 
+import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
-import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcTransactionManager;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
+/**
+ * Repository che gestisce tramite SQL e JDBC metodi per estrarre dati su parcheggi/oggetti extra prenotati in una spiaggia
+ * in un giorno specifico dal Database.
+ *
+ * @see AvailabilityQuery AvailabilityQuery
+ */
 public class JdbcAvailabilityQuery implements AvailabilityQuery {
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext) e
-     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     *
      * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
@@ -26,22 +32,25 @@ public class JdbcAvailabilityQuery implements AvailabilityQuery {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.getConnection();
+        return jdbcContext.connection();
     }
 
     /**
-     * Estrae il numero di parcheggi prenotati in un giorno specifico ad una determinata spiaggia
+     * Estrae il numero di parcheggi prenotati in un giorno specifico ad una determinata spiaggia.
+     *
      * @param beachId ID della spiaggia
-     * @param date Data da cercare
+     * @param date    Data da cercare
      * @param context Connessione JDBC
      * @return Il record di numeri di parcheggi occupati in quella data
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public BookedParkingSpaces getBookedParking(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context) {
-        if (beachId == null || date == null) throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
-        if (excludeBookingId != null && excludeBookingId <= 0) throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
+        if (beachId == null || date == null)
+            throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
+        if (excludeBookingId != null && excludeBookingId <= 0)
+            throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
 
         //estraggo la connessione JDBC
         Connection connection = getConnection(context);
@@ -76,23 +85,25 @@ public class JdbcAvailabilityQuery implements AvailabilityQuery {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to check parking availability", e);
         }
-
-        //paracadute di sicurezza se non trova nulla
+        //paracadute di sicurezza se non trovo nulla
         return new BookedParkingSpaces(0, 0, 0, 0);
     }
 
     /**
-     * Estrae il numero di oggetti extra prenotati in un giorno specifico ad una determinata spiaggia
+     * Estrae il numero di oggetti extra prenotati in un giorno specifico ad una determinata spiaggia.
+     *
      * @param beachId ID della spiaggia
-     * @param date Data da cercare
+     * @param date    Data da cercare
      * @param context Connessione JDBC
      * @return Il record di numeri di oggetti extra occupati in quella data
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     public BookedInventory getBookedInventory(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context) {
-        if (beachId == null || date == null) throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
-        if (excludeBookingId != null && excludeBookingId <= 0) throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
+        if (beachId == null || date == null)
+            throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
+        if (excludeBookingId != null && excludeBookingId <= 0)
+            throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
 
         //estraggo la connessione JDBC
         Connection connection = getConnection(context);
@@ -127,8 +138,7 @@ public class JdbcAvailabilityQuery implements AvailabilityQuery {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to check extra items availability", e);
         }
-
-        //paracadute di sicurezza se non trova nulla
+        //paracadute di sicurezza se non trovo nulla
         return new BookedInventory(0, 0, 0, 0);
     }
 }

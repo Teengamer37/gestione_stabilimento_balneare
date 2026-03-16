@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach.
- * <p>Implementata in:
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Beach.<br>
+ * Implementata in:
  *
  * @see ManageBeachService ManageBeachService
  */

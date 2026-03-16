@@ -39,8 +39,8 @@ public record BeachGeneral(String name, String description, String phoneNumber) 
     }
 
     /**
-     * L'unica validazione che restituisce il valore indietro.
-     * <p>Se l'utente inserisce "+39 363 363 3633", il metodo ritorna "+393633633633" (no spazi).
+     * L'unica validazione che restituisce il valore indietro.<br>
+     * Se l'utente inserisce "+39 363 363 3633", il metodo ritorna "+393633633633" (no spazi).
      *
      * @param phoneNumber numero di telefono da verificare
      * @return numero di telefono ben formattato

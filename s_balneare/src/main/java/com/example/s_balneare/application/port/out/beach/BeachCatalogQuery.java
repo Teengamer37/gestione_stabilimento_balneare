@@ -8,8 +8,8 @@ import java.util.List;
 
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database per estrarre
- * determinate spiagge secondo un parametro di ricerca.
- * <p>Implementata in:
+ * determinate spiagge secondo un parametro di ricerca.<br>
+ * Implementata in:
  *
  * @see JdbcBeachCatalogQuery JdbcBeachCatalogQuery
  * @see TransactionManager TransactionManager per le transazioni SQL

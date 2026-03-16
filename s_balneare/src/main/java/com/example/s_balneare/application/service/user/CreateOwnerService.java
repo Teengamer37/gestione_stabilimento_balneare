@@ -7,8 +7,8 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Owner;
 
 /**
- * Implementazione dell'interfaccia che permette la creazione dell‘Owner facendo collaborare l'app Java e il Database.
- * <p>Estende la classe CreateUserService.
+ * Implementazione dell'interfaccia che permette la creazione dell‘Owner facendo collaborare l'app Java e il Database.<br>
+ * Estende la classe CreateUserService.
  *
  * @see CreateUserService CreateUserService
  * @see CreateOwnerRequest CreateOwnerRequest

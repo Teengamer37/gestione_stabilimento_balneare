@@ -6,17 +6,21 @@ import com.example.s_balneare.domain.layout.Spot;
 import com.example.s_balneare.domain.layout.SpotType;
 import com.example.s_balneare.domain.layout.Zone;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * DAO che permette la manipolazione facilitata della tabella spots nel Database attraverso JDBC.
+ * DAO che permette la manipolazione facilitata della tabella spots nel Database attraverso JDBC.<br>
  * Essa è in stretta collaborazione con JdbcBeachRepository e JdbcZoneDao.
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao JdbcZoneDao
+ *
+ * @see JdbcBeachRepository JdbcBeachRepository
+ * @see JdbcZoneDao JdbcZoneDao
  */
 class JdbcSpotDao {
     private final JdbcZoneDao zoneDao;
@@ -26,17 +30,19 @@ class JdbcSpotDao {
     }
 
     /**
-     * Sincronizzo tutto il grafo di una lista di spot:
-     * creazione zone -> spots
-     * @param beachId ID della spiaggia
-     * @param zones Lista di zone da sincronizzare
+     * Sincronizzo tutto il grafo di una lista di spot:<br>
+     * creazione zone -> spots.
+     *
+     * @param beachId    ID della spiaggia
+     * @param zones      Lista di zone da sincronizzare
      * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     void syncZones(Integer beachId, List<Zone> zones, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
-        if (zones == null || zones.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set");
+        if (zones == null || zones.isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one zone must be set");
 
         //passo 1: eliminazione zone non incluse nella lista passata, ma presenti nel Database
         //trovo i nomi delle Zone salvate nel DB
@@ -71,11 +77,12 @@ class JdbcSpotDao {
     }
 
     /**
-     * Sincronizzo (aggiungo/aggiorno) una singola Zone
-     * @param beachId ID della spiaggia
-     * @param zone Zona da sincronizzare
+     * Sincronizzo (aggiungo/aggiorno) una singola Zone.
+     *
+     * @param beachId    ID della spiaggia
+     * @param zone       Zona da sincronizzare
      * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     void syncZone(Integer beachId, Zone zone, Connection connection) throws SQLException {
@@ -90,11 +97,12 @@ class JdbcSpotDao {
     }
 
     /**
-     * Elimina il layout fisico di tutte le Zone connesse ad una Beach.
-     * Le Zone verranno eliminate più tardi con JdbcZoneDao.deleteOrphanedZones()
-     * @param beachId ID della spiaggia
+     * Elimina il layout fisico di tutte le Zone connesse ad una Beach.<br>
+     * Le Zone verranno eliminate più tardi con JdbcZoneDao.deleteOrphanedZones().
+     *
+     * @param beachId    ID della spiaggia
      * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao#deleteOrphanedZones(Integer, Connection) JdbcZoneDao.deleteOrphanedZones()
      * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository#update(Beach, TransactionContext) JdbcBeachRepository.update()
@@ -113,9 +121,10 @@ class JdbcSpotDao {
     }
 
     /**
-     * Trova tutte le Zone di una Beach
+     * Trova tutte le Zone di una Beach.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @return Lista di Zone trovate di quella spiaggia
      * @throws SQLException se ci sono problemi col Database
      */
@@ -149,7 +158,10 @@ class JdbcSpotDao {
                     );
 
                     //aggiungo lo Spot alla Map
-                    zoneMap.computeIfPresent(zoneName, (k, list) -> { list.add(spot); return list; });
+                    zoneMap.computeIfPresent(zoneName, (k, list) -> {
+                        list.add(spot);
+                        return list;
+                    });
                 }
             }
         }
@@ -163,10 +175,11 @@ class JdbcSpotDao {
     }
 
     /**
-     * Controlla che tutti gli Spot appartengano a quella spiaggia
+     * Controlla che tutti gli Spot appartengano a quella spiaggia.
+     *
      * @param beachId ID della spiaggia
      * @param spotIds Lista di ID degli Spot da controllare
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @return se appartengono tutti alla spiaggia o meno (boolean)
      * @throws SQLException se ci sono problemi col Database
      */
@@ -198,17 +211,20 @@ class JdbcSpotDao {
 
 
     //HELPERS
+
     /**
-     * Inserisce vari Spot per una determinata Zone
-     * @param beachId ID della spiaggia
+     * Inserisce vari Spot per una determinata Zone.
+     *
+     * @param beachId  ID della spiaggia
      * @param zoneName Nome della zona
-     * @param spots Lista di Spot da inserire
-     * @param conn Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @param spots    Lista di Spot da inserire
+     * @param conn     Connessione JDBC
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     private void upsertSpotsForZone(Integer beachId, String zoneName, List<Spot> spots, Connection conn) throws SQLException {
-        if (spots == null || spots.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be set for zone");
+        if (spots == null || spots.isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one spot must be set for zone");
 
         //inserisco Spot
         //se la combinazione (row, column, zoneName, beachId) esiste, aggiorno solo il tipo
@@ -236,11 +252,12 @@ class JdbcSpotDao {
     }
 
     /**
-     * Cancella tutti gli Spot di una specifica Zone
-     * @param beachId ID della spiaggia
+     * Cancella tutti gli Spot di una specifica Zone.
+     *
+     * @param beachId  ID della spiaggia
      * @param zoneName Nome della zona
-     * @param conn Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @param conn     Connessione JDBC
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     private void deleteSpotsForZone(Integer beachId, String zoneName, Connection conn) throws SQLException {
@@ -253,11 +270,12 @@ class JdbcSpotDao {
     }
 
     /**
-     * Cancella i singoli Spot che non esistono più nell'oggetto Java (quelli non associati a nessuna Zone)
-     * @param beachId ID della spiaggia
-     * @param zoneName Nome della zona
+     * Cancella i singoli Spot che non esistono più nell'oggetto Java (quelli non associati a nessuna Zone).
+     *
+     * @param beachId   ID della spiaggia
+     * @param zoneName  Nome della zona
      * @param javaSpots Lista di Spot da controllare
-     * @param conn Connessione JDBC
+     * @param conn      Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     private void deleteMissingSpots(Integer beachId, String zoneName, List<Spot> javaSpots, Connection conn) throws SQLException {
@@ -265,7 +283,7 @@ class JdbcSpotDao {
 
         //costruisco una lista delle coordinate (row_col) presenti in javaSpots
         List<String> javaCoordinates = new ArrayList<>();
-        for(Spot s : javaSpots) javaCoordinates.add(s.row() + "_" + s.column());
+        for (Spot s : javaSpots) javaCoordinates.add(s.row() + "_" + s.column());
 
         String selectSql = "SELECT id, `row`, `column` FROM spots WHERE beachId = ? AND zoneName = ?";
         String deleteSql = "DELETE FROM spots WHERE id = ?";

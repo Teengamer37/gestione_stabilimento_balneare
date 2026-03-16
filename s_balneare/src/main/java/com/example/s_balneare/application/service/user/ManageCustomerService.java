@@ -11,10 +11,10 @@ import com.example.s_balneare.domain.user.Customer;
 import java.time.LocalDate;
 
 /**
- * Implementazione dell'interfaccia che permette la manipolazione del Customer facendo collaborare l'app Java e il Database.
- * <p>Usa AddressRepository per manipolare l’indirizzo;
- * <p>Usa BookingRepository per cancellare tutte le prenotazioni dell’utente in caso di chiusura account.
- * <p>Estende ManageUserService.
+ * Implementazione dell'interfaccia che permette la manipolazione del Customer facendo collaborare l'app Java e il Database.<br>
+ * Usa AddressRepository per manipolare l’indirizzo;<br>
+ * Usa BookingRepository per cancellare tutte le prenotazioni dell’utente in caso di chiusura account.<br>
+ * Estende ManageUserService.
  *
  * @see AddressRepository AddressRepository
  * @see BookingRepository BookingRepository
@@ -93,8 +93,8 @@ public class ManageCustomerService extends ManageUserService<Customer> {
     }
 
     /**
-     * Chiude l'account di un Customer:
-     * <p>Verifica la password, annulla tutte le prenotazioni future, disattiva l'account
+     * Chiude l'account di un Customer:<br>
+     * Verifica la password, annulla tutte le prenotazioni future, disattiva l'account
      *
      * @param customerId      ID del Customer da chiudere
      * @param currentPassword Password attuale dell'account del Customer

@@ -9,9 +9,9 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Customer;
 
 /**
- * Implementazione dell'interfaccia che permette la creazione del Customer facendo collaborare l'app Java e il Database.
- * <p>Estende la classe CreateUserService.
- * <p>Usa AddressRepository per il salvataggio dell'indirizzo nel DB.
+ * Implementazione dell'interfaccia che permette la creazione del Customer facendo collaborare l'app Java e il Database.<br>
+ * Estende la classe CreateUserService.<br>
+ * Usa AddressRepository per il salvataggio dell'indirizzo nel DB.
  *
  * @see CreateUserService CreateUserService
  * @see CreateCustomerRequest CreateCustomerRequest

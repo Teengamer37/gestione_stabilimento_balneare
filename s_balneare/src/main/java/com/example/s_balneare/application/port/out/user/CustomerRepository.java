@@ -6,8 +6,8 @@ import com.example.s_balneare.domain.user.Customer;
 import java.util.Optional;
 
 /**
- * Interfaccia che gestisce la manipolazione di Customer tra l'app e il Database.
- * <p>Estende:
+ * Interfaccia che gestisce la manipolazione di Customer tra l'app e il Database.<br>
+ * Estende:
  *
  * @see UserRepository UserRepository
  */

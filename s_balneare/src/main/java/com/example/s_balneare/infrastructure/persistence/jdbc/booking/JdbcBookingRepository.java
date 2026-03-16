@@ -1,5 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.booking;
 
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
@@ -7,7 +8,7 @@ import com.example.s_balneare.domain.booking.Booking;
 import com.example.s_balneare.domain.booking.BookingParking;
 import com.example.s_balneare.domain.booking.BookingStatus;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcTransactionManager;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -16,14 +17,16 @@ import java.util.*;
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Booking tramite
  * libreria JDBC.
+ *
  * @see BookingRepository BookingRepository
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcBookingRepository implements BookingRepository {
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext) e
-     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     *
      * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
@@ -32,16 +35,17 @@ public class JdbcBookingRepository implements BookingRepository {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.getConnection();
+        return jdbcContext.connection();
     }
 
     /**
-     * Salva nuovo booking nel DB
+     * Salva nuovo booking nel DB.
+     *
      * @param booking Oggetto Booking da salvare
      * @param context Connessione JDBC
      * @return ID generato dal Database
      * @throws RuntimeException se ci sono problemi di connessione col Database
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException     se ci sono problemi col Database
      */
     @Override
     public Integer save(Booking booking, TransactionContext context) {
@@ -108,11 +112,12 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Cancella booking dal DB
-     * @param id ID del booking da cancellare
+     * Cancella booking dal DB.
+     *
+     * @param id      ID del booking da cancellare
      * @param context Connessione JDBC
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void delete(Integer id, TransactionContext context) {
@@ -139,11 +144,12 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Aggiornamento booking nel DB
+     * Aggiornamento booking nel DB.
+     *
      * @param booking oggetto Booking da aggiornare nel DB
      * @param context Connessione JDBC
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void update(Booking booking, TransactionContext context) {
@@ -151,7 +157,8 @@ public class JdbcBookingRepository implements BookingRepository {
         Connection connection = getConnection(context);
 
         //check validità ID
-        if (booking.getId() == null || booking.getId() <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
+        if (booking.getId() == null || booking.getId() <= 0)
+            throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
         //passo 1: aggiorno tabella bookings
         String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, " +
@@ -201,12 +208,13 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Trova booking dal DB da ID
-     * @param id ID del Booking da cercare nel DB
+     * Trova booking dal DB da ID.
+     *
+     * @param id      ID del Booking da cercare nel DB
      * @param context Connessione JDBC
      * @return oggetto Optional dal quale, se trovato lil booking, può essere estratto l'oggetto Booking; altri metodi altrimenti
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public Optional<Booking> findById(Integer id, TransactionContext context) {
@@ -218,8 +226,8 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //query
         String sql = "SELECT b.*, bs.spotId FROM bookings b " +
-                     "LEFT JOIN booking_spots bs ON b.id = bs.bookingId " +
-                     "WHERE b.id = ?";
+                "LEFT JOIN booking_spots bs ON b.id = bs.bookingId " +
+                "WHERE b.id = ?";
 
         //inserisco ID ed eseguo
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -287,15 +295,16 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Trova spot occupati per una data specifica
-     * Con excludeBookingId, vado a levare i posti tecnicamente occupati del Booking che sto modificando
-     * @param beachId ID della spiaggia
-     * @param date Data da cercare
+     * Trova spot occupati per una data specifica.<br>
+     * Con excludeBookingId, vado a levare i posti tecnicamente occupati del Booking che sto modificando.
+     *
+     * @param beachId          ID della spiaggia
+     * @param date             Data da cercare
      * @param excludeBookingId ID del Booking da escludere dalla ricerca
-     * @param context Connessione JDBC
-     * @return Una lista di ID di Spots occupati di quella spiaggia in quel giorno
+     * @param context          Connessione JDBC
+     * @return una lista di ID di Spots occupati di quella spiaggia in quel giorno
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<Integer> findOccupiedSpots(Integer beachId, LocalDate date, Integer excludeBookingId, TransactionContext context) {
@@ -303,17 +312,18 @@ public class JdbcBookingRepository implements BookingRepository {
         Connection connection = getConnection(context);
 
         //check validità parametri
-        if (beachId == null || beachId <= 0 || date == null) throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
-        if (excludeBookingId != null && excludeBookingId <= 0) throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
+        if (beachId == null || beachId <= 0 || date == null)
+            throw new IllegalArgumentException("ERROR: the parameter(s) is/are not valid");
+        if (excludeBookingId != null && excludeBookingId <= 0)
+            throw new IllegalArgumentException("ERROR: the excludeBookingId parameter is not valid");
 
         //query
         String sql = "SELECT bs.spotId FROM bookings b " +
-                     "JOIN booking_spots bs ON b.id = bs.bookingId " +
-                     "WHERE b.beachId = ? AND b.date = ? " +
-                     "AND b.status != 'CANCELLED' AND b.status != 'REJECTED' " +
-                     "AND b.id != ?";
+                "JOIN booking_spots bs ON b.id = bs.bookingId " +
+                "WHERE b.beachId = ? AND b.date = ? " +
+                "AND b.status != 'CANCELLED' AND b.status != 'REJECTED' " +
+                "AND b.id != ?";
         List<Integer> occupiedSpots = new ArrayList<>();
-
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, beachId);
@@ -334,10 +344,13 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Trova tutte le prenotazioni fatte da un customer online
+     * Trova tutte le prenotazioni fatte da un customer online.
+     *
      * @param customerId ID del customer da cercare
-     * @param context Connessione JDBC
-     * @return La lista di tutti i Booking fatti dal customer in questione
+     * @param context    Connessione JDBC
+     * @return lista di tutti i Booking fatti dal customer in questione
+     * @throws IllegalArgumentException se il customer non è valido
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<Booking> findByCustomerId(Integer customerId, TransactionContext context) {
@@ -404,10 +417,13 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Trova tutte le prenotazioni fatte per una determinata spiaggia
+     * Trova tutte le prenotazioni fatte per una determinata spiaggia.
+     *
      * @param beachId ID della spiaggia da cercare
      * @param context Connessione JDBC
-     * @return lista di Bookings fatti in quella spiaggia
+     * @return lista di Bookings fatte in quella spiaggia
+     * @throws IllegalArgumentException se il beachId non è valido
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<Booking> findByBeachId(Integer beachId, TransactionContext context) {
@@ -473,12 +489,15 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Controlla se l'utente in questione ha avuto prenotazioni passate in stato CONFIRMED ad una determinata Beach
-     * @param customerId ID del customer
-     * @param beachId ID della spiaggia
+     * Controlla se l'utente in questione ha avuto prenotazioni passate in stato CONFIRMED ad una determinata Beach.
+     *
+     * @param customerId    ID del customer
+     * @param beachId       ID della spiaggia
      * @param referenceDate Data di riferimento
-     * @param context Connessione JDBC
+     * @param context       Connessione JDBC
      * @return TRUE se ci sono Booking passati con stato CONFIRMED a quella spiaggia; FALSE altrimenti
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public boolean hasPastConfirmedBooking(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context) {
@@ -505,13 +524,15 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Cerca se ci sono prenotazioni registrate per una stagione
-     * @param beachId ID della spiaggia
+     * Cerca se ci sono prenotazioni registrate per una stagione.
+     *
+     * @param beachId     ID della spiaggia
      * @param seasonStart Data di inizio stagione
-     * @param seasonEnd Data di fine stagione
-     * @param context Connessione JDBC
+     * @param seasonEnd   Data di fine stagione
+     * @param context     Connessione JDBC
      * @return TRUE se ci sono prenotazioni registrate per quella stagione, FALSE altrimenti
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public boolean hasBookingsForSeason(Integer beachId, LocalDate seasonStart, LocalDate seasonEnd, TransactionContext context) {
@@ -520,8 +541,10 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //check validità parametri
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
-        if (seasonStart == null || seasonEnd == null) throw new IllegalArgumentException("ERROR: invalid seasonStart and/or seasonEnd");
-        if (seasonStart.isAfter(seasonEnd)) throw new IllegalArgumentException("ERROR: seasonStart must be < seasonEnd");
+        if (seasonStart == null || seasonEnd == null)
+            throw new IllegalArgumentException("ERROR: invalid seasonStart and/or seasonEnd");
+        if (seasonStart.isAfter(seasonEnd))
+            throw new IllegalArgumentException("ERROR: seasonStart must be < seasonEnd");
 
         //SELECT 1 prende il primo booking trovato per quella stagione
         String sql = "SELECT 1 FROM bookings WHERE beachId = ? AND date >= ? AND date <= ?";
@@ -538,12 +561,13 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Cancella tutte le prenotazioni future di un utente (usato in caso di chiusura/ban account)
-     * @param customerId ID del customer
+     * Cancella tutte le prenotazioni future di un utente (usato in caso di chiusura/ban account).
+     *
+     * @param customerId    ID del customer
      * @param referenceDate Data di riferimento (data di chiusura/ban account di solito)
-     * @param context Connessione JDBC
+     * @param context       Connessione JDBC
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void cancelFutureBookingsForCustomer(Integer customerId, LocalDate referenceDate, TransactionContext context) {
@@ -567,12 +591,13 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Cancella tutte le prenotazioni future di una spiaggia (usato in caso di chiusura/ban spiaggia)
-     * @param beachId ID della spiaggia
+     * Cancella tutte le prenotazioni future di una spiaggia (usato in caso di chiusura/ban spiaggia).
+     *
+     * @param beachId       ID della spiaggia
      * @param referenceDate Data di riferimento (data di chiusura/ban spiaggia di solito)
-     * @param context Connessione JDBC
+     * @param context       Connessione JDBC
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void cancelFutureBookingsForBeach(Integer beachId, LocalDate referenceDate, TransactionContext context) {
@@ -594,6 +619,17 @@ public class JdbcBookingRepository implements BookingRepository {
         }
     }
 
+    /**
+     * Cancella tutte le prenotazioni future di un utente da una determinata spiaggia (usato nel caso in cui l'utente
+     * viene bannato dalla spiaggia stessa).
+     *
+     * @param customerId    ID del customer
+     * @param beachId       ID della spiaggia
+     * @param referenceDate Data di riferimento (data odierna se ban istantaneo)
+     * @param context       Connessione JDBC
+     * @throws IllegalArgumentException se ci sono parametri non validi
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
+     */
     @Override
     public void cancelFutureUserBookingsFromBeach(Integer customerId, Integer beachId, LocalDate referenceDate, TransactionContext context) {
         Connection connection = getConnection(context);
@@ -617,10 +653,11 @@ public class JdbcBookingRepository implements BookingRepository {
     }
 
     /**
-     * Trova il numero massimo di prenotazioni di posti auto per giorno
-     * @param beachId ID della spiaggia
+     * Trova il numero massimo di prenotazioni di posti auto per giorno.
+     *
+     * @param beachId       ID della spiaggia
      * @param referenceDate Data di riferimento
-     * @param context Connessione JDBC
+     * @param context       Connessione JDBC
      * @return un record del più grande numero di parcheggi prenotati di un giorno futuro a referenceDate
      */
     @Override
@@ -663,16 +700,16 @@ public class JdbcBookingRepository implements BookingRepository {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to check max future parkings", e);
         }
-
         //in caso di nessun posto prenotato, passo un record di default
         return new BookedParkingSpaces(0, 0, 0, 0);
     }
 
     /**
-     * Trova il numero massimo di prenotazioni di oggetti extra per giorno
-     * @param beachId ID della spiaggia
+     * Trova il numero massimo di prenotazioni di oggetti extra per giorno.
+     *
+     * @param beachId       ID della spiaggia
      * @param referenceDate Data di riferimento
-     * @param context Connessione JDBC
+     * @param context       Connessione JDBC
      * @return un record del più grande numero di oggetti extra prenotati di un giorno futuro a referenceDate
      */
     @Override
@@ -715,7 +752,6 @@ public class JdbcBookingRepository implements BookingRepository {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to check max future inventory", e);
         }
-
         //in caso di nessun extra prenotato, passo un record di default
         return new BookedInventory(0, 0, 0, 0);
     }

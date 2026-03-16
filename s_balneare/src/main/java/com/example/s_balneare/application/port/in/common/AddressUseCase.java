@@ -6,8 +6,8 @@ import com.example.s_balneare.domain.common.Address;
 import java.util.List;
 
 /**
- * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Address.
- * <p>Implementata in:
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Address.<br>
+ * Implementata in:
  *
  * @see AddressService AddressService
  */

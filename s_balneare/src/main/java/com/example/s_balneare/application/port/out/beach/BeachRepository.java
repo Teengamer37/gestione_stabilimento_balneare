@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Beach.
- * <p>Implementata in JdbcBeachRepository
+ * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Beach.<br>
+ * Implementata in JdbcBeachRepository.
  *
  * @see JdbcBeachRepository JdbcBeachRepository
  * @see TransactionManager TransactionManager per le transazioni SQL

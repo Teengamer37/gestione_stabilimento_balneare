@@ -9,10 +9,10 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.User;
 
 /**
- * Implementazione astratta dell'interfaccia che permette la creazione dell'utente facendo collaborare l'app Java e il Database.
- * <p>Usa UserRepository per il salvataggio dell'utente nel DB.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
- * <p>Estesa nelle classi: CreateCustomerService, CreateOwnerService, CreateAdminService.
+ * Implementazione astratta dell'interfaccia che permette la creazione dell'utente facendo collaborare l'app Java e il Database.<br>
+ * Usa UserRepository per il salvataggio dell'utente nel DB.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.<br>
+ * Estesa nelle classi: CreateCustomerService, CreateOwnerService, CreateAdminService.
  *
  * @see CreateUserRequest CreateUserRequest
  * @see UserRepository UserRepository
@@ -38,9 +38,9 @@ public abstract class CreateUserService<T extends User, R extends CreateUserRequ
     protected abstract T registerUser(R request, TransactionContext context);
 
     /**
-     * Metodo che racchiude passi comuni per la creazione di qualsiasi utente.
-     * <p>Usa BCrypt per la crittografia della password.
-     * <p>Utilizzare questo metodo per la creazione di qualsiasi utente!
+     * Metodo che racchiude passi comuni per la creazione di qualsiasi utente.<br>
+     * Usa BCrypt per la crittografia della password.<br>
+     * Utilizzare questo metodo per la creazione di qualsiasi utente!
      *
      * @param request Oggetto che contiene tutti i dati necessari per la creazione di un utente
      * @param rawPassword Password inserita dall'utente

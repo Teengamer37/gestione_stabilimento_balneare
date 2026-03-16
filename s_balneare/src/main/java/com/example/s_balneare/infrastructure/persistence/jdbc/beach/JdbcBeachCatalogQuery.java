@@ -1,14 +1,12 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
-import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachCatalogQuery;
 import com.example.s_balneare.application.port.out.beach.BeachSummary;
 import com.example.s_balneare.domain.beach.BeachServices;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcTransactionManager;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,11 +14,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository che gestisce tramite SQL e JDBC metodi per estrarre determinate collezioni di Beach dal Database.
+ *
+ * @see BeachCatalogQuery BeachCatalogQuery
+ */
 public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext)
      * e lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     *
      * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
@@ -29,9 +33,17 @@ public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.getConnection();
+        return jdbcContext.connection();
     }
 
+    /**
+     * Cerca le spiagge salvate nel DB con stato active = TRUE e con nome città o paese uguale al parametro passato.
+     *
+     * @param keyword Città/Paese da filtrare
+     * @param context Connessione JDBC
+     * @return lista di spiagge che rispettano i parametri di ricerca
+     * @see BeachSummary BeachSummary
+     */
     @Override
     public List<BeachSummary> searchActiveBeaches(String keyword, TransactionContext context) {
         //estraggo la connessione JDBC
@@ -51,11 +63,26 @@ public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
 
     // METODI PRIVATI
 
+    /**
+     * Cerca tutte le spiagge in stato active = TRUE (chiamato da searchActiveBeaches se keyword = null).
+     *
+     * @param connection Connessione JDBC
+     * @return lista di spiagge attive
+     * @see BeachSummary BeachSummary
+     * @see #searchActiveBeaches(String, TransactionContext) searchActiveBeaches()
+     */
     private List<BeachSummary> findAllActiveBeaches(Connection connection) {
         String sql = buildBaseQuery() + " WHERE b.active = TRUE";
         return executeQuery(sql, null, connection);
     }
 
+    /**
+     * Query di base usata da tutti i metodi di questa classe.
+     *
+     * @return query di base facilmente ampliabile con parametri di ricerca
+     * @see #searchActiveBeaches(String, TransactionContext) searchActiveBeaches()
+     * @see #findAllActiveBeaches(Connection) findAllActiveBeaches()
+     */
     private String buildBaseQuery() {
         return "SELECT b.id AS beach_id, b.name, b.phoneNumber, " +
                 "a.id AS address_id, a.street, a.streetNumber, a.city, a.zipCode, a.country, " +
@@ -65,11 +92,23 @@ public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
                 "LEFT JOIN beach_services bs ON b.id = bs.beachId";
     }
 
+    /**
+     * Metodo privato che va a eseguire la query creata dalle funzioni di questa classe.
+     *
+     * @param sql        Query SQL
+     * @param param      Parametro da mettere nella ricerca (searchActiveBeaches())
+     * @param connection Connessione JDBC
+     * @return lista di spiagge che rispettano i parametri di ricerca
+     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @see #searchActiveBeaches(String, TransactionContext) searchActiveBeaches()
+     * @see #findAllActiveBeaches(Connection) findAllActiveBeaches()
+     */
     private List<BeachSummary> executeQuery(String sql, String param, Connection connection) {
         List<BeachSummary> results = new ArrayList<>();
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
+            //se ho parametri di ricerca, sostituisco gli eventuali '?' nella query
             if (param != null) {
                 ps.setString(1, param);
                 ps.setString(2, param);
@@ -77,6 +116,7 @@ public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
+                    //recupero BeachServices
                     BeachServices services = new BeachServices(
                             rs.getBoolean("bathrooms"),
                             rs.getBoolean("showers"),
@@ -87,6 +127,7 @@ public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
                             rs.getBoolean("volleyballField")
                     );
 
+                    //recupero tutti i dettagli necessari lato utente
                     results.add(new BeachSummary(
                             rs.getInt("beach_id"),
                             new Address(
@@ -108,7 +149,6 @@ public class JdbcBeachCatalogQuery implements BeachCatalogQuery {
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: Unable to query beach catalog", e);
         }
-
         return results;
     }
 }

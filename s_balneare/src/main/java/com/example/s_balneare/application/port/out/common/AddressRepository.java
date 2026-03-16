@@ -3,14 +3,14 @@ package com.example.s_balneare.application.port.out.common;
 import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcAddressRepository;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcAddressRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare oggetti di tipo Address.
- * <p>Implementata in:
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare oggetti di tipo Address.<br>
+ * Implementata in:
  *
  * @see JdbcAddressRepository JdbcAddressRepository
  * @see TransactionManager TransactionManager per le transazioni SQL

@@ -9,9 +9,9 @@ import com.example.s_balneare.domain.moderation.ReportStatus;
 import java.util.List;
 
 /**
- * Implementazione dell'interfaccia che permette la navigazione dell'Admin sui Report.
- * <p>Usa ReportRepository per aggiornare i report verificati dall’Admin.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dell'interfaccia che permette la navigazione dell'Admin sui Report.<br>
+ * Usa ReportRepository per aggiornare i report verificati dall’Admin.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see ManageReportUseCase ManageReportUseCase
  * @see ReportRepository ReportRepository

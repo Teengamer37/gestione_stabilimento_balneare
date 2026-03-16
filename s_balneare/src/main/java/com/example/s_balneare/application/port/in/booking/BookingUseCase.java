@@ -7,8 +7,8 @@ import com.example.s_balneare.domain.booking.BookingParking;
 import java.util.List;
 
 /**
- * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Booking.
- * <p>Implementata in:
+ * Interfaccia che racchiude tutti i metodi che un Service deve avere per manipolare un oggetto di tipo Booking.<br>
+ * Implementata in:
  *
  * @see BookingService BookingService
  */

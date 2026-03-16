@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaccia che gestisce la manipolazione di vari User tra l'app e il Database.
- * <p>Interfaccia estesa in:
+ * Interfaccia che gestisce la manipolazione di vari User tra l'app e il Database.<br>
+ * Interfaccia estesa in:
  *
  * @see CustomerRepository CustomerRepository
  * @see OwnerRepository OwnerRepository
@@ -31,7 +31,5 @@ public interface UserRepository<T extends User> {
     //ricerche
     Optional<T> findById(Integer id, TransactionContext context);
     Optional<T> findByIdentifier(String identifier, TransactionContext context);
-    Optional<T> findByUsername(String username, TransactionContext context);
-    Optional<T> findByEmail(String email, TransactionContext context);
     List<T> findAll(TransactionContext context);
 }

@@ -9,10 +9,10 @@ import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.common.Address;
 
 /**
- * Implementazione dello Use Case di aggiunta spiaggia nel DB:
- * <p>Interagisce con AddressRepository per salvare l'indirizzo della nuova spiaggia;
- * <p>Successivamente con BeachRepository per salvare la nuova spiaggia con riferimento alla nuova Address.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dello Use Case di aggiunta spiaggia nel DB:<br>
+ * Interagisce con AddressRepository per salvare l'indirizzo della nuova spiaggia;<br>
+ * Successivamente con BeachRepository per salvare la nuova spiaggia con riferimento alla nuova Address.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see CreateBeachUseCase CreateBeachUseCase
  * @see TransactionManager TransactionManager

@@ -11,10 +11,10 @@ import com.example.s_balneare.domain.user.Customer;
 import com.example.s_balneare.domain.user.User;
 
 /**
- * Implementazione dell'interfaccia che permette l'autenticazione dell'utente facendo collaborare l'app Java e il Database.
- * <p>Usa UserRepository per il recupero dati dell’utente;
- * <p>Usa BanRepository per controllo ban dell’utente che cerca di autenticarsi.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dell'interfaccia che permette l'autenticazione dell'utente facendo collaborare l'app Java e il Database.<br>
+ * Usa UserRepository per il recupero dati dell’utente;<br>
+ * Usa BanRepository per controllo ban dell’utente che cerca di autenticarsi.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see AuthenticationUseCase AuthenticationUseCase
  * @see UserRepository UserRepository
@@ -35,8 +35,8 @@ public class AuthenticationService<T extends User> implements AuthenticationUseC
     }
 
     /**
-     * Autentifica l’utente nell’applicazione.
-     * <p>Usa BCrypt per la crittografia della password.
+     * Autentifica l’utente nell’applicazione.<br>
+     * Usa BCrypt per la crittografia della password.
      *
      * @param identifier Username o email dell’utente
      * @param rawPassword Password inserita

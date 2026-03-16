@@ -11,10 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * DAO che permette la manipolazione facilitata delle tabelle seasons, pricings e zone_tariffs nel Database attraverso JDBC.
+ * DAO che permette la manipolazione facilitata delle tabelle seasons, pricings e zone_tariffs nel Database attraverso JDBC.<br>
  * Essa è in stretta collaborazione con JdbcBeachRepository e JdbcZoneDao.
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao JdbcZoneDao
+ *
+ * @see JdbcBeachRepository JdbcBeachRepository
+ * @see JdbcZoneDao JdbcZoneDao
  */
 class JdbcSeasonDao {
     private final JdbcZoneDao zoneDao;
@@ -24,88 +25,67 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Sincronizzo tutto il grafo di una lista di stagioni:
-     * creazione pricing -> season -> zone -> zoneTariff
-     * @param beachId ID della spiaggia
-     * @param seasons Lista di stagioni da sincronizzare
+     * Sincronizzo tutto il grafo di una lista di stagioni:<br>
+     * Creazione pricing -> season -> zone -> zoneTariff
+     *
+     * @param beachId    ID della spiaggia
+     * @param seasons    Lista di stagioni da sincronizzare
      * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     void syncSeasons(Integer beachId, List<Season> seasons, Connection connection) throws SQLException {
+        //check validità parametri
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
-        if (seasons == null || seasons.isEmpty()) throw new IllegalArgumentException("ERROR: at least one season must be set");
+        if (seasons == null || seasons.isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one season must be set");
 
-        for (Season season : seasons) {
-            //passo 1: gestione Pricing
-            //se pricing.id = null, pricing viene inserito
-            //se pricing.id != null, pricing viene aggiornato
-            int pricingId = upsertPricing(season.pricing(), connection);
+        //passo 1: trovo i nomi delle stagioni salvate attualmente nel DB
+        List<String> dbSeasonNames = getSeasonNamesForBeach(beachId, connection);
 
-            //passo 2: gestione Season
-            //collega season al beachId e al pricingId
-            upsertSeasonRow(beachId, season, pricingId, connection);
+        //passo 2: creo una lista dei nomi delle stagioni passate da Java
+        List<String> javaSeasonNames = new ArrayList<>();
+        for (Season s : seasons) javaSeasonNames.add(s.name());
 
-            //passo 3: gestione Zone e ZoneTariff
-            //raccolgo tutti i nomi delle zone coinvolte in tutte le stagioni
-            List<String> zoneNames = new ArrayList<>();
-            for (Season s : seasons) {
-                if (s.zoneTariffs() != null) {
-                    for (ZoneTariff zt : s.zoneTariffs()) {
-                        if (!zoneNames.contains(zt.zoneName())) zoneNames.add(zt.zoneName());
-                    }
+        //passo 3: se una stagione è nel DB ma non in Java, la elimino
+        for (String dbSeason : dbSeasonNames) {
+            if (!javaSeasonNames.contains(dbSeason)) {
+                deleteSeason(beachId, dbSeason, connection);
+            }
+        }
+        //se alla fine vengono cancellate tutte le stagioni, mi fermo
+        if (seasons.isEmpty()) return;
+
+        //passo 4: prendo tutti i nomi delle zone
+        List<String> zoneNames = new ArrayList<>();
+        for (Season s : seasons) {
+            if (s.zoneTariffs() != null) {
+                for (ZoneTariff zt : s.zoneTariffs()) {
+                    if (!zoneNames.contains(zt.zoneName())) zoneNames.add(zt.zoneName());
                 }
             }
-            //creo le Zones in un colpo solo
-            zoneDao.ensureZonesExist(beachId, zoneNames, connection);
-
-            //mi occupo ora delle ZoneTariffs
-            upsertZonesAndTariffs(beachId, season, connection);
         }
-    }
-
-    /**
-     * Sincronizzo (aggiungo/aggiorno) una singola stagione
-     * @param beachId ID della spiaggia
-     * @param season Stagione da sincronizzare
-     * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
-     * @throws IllegalArgumentException se ci sono parametri non validi
-     */
-    void syncSeason(Integer beachId, Season season, Connection connection) throws SQLException {
-        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
-        if (season == null) throw new IllegalArgumentException("ERROR: season not valid");
-
-        //passo 1: gestione Pricing
-        //se pricing.id = null, pricing viene inserito
-        //se pricing.id != null, pricing viene aggiornato
-        int pricingId = upsertPricing(season.pricing(), connection);
-
-        //passo 2: gestione Season
-        //collega season al beachId e al pricingId
-        upsertSeasonRow(beachId, season, pricingId, connection);
-
-        //passo 3: gestione Zone e ZoneTariff
-        //raccolgo tutti i nomi delle zone coinvolte nella stagione
-        List<String> zoneNames = new ArrayList<>();
-        if (season.zoneTariffs() != null) {
-            for (ZoneTariff zt : season.zoneTariffs()) {
-                if (!zoneNames.contains(zt.zoneName())) zoneNames.add(zt.zoneName());
-            }
-        }
-        //creo le Zones in un colpo solo
         zoneDao.ensureZonesExist(beachId, zoneNames, connection);
 
-        //mi occupo ora delle ZoneTariffs
-        upsertZonesAndTariffs(beachId, season, connection);
+        //passo 5: aggiorno le stagioni una ad una
+        for (Season season : seasons) {
+            int pricingId = upsertPricing(season.pricing(), connection);
+            upsertSeasonRow(beachId, season, pricingId, connection);
+            upsertZonesAndTariffs(beachId, season, connection);
+
+            //passo 5b: elimino tariffe rimosse dalla stagione
+            deleteMissingTariffs(beachId, season, connection);
+        }
     }
 
     //HELPERS DI SYNC
+
     /**
-     * Update/Insert di un oggetto Pricing nel DB
-     * @param p oggetto Pricing
+     * Update/Insert di un oggetto Pricing nel DB.
+     *
+     * @param p          oggetto Pricing
      * @param connection Connessione JDBC
-     * @return ID generato dal DB all'inserimento; stesso ID di p passato se già presente nel DB
+     * @return ID generato dal DB all'inserimento; stesso ID di pricing passato se già presente nel DB
      * @throws SQLException se ci sono problemi col Database
      */
     private int upsertPricing(Pricing p, Connection connection) throws SQLException {
@@ -152,10 +132,11 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Update/Insert di una singola stagione nel DB
-     * @param beachId ID della spiaggia
-     * @param s oggetto Season
-     * @param pricingId ID del Pricing associato alla stagione
+     * Update/Insert di una singola stagione nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param s          oggetto Season
+     * @param pricingId  ID del Pricing associato alla stagione
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -183,15 +164,18 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Update/Insert di Zone e ZoneTariff nel DB
-     * @param beachId ID della spiaggia
-     * @param s oggetto Season
+     * Update/Insert di Zone e ZoneTariff nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param s          oggetto Season
      * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     private void upsertZonesAndTariffs(Integer beachId, Season s, Connection connection) throws SQLException {
-        if (s.zoneTariffs() == null || s.zoneTariffs().isEmpty()) throw new IllegalArgumentException("ERROR: at least one zoneTariff must be set for season for update");
+        //check validità parametri
+        if (s.zoneTariffs() == null || s.zoneTariffs().isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one zoneTariff must be set for season for update");
 
         //inserisco/aggiorno la ZoneTariff per quella Zone in questa Season
         //stessa logica di prima: se esiste già, aggiorno solo alcuni parametri
@@ -217,15 +201,78 @@ class JdbcSeasonDao {
         }
     }
 
+    /**
+     * Ricavo tutti i nomi delle stagioni associate ad una spiaggia.
+     *
+     * @param beachId ID della spiaggia
+     * @param conn    Connessione JDBC
+     * @return lista di nomi delle stagioni appartenenti a quella spiaggia
+     * @throws SQLException se ci sono problemi col Database
+     */
+    private List<String> getSeasonNamesForBeach(Integer beachId, Connection conn) throws SQLException {
+        List<String> names = new ArrayList<>();
+
+        String sql = "SELECT name FROM seasons WHERE beachId = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, beachId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) names.add(rs.getString("name"));
+            }
+        }
+        return names;
+    }
 
     /**
-     * Elimina tutte le stagioni di una spiaggia (usato quando si elimina l'intera Beach)
-     * NOTA: non vado a eliminare le zone; usare metodo di JdbcZoneDao se si vuole procedere anche con l’eliminazione delle zone
+     * Elimina le tariffe che non esistono più nell'oggetto Java.
+     *
      * @param beachId ID della spiaggia
-     * @param connection Connessione JDBC
+     * @param season  stagione da sincronizzare
+     * @param conn    Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
+     */
+    private void deleteMissingTariffs(Integer beachId, Season season, Connection conn) throws SQLException {
+        //passo 1: creo una lista di tutte le tariffe salvate nel mio oggetto Java
+        List<String> javaTariffZones = new ArrayList<>();
+        if (season.zoneTariffs() != null) {
+            for (ZoneTariff zt : season.zoneTariffs()) javaTariffZones.add(zt.zoneName());
+        }
+
+        String selectSql = "SELECT zoneName FROM zone_tariffs WHERE beachId = ? AND seasonName = ?";
+        String deleteSql = "DELETE FROM zone_tariffs WHERE beachId = ? AND seasonName = ? AND zoneName = ?";
+
+        try (PreparedStatement selectPs = conn.prepareStatement(selectSql);
+             PreparedStatement deletePs = conn.prepareStatement(deleteSql)) {
+            selectPs.setInt(1, beachId);
+            selectPs.setString(2, season.name());
+
+            try (ResultSet rs = selectPs.executeQuery()) {
+                while (rs.next()) {
+                    String dbZoneName = rs.getString("zoneName");
+
+                    //se c'è nel DB ma non nell'oggetto Java, elimino dal DB
+                    if (!javaTariffZones.contains(dbZoneName)) {
+                        deletePs.setInt(1, beachId);
+                        deletePs.setString(2, season.name());
+                        deletePs.setString(3, dbZoneName);
+                        deletePs.addBatch();
+                    }
+                }
+            }
+            deletePs.executeBatch();
+        }
+    }
+
+
+    /**
+     * Elimina tutte le stagioni di una spiaggia (usato quando si elimina l'intera Beach).<br>
+     * NOTA: non vado a eliminare le zone; usare metodo di JdbcZoneDao se si vuole procedere anche con l’eliminazione delle zone.
+     *
+     * @param beachId    ID della spiaggia
+     * @param connection Connessione JDBC
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao#deleteAllZones(Integer, Connection) JdbcZoneDao.deleteAllZones()
+     * @see JdbcZoneDao#deleteAllZones(Integer, Connection) JdbcZoneDao.deleteAllZones()
      */
     void deleteAllSeasons(Integer beachId, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
@@ -244,18 +291,20 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Elimina una determinata stagione di una spiaggia
-     * NOTA: non vado a eliminare le zone; usare metodo di JdbcZoneDao se si vuole procedere con anche l’eliminazione delle zone
-     * @param beachId ID della spiaggia
+     * Elimina una determinata stagione di una spiaggia.<br>
+     * NOTA: non vado a eliminare le zone; usare metodo di JdbcZoneDao se si vuole procedere con anche l’eliminazione delle zone.
+     *
+     * @param beachId    ID della spiaggia
      * @param seasonName Nome della stagione da eliminare
      * @param connection Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao#deleteZone(Integer, String, Connection) JdbcZoneDao.deleteZone()
      */
     void deleteSeason(Integer beachId, String seasonName, Connection connection) throws SQLException {
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid");
-        if (seasonName == null || seasonName.isEmpty()) throw new IllegalArgumentException("ERROR: seasonName not valid");
+        if (seasonName == null || seasonName.isEmpty())
+            throw new IllegalArgumentException("ERROR: seasonName not valid");
 
         //passo 1: trovo l'ID Pricing per questa Season
         Integer pricingId = getPricingIdForSeason(beachId, seasonName, connection);
@@ -274,11 +323,13 @@ class JdbcSeasonDao {
 
 
     //HELPERS DI DELETE
+
     /**
-     * Genera lista di ID di pricings associati ad una determinata Beach
+     * Genera lista di ID di pricings associati ad una determinata Beach.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
-     * @return Lista di ID di pricings associati ad una determinata Beach
+     * @param conn    Connessione JDBC
+     * @return lista di ID di pricings associati ad una determinata Beach
      * @throws SQLException se ci sono problemi col Database
      */
     private List<Integer> getPricingIdsForBeach(Integer beachId, Connection conn) throws SQLException {
@@ -292,15 +343,15 @@ class JdbcSeasonDao {
                 while (rs.next()) ids.add(rs.getInt(1));
             }
         }
-
         return ids;
     }
 
     /**
-     * Ritorna ID di un record di pricings associato ad una determinata Season
-     * @param beachId ID della spiaggia
+     * Ritorna ID di un record di pricings associato ad una determinata Season.
+     *
+     * @param beachId    ID della spiaggia
      * @param seasonName Nome della stagione
-     * @param conn Connessione JDBC
+     * @param conn       Connessione JDBC
      * @return ID di un record di pricings associato ad una determinata Season
      * @throws SQLException se ci sono problemi col Database
      */
@@ -314,14 +365,15 @@ class JdbcSeasonDao {
                 if (rs.next()) return rs.getInt(1);
             }
         }
-
+        //se qualcosa va storto, return null
         return null;
     }
 
     /**
-     * Cancella tutte le ZoneTariff di tutte le Zone di una determinata Beach
+     * Cancella tutte le ZoneTariff di tutte le Zone di una determinata Beach.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     private void deleteAllZoneTariffs(Integer beachId, Connection conn) throws SQLException {
@@ -333,10 +385,11 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Cancella tutte le ZoneTariff di tutte le Zone di una determinata Season
-     * @param beachId ID della spiaggia
+     * Cancella tutte le ZoneTariff di tutte le Zone di una determinata Season.
+     *
+     * @param beachId    ID della spiaggia
      * @param seasonName Nome della stagione dalla quale eliminare le ZoneTariff
-     * @param conn Connessione JDBC
+     * @param conn       Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     private void deleteZoneTariffsForSeason(Integer beachId, String seasonName, Connection conn) throws SQLException {
@@ -349,9 +402,10 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Cancella tutte le Season di una determinata Beach
+     * Cancella tutte le Season di una determinata Beach.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     private void deleteSeasonsRow(Integer beachId, Connection conn) throws SQLException {
@@ -363,10 +417,11 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Cancella una determinata Season di una determinata Beach
-     * @param beachId ID della spiaggia
+     * Cancella una determinata Season di una determinata Beach.
+     *
+     * @param beachId    ID della spiaggia
      * @param seasonName Nome della stagione da eliminare
-     * @param conn Connessione JDBC
+     * @param conn       Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     private void deleteSingleSeasonRow(Integer beachId, String seasonName, Connection conn) throws SQLException {
@@ -379,9 +434,10 @@ class JdbcSeasonDao {
     }
 
     /**
-     * Cancella varie righe di pricings
+     * Cancella varie righe di pricings.
+     *
      * @param pricingIds Lista di ID di pricings
-     * @param conn Connessione JDBC
+     * @param conn       Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     private void deletePricings(List<Integer> pricingIds, Connection conn) throws SQLException {
@@ -399,10 +455,11 @@ class JdbcSeasonDao {
 
 
     /**
-     * Cerca le stagioni di una determinata Beach
+     * Cerca le stagioni di una determinata Beach.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
-     * @return Lista di stagioni di una determinata spiaggia
+     * @param conn    Connessione JDBC
+     * @return lista di stagioni di una determinata spiaggia
      * @throws SQLException se ci sono problemi col Database
      */
     public List<Season> findSeasonsByBeachId(Integer beachId, Connection conn) throws SQLException {

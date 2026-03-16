@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Booking.
- * <p>Implementata in:
+ * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database su oggetti di tipo Booking.<br>
+ * Implementata in:
  *
  * @see JdbcBookingRepository JdbcBookingRepository
  * @see TransactionManager TransactionManager per le transazioni SQL

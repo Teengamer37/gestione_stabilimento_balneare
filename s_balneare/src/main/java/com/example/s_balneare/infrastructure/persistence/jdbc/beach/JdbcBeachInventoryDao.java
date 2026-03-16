@@ -7,15 +7,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * DAO che permette la manipolazione facilitata della tabella beach_inventories nel Database attraverso JDBC.
+ * DAO che permette la manipolazione facilitata della tabella beach_inventories nel Database attraverso JDBC.<br>
  * Essa è in stretta collaborazione con JdbcBeachRepository.
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ *
+ * @see JdbcBeachRepository JdbcBeachRepository
  */
 class JdbcBeachInventoryDao {
     /**
-     * Update/Insert di un oggetto BeachInventory nel DB
-     * @param beachId ID della spiaggia
-     * @param inv oggetto BeachInventory
+     * Update/Insert di un oggetto BeachInventory nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param inv        Oggetto BeachInventory
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -44,9 +46,10 @@ class JdbcBeachInventoryDao {
     }
 
     /**
-     * Inserimento di un oggetto BeachInventory nel DB
-     * @param beachId ID della spiaggia
-     * @param inv oggetto BeachInventory
+     * Inserimento di un oggetto BeachInventory nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param inv        Oggetto BeachInventory
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -68,8 +71,9 @@ class JdbcBeachInventoryDao {
     }
 
     /**
-     * Eliminazione di un oggetto BeachInventory dal DB
-     * @param beachId ID della spiaggia
+     * Eliminazione di un oggetto BeachInventory dal DB.
+     *
+     * @param beachId    ID della spiaggia
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */

@@ -8,8 +8,8 @@ import java.time.LocalDate;
 
 /**
  * Interfaccia che racchiude tutti i metodi che una Repository deve avere per interagire con un Database per controllare la
- * disponibilità dei parcheggi/inventario di una spiaggia.
- * <p>Implementata in:
+ * disponibilità dei parcheggi/inventario di una spiaggia.<br>
+ * Implementata in:
  *
  * @see JdbcAvailabilityQuery JdbcAvailabilityQuery
  * @see TransactionManager TransactionManager per le transazioni SQL

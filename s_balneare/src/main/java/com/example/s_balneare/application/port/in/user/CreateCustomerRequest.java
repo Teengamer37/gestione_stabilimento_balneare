@@ -1,8 +1,8 @@
 package com.example.s_balneare.application.port.in.user;
 
 /**
- * Rappresenta una richiesta per la creazione di un Customer.
- * <p>Estende la classe astratta CreateUserRequest e aggiunge gli attributi specifici di un Customer.
+ * Rappresenta una richiesta per la creazione di un Customer.<br>
+ * Estende la classe astratta CreateUserRequest e aggiunge gli attributi specifici di un Customer.
  *
  * @see CreateUserRequest CreateUserRequest
  */

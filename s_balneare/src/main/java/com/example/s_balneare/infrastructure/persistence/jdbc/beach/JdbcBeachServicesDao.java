@@ -7,15 +7,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * DAO che permette la manipolazione facilitata della tabella beach_services nel Database attraverso JDBC.
+ * DAO che permette la manipolazione facilitata della tabella beach_services nel Database attraverso JDBC.<br>
  * Essa è in stretta collaborazione con JdbcBeachRepository.
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
+ *
+ * @see JdbcBeachRepository JdbcBeachRepository
  */
 class JdbcBeachServicesDao {
     /**
-     * Update/Insert di un oggetto BeachServices nel DB
-     * @param beachId ID della spiaggia
-     * @param srv oggetto BeachServices
+     * Update/Insert di un oggetto BeachServices nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param srv        oggetto BeachServices
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -45,9 +47,10 @@ class JdbcBeachServicesDao {
     }
 
     /**
-     * Inserimento di un oggetto BeachServices nel DB
-     * @param beachId ID della spiaggia
-     * @param srv oggetto BeachServices
+     * Inserimento di un oggetto BeachServices nel DB.
+     *
+     * @param beachId    ID della spiaggia
+     * @param srv        oggetto BeachServices
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
@@ -70,8 +73,9 @@ class JdbcBeachServicesDao {
     }
 
     /**
-     * Eliminazione di un oggetto BeachServices dal DB
-     * @param beachId ID della spiaggia
+     * Eliminazione di un oggetto BeachServices dal DB.
+     *
+     * @param beachId    ID della spiaggia
      * @param connection Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */

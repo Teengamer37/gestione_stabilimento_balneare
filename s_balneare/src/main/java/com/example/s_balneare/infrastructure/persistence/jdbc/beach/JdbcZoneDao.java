@@ -8,18 +8,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DAO che permette la manipolazione facilitata della tabella zones nel Database attraverso JDBC.
+ * DAO che permette la manipolazione facilitata della tabella zones nel Database attraverso JDBC.<br>
  * Essa è in stretta collaborazione con JdbcBeachRepository, JdbcSpotDao e JdbcSeasonDao.
+ *
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachRepository JdbcBeachRepository
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSpotDao JdbcSpotDao
  * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSeasonDao JdbcSeasonDao
  */
 class JdbcZoneDao {
     /**
-     * Assicura che una zona esista nel DB
-     * @param beachId ID della spiaggia
+     * Assicura che una zona esista nel DB.
+     *
+     * @param beachId  ID della spiaggia
      * @param zoneName Nome della zona
-     * @param conn Connessione JDBC
+     * @param conn     Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     void ensureZoneExists(Integer beachId, String zoneName, Connection conn) throws SQLException {
@@ -33,15 +35,17 @@ class JdbcZoneDao {
     }
 
     /**
-     * Assicura che una lista di zone esistano nel DB
-     * @param beachId ID della spiaggia
+     * Assicura che una lista di zone esistano nel DB.
+     *
+     * @param beachId   ID della spiaggia
      * @param zoneNames Lista di nomi di zone
-     * @param conn Connessione JDBC
-     * @throws SQLException se ci sono problemi col Database
+     * @param conn      Connessione JDBC
+     * @throws SQLException             se ci sono problemi col Database
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     void ensureZonesExist(Integer beachId, List<String> zoneNames, Connection conn) throws SQLException {
-        if (zoneNames == null || zoneNames.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zone must be set in order to call this function");
+        if (zoneNames == null || zoneNames.isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one zone must be set in order to call this function");
 
         String sql = "INSERT IGNORE INTO zones (name, beachId) VALUES (?, ?)";
 
@@ -59,9 +63,10 @@ class JdbcZoneDao {
     }
 
     /**
-     * Elimina tutte le zone associate ad una spiaggia
+     * Elimina tutte le zone associate ad una spiaggia.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     void deleteAllZones(Integer beachId, Connection conn) throws SQLException {
@@ -73,10 +78,11 @@ class JdbcZoneDao {
     }
 
     /**
-     * Elimina una singola Zone di una Beach
-     * @param beachId ID della spiaggia
+     * Elimina una singola Zone di una Beach.
+     *
+     * @param beachId  ID della spiaggia
      * @param zoneName Nome della zona da eliminare
-     * @param conn Connessione JDBC
+     * @param conn     Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     void deleteZone(Integer beachId, String zoneName, Connection conn) throws SQLException {
@@ -89,9 +95,10 @@ class JdbcZoneDao {
     }
 
     /**
-     * Cancella le Zone che non hanno nè Spot nè ZoneTariff connesse
+     * Cancella le Zone che non hanno nè Spot nè ZoneTariff connesse.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     void deleteOrphanedZones(Integer beachId, Connection conn) throws SQLException {
@@ -107,11 +114,12 @@ class JdbcZoneDao {
     }
 
     /**
-     * Rinomina una Zone di una Beach
-     * @param beachId ID della spiaggia
+     * Rinomina una Zone di una Beach.
+     *
+     * @param beachId     ID della spiaggia
      * @param oldZoneName Vecchio nome della zona da rinominare
      * @param newZoneName Nuovo nome della zona
-     * @param conn Connessione JDBC
+     * @param conn        Connessione JDBC
      * @throws SQLException se ci sono problemi col Database
      */
     void renameZone(Integer beachId, String oldZoneName, String newZoneName, Connection conn) throws SQLException {
@@ -125,9 +133,10 @@ class JdbcZoneDao {
     }
 
     /**
-     * Trova tutte le Zone.name di una Beach
+     * Trova tutte le Zone.name di una Beach.
+     *
      * @param beachId ID della spiaggia
-     * @param conn Connessione JDBC
+     * @param conn    Connessione JDBC
      * @return una lista di nomi delle zone di una spiaggia
      * @throws SQLException se ci sono problemi col Database
      */

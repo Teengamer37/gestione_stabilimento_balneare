@@ -1,5 +1,6 @@
-package com.example.s_balneare.infrastructure.persistence.jdbc;
+package com.example.s_balneare.infrastructure.persistence.jdbc.common;
 
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.common.AddressRepository;
 import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
@@ -12,14 +13,16 @@ import java.util.Optional;
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Address tramite
  * libreria JDBC.
+ *
  * @see AddressRepository AddressRepository
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcAddressRepository implements AddressRepository {
     /**
      * METODO HELPER:
      * prende il token vuoto (TransactionContext) e
-     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection
+     * lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     *
      * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
@@ -28,16 +31,17 @@ public class JdbcAddressRepository implements AddressRepository {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.getConnection();
+        return jdbcContext.connection();
     }
 
     /**
-     * Salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User.
-     * Usato direttamente dagli use cases di Beach e User, nessun rischio di avere address non associati
+     * Salvataggio indirizzo nel DB, restituendo ID da associare poi a Beach o User.<br>
+     * Usato direttamente dagli use cases di Beach e User, nessun rischio di avere address non associati.
+     *
      * @param address Indirizzo da salvare nel Database
      * @param context Connessione JDBC
      * @return ID generato dal Database
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException     se ci sono problemi col Database
      * @throws RuntimeException se ci sono problemi di connessione col Database
      */
     @Override
@@ -68,11 +72,12 @@ public class JdbcAddressRepository implements AddressRepository {
     }
 
     /**
-     * Aggiorna indirizzo nel DB
+     * Aggiorna indirizzo nel DB.
+     *
      * @param address Indirizzo da aggiornare
      * @param context Connessione JDBC
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void update(Address address, TransactionContext context) {
@@ -86,25 +91,26 @@ public class JdbcAddressRepository implements AddressRepository {
 
         //apro connessione
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                statement.setString(1, address.street());
-                statement.setString(2, address.streetNumber());
-                statement.setString(3, address.city());
-                statement.setString(4, address.zipCode());
-                statement.setString(5, address.country());
-                statement.setInt(6, address.id());
-                statement.executeUpdate();
+            statement.setString(1, address.street());
+            statement.setString(2, address.streetNumber());
+            statement.setString(3, address.city());
+            statement.setString(4, address.zipCode());
+            statement.setString(5, address.country());
+            statement.setInt(6, address.id());
+            statement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to update address", e);
         }
     }
 
     /**
-     * Cerca indirizzo nel DB per ID
-     * @param id ID dell'indirizzo
+     * Cerca indirizzo nel DB per ID.
+     *
+     * @param id      ID dell'indirizzo
      * @param context Connessione JDBC
      * @return oggetto Optional dal quale, se trovato l'indirizzo, può essere estratto l'oggetto Address; altri metodi altrimenti
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public Optional<Address> findById(Integer id, TransactionContext context) {
@@ -138,12 +144,13 @@ public class JdbcAddressRepository implements AddressRepository {
     }
 
     /**
-     * Cerca indirizzi nel DB per città
-     * @param city Città da cercare
+     * Cerca indirizzi nel DB per città.
+     *
+     * @param city    Città da cercare
      * @param context Connessione JDBC
      * @return una lista di indirizzi che hanno la stessa città passata come parametro
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<Address> findByCity(String city, TransactionContext context) {
@@ -151,7 +158,8 @@ public class JdbcAddressRepository implements AddressRepository {
         Connection connection = getConnection(context);
 
         //check validità stringa
-        if (city == null || city.isBlank()) throw new IllegalArgumentException("ERROR: the parameter is either blank or null");
+        if (city == null || city.isBlank())
+            throw new IllegalArgumentException("ERROR: the parameter is either blank or null");
 
         String sql = "SELECT id, street, streetNumber, city, zipCode, country FROM addresses WHERE city = ?";
         List<Address> addresses = new ArrayList<>();
@@ -163,23 +171,29 @@ public class JdbcAddressRepository implements AddressRepository {
             //ciclo while per scorrere in tutte le righe e salvarle nella lista
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    addresses.add(new Address(rs.getInt("id"), rs.getString("street"), rs.getString("streetNumber"), rs.getString("city"), rs.getString("zipCode"), rs.getString("country")));
+                    addresses.add(new Address(rs.getInt("id"),
+                            rs.getString("street"),
+                            rs.getString("streetNumber"),
+                            rs.getString("city"),
+                            rs.getString("zipCode"),
+                            rs.getString("country")
+                    ));
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to find address by value", e);
         }
-
         return addresses;
     }
 
     /**
-     * Cerca indirizzi nel DB per paese
+     * Cerca indirizzi nel DB per paese.
+     *
      * @param country Paese da cercare
      * @param context Connessione JDBC
      * @return una lista di indirizzi che hanno lo stesso paese passato come parametro
      * @throws IllegalArgumentException se ci sono parametri non validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<Address> findByCountry(String country, TransactionContext context) {
@@ -187,7 +201,8 @@ public class JdbcAddressRepository implements AddressRepository {
         Connection connection = getConnection(context);
 
         //check validità stringa
-        if (country == null || country.isBlank()) throw new IllegalArgumentException("ERROR: the parameter is either blank or null");
+        if (country == null || country.isBlank())
+            throw new IllegalArgumentException("ERROR: the parameter is either blank or null");
 
         String sql = "SELECT id, street, streetNumber, city, zipCode, country FROM addresses WHERE country = ?";
         List<Address> addresses = new ArrayList<>();
@@ -198,7 +213,13 @@ public class JdbcAddressRepository implements AddressRepository {
 
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    addresses.add(new Address(rs.getInt("id"), rs.getString("street"), rs.getString("streetNumber"), rs.getString("city"), rs.getString("zipCode"), rs.getString("country")));
+                    addresses.add(new Address(rs.getInt("id"),
+                            rs.getString("street"),
+                            rs.getString("streetNumber"),
+                            rs.getString("city"),
+                            rs.getString("zipCode"),
+                            rs.getString("country")
+                    ));
                 }
             }
         } catch (SQLException e) {
@@ -210,9 +231,11 @@ public class JdbcAddressRepository implements AddressRepository {
 
     /**
      * Ritorna tutti gli indirizzi presenti nel DB
-     * (solo scopo di filtraggio e manipolazione in-app + eventuali esperimenti)
+     * (solo scopo di filtraggio e manipolazione in-app + eventuali esperimenti).
+     *
      * @param context Connessione JDBC
      * @return una lista di tutti gli indirizzi salvati nel Database
+     * @throws RuntimeException se ci sono problemi di connessione col Database
      */
     @Override
     public List<Address> findAll(TransactionContext context) {
@@ -226,20 +249,28 @@ public class JdbcAddressRepository implements AddressRepository {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    addresses.add(new Address(rs.getInt("id"), rs.getString("street"), rs.getString("streetNumber"), rs.getString("city"), rs.getString("zipCode"), rs.getString("country")));
+                    addresses.add(new Address(rs.getInt("id"),
+                            rs.getString("street"),
+                            rs.getString("streetNumber"),
+                            rs.getString("city"),
+                            rs.getString("zipCode"),
+                            rs.getString("country")
+                    ));
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("ERROR: unable to find addresses", e);
         }
-
         return addresses;
     }
 
     /**
-     * Elimina un indirizzo dal DB
-     * @param id ID dell'indirizzo da eliminare
+     * Elimina un indirizzo dal DB.
+     *
+     * @param id      ID dell'indirizzo da eliminare
      * @param context Connessione JDBC
+     * @throws IllegalArgumentException se ID di address passato non esiste nel Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void delete(Integer id, TransactionContext context) {

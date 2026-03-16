@@ -9,9 +9,9 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import java.util.List;
 
 /**
- * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
- * <p>Usa AddressRepository per manipolare l’oggetto Address nel database.
- * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.<br>
+ * Usa AddressRepository per manipolare l’oggetto Address nel database.<br>
+ * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see AddressUseCase AddressUseCase
  * @see AddressRepository AddressRepository
@@ -102,8 +102,8 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
-     * <p>Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto.
+     * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):<br>
+     * Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto.
      *
      * @param id      Identificativo indirizzo da cercare
      * @param context Connessione JDBC

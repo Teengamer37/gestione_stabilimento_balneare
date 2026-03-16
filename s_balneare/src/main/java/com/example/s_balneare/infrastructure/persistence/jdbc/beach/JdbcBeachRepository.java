@@ -1,10 +1,11 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.beach;
 
+import com.example.s_balneare.application.port.out.TransactionManager;
 import com.example.s_balneare.application.port.out.beach.BeachRepository;
 import com.example.s_balneare.domain.beach.*;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.layout.Zone;
-import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
+import com.example.s_balneare.infrastructure.persistence.jdbc.common.JdbcTransactionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,17 +14,18 @@ import java.util.Optional;
 
 /**
  * Repository che implementa tutti i metodi che permettono di interagire con un Database su oggetti di tipo Beach tramite
- * libreria JDBC.
- * Detiene anche riferimenti alle varie DAO del package attuale per dividere ancora meglio le operazioni.
+ * libreria JDBC.<br>
+ * Detiene anche riferimenti alle varie DAO del package attuale per dividere ancora meglio le operazioni.<br>
  * Nella maggior parte dei casi, questa Repository orchestra le DAO per l'interazione tra oggetti e Database.
+ *
  * @see BeachRepository BeachRepository
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachInventoryDao JdbcBeachInventoryDao
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcBeachServicesDao JdbcBeachServicesDao
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcParkingDao JdbcParkingDao
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcZoneDao JdbcZoneDao
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSeasonDao JdbcSeasonDao
- * @see com.example.s_balneare.infrastructure.persistence.jdbc.beach.JdbcSpotDao JdbcSpotDao
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see JdbcBeachInventoryDao JdbcBeachInventoryDao
+ * @see JdbcBeachServicesDao JdbcBeachServicesDao
+ * @see JdbcParkingDao JdbcParkingDao
+ * @see JdbcZoneDao JdbcZoneDao
+ * @see JdbcSeasonDao JdbcSeasonDao
+ * @see JdbcSpotDao JdbcSpotDao
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class JdbcBeachRepository implements BeachRepository {
     private final JdbcBeachInventoryDao inventoryDao;
@@ -46,6 +48,7 @@ public class JdbcBeachRepository implements BeachRepository {
      * METODO HELPER:
      * prende il token vuoto (TransactionContext)
      * e lo converte di nuovo nella classe concreta per estrarre java.sql.Connection.
+     *
      * @param context Token connessione
      * @return oggetto java.sql.Connection implementato in JDBC
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
@@ -54,17 +57,18 @@ public class JdbcBeachRepository implements BeachRepository {
         if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.getConnection();
+        return jdbcContext.connection();
     }
 
     /**
-     * Inserimento nuova spiaggia nel DB
-     * @param beach Nuova spiaggia da aggiungere
+     * Inserimento nuova spiaggia nel DB.
+     *
+     * @param beach   Nuova spiaggia da aggiungere
      * @param context Connessione JDBC
      * @return ID generato dal Database
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se il beach non ha parametri corretti
-     * @throws SQLException se ci sono problemi col Database
+     * @throws SQLException             se ci sono problemi col Database
      */
     @Override
     public Integer save(Beach beach, TransactionContext context) {
@@ -79,7 +83,8 @@ public class JdbcBeachRepository implements BeachRepository {
             //passo 1: inserisco in beaches gli oggetti Beach e BeachGeneral
             try (PreparedStatement statement = connection.prepareStatement(sqlBeach, Statement.RETURN_GENERATED_KEYS)) {
                 BeachGeneral general = beach.getBeachGeneral();
-                if (general == null) throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when saving a beach.");
+                if (general == null)
+                    throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when saving a beach");
 
                 statement.setString(1, general.name());
                 statement.setString(2, general.description());
@@ -112,7 +117,7 @@ public class JdbcBeachRepository implements BeachRepository {
                 parkingDao.upsert(newId, beach.getParking(), connection);
             }
 
-            //passo 5: inserisco in pricings, seasons, zone e zone_tariffs la lista di Seasons
+            //passo 5: inserisco in pricings, seasons, zones e zone_tariffs la lista di Seasons
             if (beach.getSeasons() != null) {
                 seasonDao.syncSeasons(newId, beach.getSeasons(), connection);
             }
@@ -127,10 +132,11 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Aggiorno spiaggia presente nel DB
-     * @param beach oggetto da aggiornare (stesso ID, attributi diversi)
+     * Aggiorno spiaggia presente nel DB.
+     *
+     * @param beach   Oggetto da aggiornare (stesso ID, attributi diversi)
      * @param context Connessione JDBC
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se il beach non ha parametri corretti
      */
     @Override
@@ -149,7 +155,7 @@ public class JdbcBeachRepository implements BeachRepository {
             try (PreparedStatement statement = connection.prepareStatement(sqlBeach)) {
                 BeachGeneral general = beach.getBeachGeneral();
                 if (general == null)
-                    throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when updating a beach.");
+                    throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when updating a beach");
 
                 statement.setString(1, general.name());
                 statement.setString(2, general.description());
@@ -187,12 +193,14 @@ public class JdbcBeachRepository implements BeachRepository {
                 parkingDao.delete(beach.getId(), connection);
             }
 
-            //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff
+            //passo 5: aggiorno/inserisco dati nuovi su Season, Pricing, Zone e ZoneTariff (o elimino dati)
             if (!beach.getSeasons().isEmpty()) {
                 seasonDao.syncSeasons(beach.getId(), beach.getSeasons(), connection);
+            } else {
+                seasonDao.deleteAllSeasons(beach.getId(), connection);
             }
 
-            //passo 6: aggiorno/inserisco dati nuovi dei vari Spot sulle Zone
+            //passo 6: aggiorno/inserisco dati nuovi dei vari Spot sulle Zone (o elimino dati)
             if (!beach.getZones().isEmpty()) {
                 spotDao.syncZones(beach.getId(), beach.getZones(), connection);
             } else {
@@ -207,10 +215,11 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Permette di eliminare una spiaggia
-     * @param id ID della spiaggia da eliminare
+     * Permette di eliminare una spiaggia.
+     *
+     * @param id      ID della spiaggia da eliminare
      * @param context Connessione JDBC
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID non è valido
      */
     @Override
@@ -242,9 +251,10 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Stampa TUTTE le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse)
+     * Stampa TUTTE le spiagge senza inventario né stagioni (nel caso possa servire nella ricerca delle stesse).
+     *
      * @param context Connessione JDBC
-     * @return Lista di spiagge trovate nel Database
+     * @return lista di spiagge trovate nel Database
      * @throws RuntimeException se ci sono problemi di connessione col Database
      */
     @Override
@@ -319,11 +329,12 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Cerca una spiaggia per ID e la restituisce
-     * @param id ID della spiaggia da cercare
+     * Cerca una spiaggia per ID e la restituisce.
+     *
+     * @param id      ID della spiaggia da cercare
      * @param context Connessione JDBC
      * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID inserito non è valido
      */
     @Override
@@ -335,14 +346,14 @@ public class JdbcBeachRepository implements BeachRepository {
         if (id == null || id <= 0) throw new IllegalArgumentException("ERROR: the parameter is not valid");
 
         String sql = "SELECT b.*, " +
-                     "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
-                     "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
-                     "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
-                     "FROM beaches b " +
-                     "LEFT JOIN beach_inventories bi ON b.id = bi.beachId " +
-                     "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
-                     "LEFT JOIN parkings p ON b.id = p.beachId " +
-                     "WHERE b.id = ?";
+                "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
+                "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
+                "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
+                "FROM beaches b " +
+                "LEFT JOIN beach_inventories bi ON b.id = bi.beachId " +
+                "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
+                "LEFT JOIN parkings p ON b.id = p.beachId " +
+                "WHERE b.id = ?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
@@ -421,12 +432,13 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Cerca tutte le stagioni associate ad una spiaggia
+     * Cerca tutte le stagioni associate ad una spiaggia.
+     *
      * @param beachId ID della spiaggia da cercare per le stagioni
      * @param context Connessione JDBC
      * @return una lista di stagioni che si riferiscono alla spiaggia
      * @throws IllegalArgumentException se l'ID passato non è valido
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public List<Season> findBeachSeasons(Integer beachId, TransactionContext context) {
@@ -446,11 +458,12 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Cerca spiaggia per ID del proprietario
+     * Cerca spiaggia per ID del proprietario.
+     *
      * @param ownerId ID del proprietario
      * @param context Connessione JDBC
      * @return oggetto Optional dal quale, se la spiaggia è stata trovata, si può estrarre Beach
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID inserito non è valido
      */
     @Override
@@ -465,7 +478,6 @@ public class JdbcBeachRepository implements BeachRepository {
         Integer beachId = null;
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-
             statement.setInt(1, ownerId);
 
             try (ResultSet rs = statement.executeQuery()) {
@@ -486,11 +498,12 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Aggiorna la colonna active di una spiaggia specifica
+     * Aggiorna la colonna active di una spiaggia specifica.
+     *
      * @param beachId ID della spiaggia
      * @param context Connessione JDBC
-     * @param active Nuovo stato della spiaggia
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @param active  Nuovo stato della spiaggia
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se l'ID non è valido
      */
     @Override
@@ -514,12 +527,13 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Chiama metodo su JdbcSpotDao per controllare se una list di Spot apprtengono alla spiaggia
+     * Chiama metodo su JdbcSpotDao per controllare se una list di Spot appartengono alla spiaggia.
+     *
      * @param beachId ID della spiaggia
      * @param spotIds Lista di ID dei Spot da controllare
      * @param context Connessione JDBC
      * @return risultato di JdbcSpotDao.doSpotsBelongToBeach()
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      * @throws IllegalArgumentException se i parametri passati non sono validi
      * @see JdbcSpotDao#doSpotsBelongToBeach(Integer, List, Connection) JdbcSpotDao.doSpotsBelongToBeach()
      */
@@ -528,6 +542,7 @@ public class JdbcBeachRepository implements BeachRepository {
         //estraggo la connessione JDBC
         Connection connection = getConnection(context);
 
+        //check validità parametri
         if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
         if (spotIds == null || spotIds.isEmpty()) return false;
 
@@ -539,13 +554,14 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Rinomina una zona della spiaggia
-     * @param beachId ID della spiaggia
+     * Rinomina una zona della spiaggia.
+     *
+     * @param beachId     ID della spiaggia
      * @param oldZoneName Nome della zona da rinominare
      * @param newZoneName Nuovo nome da applicare
-     * @param context Connessione JDBC
+     * @param context     Connessione JDBC
      * @throws IllegalArgumentException se i parametri passati non sono validi
-     * @throws RuntimeException se ci sono problemi di connessione col Database
+     * @throws RuntimeException         se ci sono problemi di connessione col Database
      */
     @Override
     public void renameZone(Integer beachId, String oldZoneName, String newZoneName, TransactionContext context) {
@@ -553,9 +569,9 @@ public class JdbcBeachRepository implements BeachRepository {
         Connection connection = getConnection(context);
 
         //check validità parametri
-        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("Invalid beachId");
+        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: invalid beachId");
         if (oldZoneName == null || oldZoneName.isEmpty() || newZoneName == null || newZoneName.isEmpty())
-            throw new IllegalArgumentException("Invalid zone names");
+            throw new IllegalArgumentException("ERROR: invalid old and/or new zone name");
 
         try {
             zoneDao.renameZone(beachId, oldZoneName, newZoneName, connection);

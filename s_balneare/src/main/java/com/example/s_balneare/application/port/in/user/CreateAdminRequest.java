@@ -1,8 +1,8 @@
 package com.example.s_balneare.application.port.in.user;
 
 /**
- * Rappresenta una richiesta per la creazione di un Admin.
- * <p>Estende la classe astratta CreateUserRequest e aggiunge gli attributi specifici di un Admin (per ora nessuno).
+ * Rappresenta una richiesta per la creazione di un Admin.<br>
+ * Estende la classe astratta CreateUserRequest e aggiunge gli attributi specifici di un Admin (per ora nessuno).
  *
  * @see CreateUserRequest CreateUserRequest
  */
