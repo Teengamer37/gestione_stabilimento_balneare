@@ -1,10 +1,23 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>Coord</w>
+      <w>Datas</w>
+      <w>Parkings</w>
       <w>ampliabile</w>
+      <w>bannabile</w>
+      <w>bannato</w>
+      <w>bcrypt</w>
+      <w>dell'owner</w>
       <w>istanziato</w>
       <w>l'id</w>
+      <w>l'owner</w>
+      <w>l'ownerid</w>
+      <w>nonneg</w>
+      <w>parkings</w>
       <w>prenotabili</w>
+      <w>pricings</w>
+      <w>quell'id</w>
     </words>
   </dictionary>
 </component>

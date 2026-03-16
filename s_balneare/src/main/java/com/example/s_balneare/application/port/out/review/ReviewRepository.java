@@ -15,12 +15,12 @@ import java.util.Optional;
  */
 public interface ReviewRepository {
     //manipolazione
-    public Integer save(Review review, TransactionContext context);
-    public void delete(Integer id, TransactionContext context);
+    Integer save(Review review, TransactionContext context);
+    void delete(Integer id, TransactionContext context);
 
     //ricerche
-    public Optional<Review> findById(Integer id, TransactionContext context);
-    public List<Review> findAll(TransactionContext context);
-    public List<Review> findByBeachId(Integer beachId, TransactionContext context);
-    public List<Review> findByBeachIdAndRating(Integer beachId, Integer rating, TransactionContext context);
+    Optional<Review> findById(Integer id, TransactionContext context);
+    List<Review> findAll(TransactionContext context);
+    List<Review> findByBeachId(Integer beachId, TransactionContext context);
+    List<Review> findByBeachIdAndRating(Integer beachId, Integer rating, TransactionContext context);
 }

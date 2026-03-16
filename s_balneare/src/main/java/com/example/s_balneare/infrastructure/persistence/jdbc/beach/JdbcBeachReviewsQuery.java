@@ -28,10 +28,10 @@ public class JdbcBeachReviewsQuery implements BeachReviewsQuery {
      * @throws IllegalArgumentException se il token non è di tipo JdbcTransactionContext (quindi non rispecchia il JDBC)
      */
     private Connection getConnection(TransactionContext context) {
-        if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext jdbcContext)) {
+        if (!(context instanceof JdbcTransactionManager.JdbcTransactionContext(Connection connection))) {
             throw new IllegalArgumentException("ERROR: context must be of type JdbcTransactionContext");
         }
-        return jdbcContext.connection();
+        return connection;
     }
 
     /**

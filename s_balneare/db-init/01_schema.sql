@@ -201,7 +201,7 @@ CREATE TABLE reviews (
 );
 
 CREATE TABLE reports (
-    id INT NOT NULL PRIMARY KEY,
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     reporterId INT NOT NULL,
     reportedId INT NOT NULL,
     reportedType ENUM('USER', 'BEACH'),

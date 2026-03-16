@@ -1,6 +1,5 @@
 package com.example.s_balneare.application.service.review;
 
-import com.example.s_balneare.application.port.in.booking.BookingUseCase;
 import com.example.s_balneare.application.port.in.review.CreateReviewCommand;
 import com.example.s_balneare.application.port.in.review.ReviewUseCase;
 import com.example.s_balneare.application.port.out.TransactionManager;

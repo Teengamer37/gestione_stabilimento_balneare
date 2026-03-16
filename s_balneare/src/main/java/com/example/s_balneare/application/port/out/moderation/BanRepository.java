@@ -15,11 +15,11 @@ import java.util.Optional;
  */
 public interface BanRepository {
     //salvataggio
-    public Integer save(Ban ban, TransactionContext context);
+    Integer save(Ban ban, TransactionContext context);
 
     //ricerche
-    public Optional<Ban> findById(Integer id, TransactionContext context);
-    public List<Ban> findAll(TransactionContext context);
-    public boolean isBannedFromBeach(Integer customerId, Integer beachId, TransactionContext context);
-    public boolean isBannedFromApp(Integer customerId, TransactionContext context);
+    Optional<Ban> findById(Integer id, TransactionContext context);
+    List<Ban> findAll(TransactionContext context);
+    boolean isBannedFromBeach(Integer customerId, Integer beachId, TransactionContext context);
+    boolean isBannedFromApp(Integer customerId, TransactionContext context);
 }

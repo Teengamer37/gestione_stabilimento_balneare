@@ -50,7 +50,7 @@ public class JdbcReportRepository implements ReportRepository {
         //estraggo la connessione JDBC
         Connection connection = getConnection(context);
 
-        String sql = "INSERT INTO reports(reporterId, reportedId, reportedType, description, createdAt, status, bookingId) VALUES (?, ?, ?, ?, ?, ?, ?) ";
+        String sql = "INSERT INTO reports(reporterId, reportedId, reportedType, description, createdAt, status, bookingId) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         //query
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

@@ -61,30 +61,34 @@ public class CreateBeachService implements CreateBeachUseCase {
 
             //passo 3: creazione spiaggia e salvataggio nel DB
             //salvo lo stato di active, passato da command
-            boolean finalActiveState = command.active();
-            Beach beach = new Beach(0,
-                    command.ownerId(),
-                    addressId,
-                    command.beachGeneral(),
-                    command.beachInventory(),
-                    command.beachServices(),
-                    command.parking(),
-                    command.extraInfo(),
-                    command.seasons(),
-                    command.zones(),
-                    false,
-                    false
-            );
-            //verifico activeState: se è messo a true, ma la spiaggia non è configurata completamente, metto active a false,
-            //senza lanciare errori/eccezioni
-            //se activeState è false, allora procedo normalmente
-            if (finalActiveState) {
-                // UC-10 Step 10a: Save as Draft
-                beach.setActive(beach.isFullyConfigured());
-            }
+            Beach beach = getBeach(command, addressId);
 
             //passo 4: fine transaction e ritorno il nuovo ID della spiaggia
             return beachRepository.save(beach, context);
         });
+    }
+
+    private static Beach getBeach(CreateBeachCommand command, Integer addressId) {
+        boolean finalActiveState = command.active();
+        Beach beach = new Beach(0,
+                command.ownerId(),
+                addressId,
+                command.beachGeneral(),
+                command.beachInventory(),
+                command.beachServices(),
+                command.parking(),
+                command.extraInfo(),
+                command.seasons(),
+                command.zones(),
+                false,
+                false
+        );
+        //verifico activeState: se è messo a true, ma la spiaggia non è configurata completamente, metto active a false,
+        //senza lanciare errori/eccezioni
+        //se activeState è false, allora procedo normalmente
+        if (finalActiveState) {
+            beach.setActive(beach.isFullyConfigured());
+        }
+        return beach;
     }
 }

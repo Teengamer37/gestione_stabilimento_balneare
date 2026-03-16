@@ -113,7 +113,7 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
             ReportTargetType reportedType;
             Integer reportedId;
 
-            if (reporterUser instanceof Customer customer) {
+            if (reporterUser instanceof Customer) {
                 //Customer segnala la spiaggia
                 if (!Objects.equals(command.reporterId(), booking.getCustomerId())) {
                     throw new IllegalStateException("ERROR: Customer does not match with the booking");

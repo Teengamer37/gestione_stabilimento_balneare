@@ -158,7 +158,7 @@ class JdbcSpotDao {
                     );
 
                     //aggiungo lo Spot alla Map
-                    zoneMap.computeIfPresent(zoneName, (k, list) -> {
+                    zoneMap.computeIfPresent(zoneName, (_, list) -> {
                         list.add(spot);
                         return list;
                     });

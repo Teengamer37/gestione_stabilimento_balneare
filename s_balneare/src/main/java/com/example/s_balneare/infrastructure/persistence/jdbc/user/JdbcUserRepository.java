@@ -1,7 +1,6 @@
 package com.example.s_balneare.infrastructure.persistence.jdbc.user;
 
 import com.example.s_balneare.application.port.out.TransactionManager;
-import com.example.s_balneare.application.port.out.review.ReviewRepository;
 import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.User;

@@ -37,10 +37,10 @@ public class Beach {
         this.parking = parking;
         updateExtraInfo(extraInfo);
 
-        if (zones == null || zones.isEmpty()) this.zones = new ArrayList<Zone>();
+        if (zones == null || zones.isEmpty()) this.zones = new ArrayList<>();
         else this.zones = new ArrayList<>(zones);
 
-        this.seasons = new ArrayList<Season>();
+        this.seasons = new ArrayList<>();
         if (seasons != null && !seasons.isEmpty()) {
             addSeasons(seasons);
         }
