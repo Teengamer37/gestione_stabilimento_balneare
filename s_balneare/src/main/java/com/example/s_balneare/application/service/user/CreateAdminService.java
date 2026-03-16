@@ -6,7 +6,13 @@ import com.example.s_balneare.application.port.out.user.UserRepository;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Admin;
 
-
+/**
+ * Implementazione dell'interfaccia che permette la creazione dell‘Admin facendo collaborare l'app Java e il Database.
+ * <p>Estende la classe CreateUserService.
+ *
+ * @see CreateUserService CreateUserService
+ * @see CreateAdminRequest CreateAdminRequest
+ */
 public class CreateAdminService extends CreateUserService<Admin, CreateAdminRequest> {
     public CreateAdminService(UserRepository<Admin> userRepository, TransactionManager transactionManager) {
         super(userRepository, transactionManager);

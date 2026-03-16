@@ -16,8 +16,13 @@ import java.util.Optional;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Beach tra l'app Java e il Database.
+ * <p>Usa BeachRepository per compiere le varie operazioni di aggiornamento sulla spiaggia;
+ * <p>Usa BookingRepository per garantire l’integrità dei dati in caso di modifica di alcuni dati.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see ManageBeachUseCase ManageBeachUseCase
+ * @see BeachRepository BeachRepository
+ * @see BookingRepository BookingRepository
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ManageBeachService implements ManageBeachUseCase {

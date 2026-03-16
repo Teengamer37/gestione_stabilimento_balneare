@@ -9,8 +9,12 @@ import com.example.s_balneare.domain.moderation.ReportStatus;
 import java.util.List;
 
 /**
- * Implementazione dell'interfaccia che permette la navigazione dell'admin sui report
+ * Implementazione dell'interfaccia che permette la navigazione dell'Admin sui Report.
+ * <p>Usa ReportRepository per aggiornare i report verificati dall’Admin.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
+ * @see ManageReportUseCase ManageReportUseCase
+ * @see ReportRepository ReportRepository
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ManageReportService implements ManageReportUseCase {
@@ -22,6 +26,13 @@ public class ManageReportService implements ManageReportUseCase {
         this.transactionManager = transactionManager;
     }
 
+    /**
+     * Recupera Report specifico dal DB.
+     *
+     * @param reportId ID del report da recuperare
+     * @return oggetto Report con quell'ID
+     * @throws IllegalArgumentException se il report non esiste nel DB
+     */
     @Override
     public Report getReport(Integer reportId) {
         return transactionManager.executeInTransaction(context -> {
@@ -30,6 +41,11 @@ public class ManageReportService implements ManageReportUseCase {
         });
     }
 
+    /**
+     * Recupera tutti i report non ancora verificati dall‘Admin (stato PENDING).
+     *
+     * @return lista di report non ancora verificati
+     */
     @Override
     public List<Report> getPendingReports() {
         return transactionManager.executeInTransaction(context -> {
@@ -37,6 +53,12 @@ public class ManageReportService implements ManageReportUseCase {
         });
     }
 
+    /**
+     * Recupera tutti i Report fatti da quell‘utente o che riguardano uno specifico utente.
+     *
+     * @param userId ID dell'utente
+     * @return lista di report fatti da o riguardanti quell’utente
+     */
     @Override
     public List<Report> getUserReports(Integer userId) {
         transactionManager.executeInTransaction(context -> {
@@ -48,6 +70,11 @@ public class ManageReportService implements ManageReportUseCase {
         return List.of();
     }
 
+    /**
+     * Approva un report.
+     *
+     * @param reportId ID del report da approvare
+     */
     @Override
     public void approveReport(Integer reportId) {
         transactionManager.executeInTransaction(context -> {
@@ -57,6 +84,11 @@ public class ManageReportService implements ManageReportUseCase {
         });
     }
 
+    /**
+     * Rifiuta un report.
+     *
+     * @param reportId ID del report da rifiutare
+     */
     @Override
     public void rejectReport(Integer reportId) {
         transactionManager.executeInTransaction(context -> {

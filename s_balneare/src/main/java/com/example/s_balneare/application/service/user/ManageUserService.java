@@ -8,6 +8,15 @@ import com.example.s_balneare.domain.user.Admin;
 import com.example.s_balneare.domain.user.Owner;
 import com.example.s_balneare.domain.user.User;
 
+/**
+ * Implementazione astratta dell'interfaccia che permette la manipolazione dell'utente facendo collaborare l'app Java e il Database.
+ * <p>Usa UserRepository per il recupero e la modifica dei dati dell’utente;
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ * <p>Estesa nelle classi: ManageCustomerService, ManageOwnerService, ManageAdminService.
+ *
+ * @see UserRepository UserRepositry
+ * @see TransactionManager TransactionManager per le transazioni SQL
+ */
 public class ManageUserService<T extends User> {
     protected final UserRepository<T> userRepository;
     protected final TransactionManager transactionManager;
@@ -17,6 +26,13 @@ public class ManageUserService<T extends User> {
         this.transactionManager = transactionManager;
     }
 
+    /**
+     * Verifica se la password inserita è uguale a quella salvata nel DB.
+     *
+     * @param rawPassword    Password non crittografata inserita dall’utente
+     * @param hashedPassword Password crittografata ricavata dal DB
+     * @throws IllegalArgumentException se la password non corrisponde
+     */
     protected void verifyPassword(String rawPassword, String hashedPassword) {
         BCrypt.Result result = BCrypt.verifyer().verify(rawPassword.toCharArray(), hashedPassword);
         //se la password non corrisponde, lancio l'eccezione
@@ -25,6 +41,16 @@ public class ManageUserService<T extends User> {
         }
     }
 
+    /**
+     * Aggiorna la password di un utente.
+     * <p>Disattiva il flag OTP se primo accesso all’account.
+     *
+     * @param id ID dell‘utente
+     * @param oldPassword Vecchia password (per convalida)
+     * @param newPassword Nuova password
+     * @param OTP Parametro OTP
+     * @throws IllegalArgumentException se l’utente non esiste nel DB/la vecchia password non corrisponde
+     */
     public void updatePassword(Integer id, String oldPassword, String newPassword, boolean OTP) {
         transactionManager.executeInTransaction(context -> {
             //cerco password vecchia
@@ -53,7 +79,15 @@ public class ManageUserService<T extends User> {
         });
     }
 
-    //transazione unica, aggiornamento indirizzo sarà gestito da un'altra transazione ed interfaccia
+    /**
+     * Aggiorna i dati di un utente (nome, cognome, username).
+     * <p>DA NON USARE CON CUSTOMER!
+     *
+     * @param id       ID dell‘utente da aggiornare
+     * @param name     Nuovo nome
+     * @param surname  Nuovo cognome
+     * @param username Nuovo Username
+     */
     public void updateDatas(Integer id, String name, String surname, String username) {
         transactionManager.executeInTransaction(context -> {
             T user = getUserOrThrow(id, context);
@@ -64,13 +98,20 @@ public class ManageUserService<T extends User> {
         });
     }
 
-    //transazione unica eliminazione email, da gestire per controlli lato applicazione
+    /**
+     * Aggiorna la email di un utente.
+     *
+     * @param id              ID dell’utente da aggiornare
+     * @param email           Nuova email
+     * @param currentPassword Password attuale (per convalida modifiche)
+     * @throws IllegalArgumentException se l’utente non esiste nel DB/la vecchia password non corrisponde
+     */
     public void updateEmail(Integer id, String email, String currentPassword) {
         transactionManager.executeInTransaction(context -> {
             T user = getUserOrThrow(id, context);
 
             String currentHashedPassword = userRepository.findPassword(id, context)
-                    .orElseThrow(() -> new IllegalArgumentException("ERROR: Password not found"));
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: password not found"));
             verifyPassword(currentPassword, currentHashedPassword);
 
             user.updateEmail(email);
@@ -78,10 +119,16 @@ public class ManageUserService<T extends User> {
         });
     }
 
+    /**
+     * Metodo protetto che preleva dal database uno specifico utente.
+     *
+     * @param id      ID dell’utente
+     * @param context Connessione JDBC
+     * @return utente prelevato dal database
+     * @throws IllegalArgumentException se l’utente non esiste nel DB
+     */
     protected T getUserOrThrow(Integer id, TransactionContext context) {
         return userRepository.findById(id, context)
                 .orElseThrow(() -> new IllegalArgumentException("ERROR: user not found with id: " + id));
     }
 }
-
-//TODO: finire controlla aggiunta metodi con gli useCase

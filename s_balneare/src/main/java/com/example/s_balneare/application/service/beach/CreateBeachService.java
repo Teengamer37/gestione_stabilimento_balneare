@@ -36,6 +36,7 @@ public class CreateBeachService implements CreateBeachUseCase {
      *
      * @param command Oggetto contenente tutti i dettagli di una spiaggia
      * @return ID della spiaggia appena salvata (assegnato dal DB)
+     * @see CreateBeachCommand CreateBeachCommand
      */
     @Override
     public Integer createBeach(CreateBeachCommand command) {

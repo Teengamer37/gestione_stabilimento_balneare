@@ -11,34 +11,47 @@ import com.example.s_balneare.domain.user.Customer;
 import com.example.s_balneare.domain.user.User;
 
 /**
- * Implementazione dell'interfaccia che permette l'autenticazione dell'utente facendo collaborare l'app Java e il Database
+ * Implementazione dell'interfaccia che permette l'autenticazione dell'utente facendo collaborare l'app Java e il Database.
+ * <p>Usa UserRepository per il recupero dati dell’utente;
+ * <p>Usa BanRepository per controllo ban dell’utente che cerca di autenticarsi.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see AuthenticationUseCase AuthenticationUseCase
+ * @see UserRepository UserRepository
+ * @see BanRepository BanRepository
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class AuthenticationService<T extends User> implements AuthenticationUseCase {
-
     private final UserRepository<T> userRepository;
     private final BanRepository banRepository;
-    private final BeachRepository beachRepository;
     private final TransactionManager transactionManager;
 
     public AuthenticationService(UserRepository<T> userRepository,
                                  BanRepository banRepository,
-                                 BeachRepository beachRepository,
                                  TransactionManager transactionManager) {
         this.userRepository = userRepository;
         this.banRepository = banRepository;
-        this.beachRepository = beachRepository;
         this.transactionManager = transactionManager;
     }
 
+    /**
+     * Autentifica l’utente nell’applicazione.
+     * <p>Usa BCrypt per la crittografia della password.
+     *
+     * @param identifier Username o email dell’utente
+     * @param rawPassword Password inserita
+     * @return oggetto utile per mantenere la sessione dell’utente all’interno dell’app
+     * @throws IllegalArgumentException se username, email e/o password non sono corretti
+     * @throws SecurityException se faccio login su un account bannato/disattivato
+     * @see LoginResult LoginResult
+     * @see BCrypt BCrypt per la crittografia della password
+     */
     @Override
     public LoginResult login(String identifier, String rawPassword) {
         return transactionManager.executeInTransaction(context -> {
             //passo 1: verifico username e password
             String hashedPassword = userRepository.findPassword(identifier, context)
-                    .orElseThrow(() -> new IllegalArgumentException("ERROR: invalid username or password."));
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: invalid username/email and/or password."));
             BCrypt.Result result = BCrypt.verifyer().verify(rawPassword.toCharArray(), hashedPassword);
             if (!result.verified) {
                 throw new IllegalArgumentException("ERROR: invalid username or password.");

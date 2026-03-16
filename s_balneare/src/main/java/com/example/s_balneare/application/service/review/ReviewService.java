@@ -16,8 +16,17 @@ import java.time.LocalDate;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Review tra l'app Java e il Database.
+ * <p>Usa ReviewRepository per manipolare oggetti Review nel DB;
+ * <p>Usa BeachRepository per recuperare la spiaggia interessata alla recensione;
+ * <p>Usa BookingRepository per recuperare la prenotazione interessata alla recensione;
+ * <p>Usa BanRepository per verificare lo stato degli attori interessati.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
- * @see BookingUseCase BookingUseCase
+ * @see ReviewUseCase ReviewUseCase
+ * @see ReviewRepository ReviewRepository
+ * @see BeachRepository BeachRepository
+ * @see BookingRepository BookingRepository
+ * @see BanRepository BanRepository
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ReviewService implements ReviewUseCase {
@@ -40,7 +49,7 @@ public class ReviewService implements ReviewUseCase {
     }
 
     /**
-     * Aggiunge una nuova recensione nel DB
+     * Aggiunge una nuova recensione nel DB.
      *
      * @param command parametri necessari per la creazione di una nuova recensione
      * @return ID della recensione appena creata
@@ -59,27 +68,26 @@ public class ReviewService implements ReviewUseCase {
                 throw new SecurityException("ERROR: cannot review an inactive beach");
             }
 
-            //Controllo che l'utente non sia bannato dalla spiaggia e dall'app
+            //passo 2: controllo che l'utente non sia bannato dalla spiaggia e dall'app
             if (banRepository.isBannedFromApp(command.customerId(), context)) {
-                throw new SecurityException("ERROR: cannot review, you are banned from the app");
+                throw new SecurityException("ERROR: user is banned from the app");
             }
             if (banRepository.isBannedFromBeach(command.customerId(), command.beachId(), context)) {
-                throw new SecurityException("ERROR: cannot review, you are banned from the beach");
+                throw new SecurityException("ERROR: user is banned from this beach");
             }
 
-
-            //passo 2: controllo che l'utente abbia effettivamente visitato la spiaggia con un booking confermato nel passato
+            //passo 3: controllo che l'utente abbia effettivamente visitato la spiaggia con un booking confermato nel passato
             boolean hasCompletedStay = bookingRepository.hasPastConfirmedBooking(
                     command.customerId(),
                     command.beachId(),
-                    LocalDate.now(), //data di riferimento = oggi
+                    LocalDate.now(),
                     context
             );
             if (!hasCompletedStay) {
                 throw new IllegalStateException("ERROR: customer does not have past confirmed bookings in this structure");
             }
 
-            //passo 3: creo oggetto Review
+            //passo 4: creo oggetto Review
             Review review = new Review(
                     0,
                     command.beachId(),
@@ -89,13 +97,13 @@ public class ReviewService implements ReviewUseCase {
                     Instant.now()
             );
 
-            //passo 4: salvo nel DB
+            //passo 5: salvo nel DB
             return reviewRepository.save(review, context);
         });
     }
 
     /**
-     * Elimina una recensione dal DB
+     * Elimina una recensione dal DB.
      *
      * @param reviewId   ID della recensione da eliminare
      * @param customerId ID del Customer creatore della recensione
@@ -109,12 +117,20 @@ public class ReviewService implements ReviewUseCase {
             Review review = reviewRepository.findById(reviewId, context)
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: Review not found"));
 
-            //passo 2: controllo che la review sia effettivamente dell'utente richiedente
+            //passo 2: controllo che l'utente non sia bannato dalla spiaggia e dall'app
+            if (banRepository.isBannedFromApp(customerId, context)) {
+                throw new SecurityException("ERROR: user is banned from the app");
+            }
+            if (banRepository.isBannedFromBeach(customerId, review.getBeachId(), context)) {
+                throw new SecurityException("ERROR: user is banned from this beach");
+            }
+
+            //passo 3: controllo che la review sia effettivamente dell'utente richiedente
             if (!review.getCustomerId().equals(customerId)) {
                 throw new SecurityException("ERROR: the review doesn't belong to this customer");
             }
 
-            //passo 3: elimino la recensione dal DB
+            //passo 4: elimino la recensione dal DB
             reviewRepository.delete(reviewId, context);
         });
     }

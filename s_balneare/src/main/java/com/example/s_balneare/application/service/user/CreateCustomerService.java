@@ -8,8 +8,15 @@ import com.example.s_balneare.domain.common.Address;
 import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.user.Customer;
 
+/**
+ * Implementazione dell'interfaccia che permette la creazione del Customer facendo collaborare l'app Java e il Database.
+ * <p>Estende la classe CreateUserService.
+ * <p>Usa AddressRepository per il salvataggio dell'indirizzo nel DB.
+ *
+ * @see CreateUserService CreateUserService
+ * @see CreateCustomerRequest CreateCustomerRequest
+ */
 public class CreateCustomerService extends CreateUserService<Customer, CreateCustomerRequest> {
-
     private final AddressRepository addressRepository;
 
     public CreateCustomerService(UserRepository<Customer> userRepository, AddressRepository addressRepository, TransactionManager transactionManager) {
@@ -19,6 +26,7 @@ public class CreateCustomerService extends CreateUserService<Customer, CreateCus
 
     @Override
     protected Customer registerUser(CreateCustomerRequest request, TransactionContext context) {
+        //passo 1: creazione e salvataggio nel DB dell’indirizzo
         Address address = new Address(
                 0,
                 request.getStreet(),
@@ -29,6 +37,7 @@ public class CreateCustomerService extends CreateUserService<Customer, CreateCus
         );
         Integer addressId = addressRepository.save(address, context);
 
+        //passo 2: creazione e salvataggio nel DB del Customer
         return new Customer(
                 0,
                 request.getEmail(),

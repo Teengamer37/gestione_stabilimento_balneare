@@ -29,6 +29,7 @@ public class BrowseBeachService implements BrowseBeachUseCase {
      * Cerca nel database tutte le spiagge attive
      *
      * @return lista di spiagge attive
+     * @see BeachSummary BeachSummary
      */
     @Override
     public List<BeachSummary> getActiveBeaches() {
@@ -42,6 +43,7 @@ public class BrowseBeachService implements BrowseBeachUseCase {
      *
      * @param keyword Parametro di ricerca (città o paese)
      * @return lista di spiagge attive che rispettano il parametro di ricerca
+     * @see BeachSummary BeachSummary
      */
     @Override
     public List<BeachSummary> searchActiveBeaches(String keyword) {

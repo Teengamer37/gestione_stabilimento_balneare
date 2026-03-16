@@ -17,6 +17,21 @@ import com.example.s_balneare.domain.user.User;
 import java.time.Instant;
 import java.time.LocalDate;
 
+/**
+ * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
+ * <p>Usa BanRepository per manipolare l’oggetto Ban nel database;
+ * <p>Usa BookingRepository per annullare tutte le prenotazioni future di un customer/fatte su una spiaggia;
+ * <p>Usa UserRepository per recuperare e aggiornare righe di utenti partecipanti al Ban;
+ * <p>Usa BeachRepository per recuperare e aggiornare righe di spiagge partecipanti al Ban.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
+ *
+ * @see BanUseCase BanUseCase
+ * @see BanRepository BanRepository
+ * @see BookingRepository BookingRepository
+ * @see UserRepository UserRepository
+ * @see BeachRepository BeachRepository
+ * @see TransactionManager TransactionManager per le transazioni SQL
+ */
 public class BanService<T extends User> implements BanUseCase {
     private final BanRepository banRepository;
     private final BookingRepository bookingRepository;
@@ -32,56 +47,70 @@ public class BanService<T extends User> implements BanUseCase {
         this.transactionManager = transactionManager;
     }
 
+    /**
+     * Crea e applica un nuovo ban.
+     *
+     * @param command Oggetto contenente tutti gli attributi necessari per creare il ban
+     * @return ID univoco generato dal Database
+     * @see CreateBanCommand CreateBanCommand
+     */
     @Override
     public Integer createBan(CreateBanCommand command) {
         return transactionManager.executeInTransaction(context -> {
-            //Trovo l'utente
+            //trovo l'utente
             T user = userRepository.findById(command.bannedId(), context)
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: User not found"));
 
-            //Flusso di operazione se l'utente è un owner
+            //flusso di operazione se l'utente è un Owner
             if (user instanceof Owner owner) {
-                //Controllo che non ci sia id di una spiaggia
+                //controllo che non ci sia ID di una spiaggia
                 if (command.bannedFromBeachId() != null && command.bannedFromBeachId() > 0) {
                     throw new IllegalStateException("ERROR: Owner cannot be banned from beach");
                 }
-                //Controllo il ban sia di application
+
+                //controllo che il ban sia di tipo application
                 if (command.banType() == BanType.BEACH) {
-                    throw new IllegalStateException("ERROR: owner cannot be banned from beach ");
+                    throw new IllegalStateException("ERROR: Owner cannot be banned from beach");
                 }
+
+                //recupero Beach dal DB
                 Beach beach = beachRepository.findByOwnerId(command.bannedId(), context)
                         .orElseThrow(() -> new IllegalArgumentException("ERROR: beach doesn't exist"));
+
                 //elimino booking futuri
                 bookingRepository.cancelFutureBookingsForBeach(beach.getId(), LocalDate.now(), context);
-                //Disattiva owner
+
+                //disattivo owner
                 owner.closeAccount();
                 userRepository.update(user, context);
-                //Chiudi spiaggia
+
+                //chiudo spiaggia
                 beach.closeBeach();
                 beachRepository.update(beach, context);
-            }
-            //Flusso di operazioni se l'utente è un customer
-            else if (user instanceof Customer customer) {
-                //Controllo tipo di ban
+            //flusso di operazioni se l'utente è un Customer
+            } else if (user instanceof Customer customer) {
+                //controllo tipo di ban
                 if (command.banType() == BanType.BEACH) {
-                    //Elimino prenotazioni del singolo utente da quella spiaggia
+                    //se tipo BEACH, elimino prenotazioni del singolo utente da quella spiaggia
                     Beach beach = beachRepository.findById(command.bannedFromBeachId(), context)
                             .orElseThrow(() -> new IllegalArgumentException("ERROR: beach doesn't exist"));
-                    // metodo che elimina prenotazioni utente da una singola spiaggia
+
+                    //elimino prenotazioni utente da una singola spiaggia
                     bookingRepository.cancelFutureUserBookingsFromBeach(customer.getId(), beach.getId(), LocalDate.now(), context);
-                } else { //Ban dall'applicazione
-                    //Elimino tutte prenotazioni utente
+                } else {
+                    //se tipo APPLICATION, elimino tutte le sue prenotazioni
                     bookingRepository.cancelFutureBookingsForCustomer(customer.getId(), LocalDate.now(), context);
-                    //Chiudo definitivamente l'account
+
+                    //chiudo definitivamente l'account
                     customer.closeAccount();
                     userRepository.update(user, context);
                 }
-            }
-            // Gestione caso utente non bannabile (es. Admin)
-            else {
+            //gestione caso utente non bannabile (es. Admin)
+            } else {
                 throw new IllegalArgumentException("ERROR: This type of user cannot be banned");
             }
 
+            //creo nuovo oggetto Ban
             Ban ban = new Ban(0,
                     command.bannedId(),
                     command.banType(),
@@ -90,10 +119,17 @@ public class BanService<T extends User> implements BanUseCase {
                     command.reason(),
                     Instant.now());
 
+            //salvo nel DB
             return banRepository.save(ban, context);
         });
     }
 
+    /**
+     * Controlla se l’utente in questione ha un ban attivo a livello applicazione.
+     *
+     * @param customerId ID dell'utente da controllare
+     * @return TRUE se c’è un ban attivo a livello applicazione per l’utente, FALSE altrimenti
+     */
     @Override
     public boolean isUserBannedFromApp(Integer customerId) {
         return transactionManager.executeInTransaction(context -> {
@@ -101,11 +137,17 @@ public class BanService<T extends User> implements BanUseCase {
         });
     }
 
+    /**
+     * Controlla se il Customer in questione ha un ban attivo su una determinata spiaggia.
+     *
+     * @param customerId ID dell'utente da controllare
+     * @param beachId ID della spiaggia
+     * @return TRUE se c’è un ban attivo su quella spiaggia, FALSE altrimenti
+     */
     @Override
     public boolean isCustomerBannedFromBeach(Integer customerId, Integer beachId) {
         return transactionManager.executeInTransaction(context -> {
             return banRepository.isBannedFromBeach(customerId, beachId, context);
         });
     }
-
 }

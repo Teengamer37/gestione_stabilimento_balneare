@@ -20,8 +20,15 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Booking tra l'app Java e il Database.
+ * <p>Usa BookingRepository per compiere le varie operazioni di aggiornamento sulla prenotazione;
+ * <p>Usa BeachRepository per prendere riferimenti vari dalla spiaggia registrata nella prenotazione;
+ * <p>Usa AvailabilityQuery per controllare le varie disponibilità sui parcheggi/oggetti extra.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see BookingUseCase BookingUseCase
+ * @see BookingRepository BookingRepository
+ * @see BeachRepository BeachRepository
+ * @see AvailabilityQuery AvailabilityQuery
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class BookingService implements BookingUseCase {
@@ -39,7 +46,7 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Aggiorna booking nel DB con nuovi dettagli
+     * Aggiorna booking nel DB con nuovi dettagli.
      *
      * @param id          ID del Booking da modificare
      * @param newSpotIds  Spot prenotati da aggiornare nel Booking
@@ -59,7 +66,7 @@ public class BookingService implements BookingUseCase {
 
             //passo 2: check sulla data per vedere se è possibile modificare la prenotazione
             if (!booking.getDate().isAfter(LocalDate.now())) {
-                throw new IllegalStateException("ERROR: booking cannot be updated on or after its date.");
+                throw new IllegalStateException("ERROR: booking cannot be updated on or after its date");
             }
 
             //passo 3: calcolo il numero di posti parcheggio ed extra oggetti prenotati finora
@@ -97,7 +104,7 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Ricerca, aggiorna stato in CONFIRMED e salva booking nel DB
+     * Ricerca, aggiorna stato in CONFIRMED e salva booking nel DB.
      *
      * @param id Identificatore booking da manipolare nel DB
      */
@@ -108,7 +115,7 @@ public class BookingService implements BookingUseCase {
 
             //check sulla data per vedere se è possibile modificare la prenotazione
             if (!booking.getDate().isAfter(LocalDate.now())) {
-                throw new IllegalStateException("ERROR: booking cannot be confirmed on or after its date.");
+                throw new IllegalStateException("ERROR: booking cannot be confirmed on or after its date");
             }
 
             booking.confirmBooking();
@@ -118,7 +125,7 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Ricerca, aggiorna stato in REJECTED e salva booking nel DB
+     * Ricerca, aggiorna stato in REJECTED e salva booking nel DB.
      *
      * @param id Identificatore booking da manipolare nel DB
      */
@@ -129,7 +136,7 @@ public class BookingService implements BookingUseCase {
 
             //check sulla data per vedere se è possibile modificare la prenotazione
             if (!booking.getDate().isAfter(LocalDate.now())) {
-                throw new IllegalStateException("ERROR: booking cannot be rejected on or after its date.");
+                throw new IllegalStateException("ERROR: booking cannot be rejected on or after its date");
             }
 
             booking.rejectBooking();
@@ -139,7 +146,7 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Ricerca, aggiorna stato in CANCELLED e salva booking nel DB
+     * Ricerca, aggiorna stato in CANCELLED e salva booking nel DB.
      *
      * @param id Identificatore booking da manipolare nel DB
      */
@@ -150,7 +157,7 @@ public class BookingService implements BookingUseCase {
 
             //check sulla data per vedere se è possibile modificare la prenotazione
             if (!booking.getDate().isAfter(LocalDate.now())) {
-                throw new IllegalStateException("ERROR: booking cannot be cancelled on or after its date.");
+                throw new IllegalStateException("ERROR: booking cannot be cancelled on or after its date");
             }
 
             booking.cancelBooking();
@@ -160,7 +167,7 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Prende dal database una lista di Booking fatti da un Customer (indipendentemente dallo stato dei singoli Booking)
+     * Prende dal database una lista di Booking fatti da un Customer (indipendentemente dallo stato dei singoli Booking).
      *
      * @param customerId ID del Customer da cercare nel DB
      * @return Lista di Booking effettuati da quel Customer
@@ -173,7 +180,7 @@ public class BookingService implements BookingUseCase {
     }
 
     /**
-     * Prende dal database una lista di Booking fatti per una determinata Beach (indipendentemente dallo stato dei singoli Booking)
+     * Prende dal database una lista di Booking fatti per una determinata Beach (indipendentemente dallo stato dei singoli Booking).
      *
      * @param ownerId ID dell'Owner per poi cercare la spiaggia associata
      * @return Lista di Booking registrati nella spiaggia
@@ -183,7 +190,7 @@ public class BookingService implements BookingUseCase {
         return transactionManager.executeInTransaction(context -> {
             //cerco la spiaggia dell'Owner
             Beach beach = beachRepository.findByOwnerId(ownerId, context)
-                    .orElseThrow(() -> new IllegalArgumentException("Owner has no beach"));
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: Owner has no beach"));
 
             //cerco tutti i Booking di quella spiaggia
             return bookingRepository.findByBeachId(beach.getId(), context);
@@ -192,7 +199,7 @@ public class BookingService implements BookingUseCase {
 
     /**
      * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
-     * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     * <p>Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto.
      *
      * @param id      Identificativo booking da cercare
      * @param context Connessione JDBC
@@ -207,7 +214,7 @@ public class BookingService implements BookingUseCase {
     /**
      * Metodo privato che va a fare questo calcolo:
      * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
-     * Questa operazione viene fatta per ciascuna categoria di parcheggio.
+     * <p>Questa operazione viene fatta per ciascuna categoria di parcheggio.
      *
      * @param capacity  Parcheggio della spiaggia
      * @param booked    Parcheggi prenotati in quella data

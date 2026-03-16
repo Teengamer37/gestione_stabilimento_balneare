@@ -10,9 +10,12 @@ import java.util.List;
 
 /**
  * Implementazione dell'interfaccia che permette la manipolazione della collezione di Address tra l'app Java e il Database.
+ * <p>Usa AddressRepository per manipolare l’oggetto Address nel database.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see AddressUseCase AddressUseCase
- * @see com.example.s_balneare.application.port.out.TransactionManager TransactionManager per le transazioni SQL
+ * @see AddressRepository AddressRepository
+ * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class AddressService implements AddressUseCase {
     private final AddressRepository addressRepository;
@@ -24,7 +27,7 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Aggiunta nuovo indirizzo associato a utente/spiaggia nel DB
+     * Aggiunta nuovo indirizzo associato a utente/spiaggia nel DB.
      *
      * @param address Indirizzo da aggiungere
      * @return ID univoco generato dal Database
@@ -37,7 +40,7 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Aggiornamento indirizzo presente nel DB
+     * Aggiornamento indirizzo presente nel DB.
      *
      * @param id      Identificatore indirizzo da cercare nel DB
      * @param address Parametri da aggiornare
@@ -60,7 +63,7 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Ricerca indirizzo nel DB
+     * Ricerca indirizzo nel DB.
      *
      * @param id Identificatore indirizzo da cercare nel DB
      * @return oggetto Address con quell'ID
@@ -73,7 +76,7 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Ricerca indirizzi nel DB data la città
+     * Ricerca indirizzi nel DB data la città.
      *
      * @param city Nome della città
      * @return Lista di indirizzi che hanno come città quella passata come parametro
@@ -86,7 +89,7 @@ public class AddressService implements AddressUseCase {
     }
 
     /**
-     * Ricerca indirizzi nel DB dato il paese
+     * Ricerca indirizzi nel DB dato il paese.
      *
      * @param country Nome del paese
      * @return Lista di indirizzi che hanno come paese quello passato come parametro
@@ -100,7 +103,7 @@ public class AddressService implements AddressUseCase {
 
     /**
      * Metodo privato che serve nelle operazioni sensibili (in questo caso in update):
-     * cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto
+     * <p>Cerca in DB -> se non trovo la spiaggia, restituisce NULL -> interrompo tutto.
      *
      * @param id      Identificativo indirizzo da cercare
      * @param context Connessione JDBC

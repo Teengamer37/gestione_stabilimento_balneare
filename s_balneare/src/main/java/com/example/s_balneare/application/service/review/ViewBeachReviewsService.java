@@ -10,8 +10,11 @@ import java.util.List;
 /**
  * Implementazione dell'interfaccia che permette l'interazione per il recupero di oggetti Review collegati ad una
  * determinata Beach tra l'app Java e il Database.
+ * <p>Usa BeachReviewsQuery per recuperare tutte le recensioni effettuate da una spiaggia.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see ViewBeachReviewsUseCase ViewBeachReviewsUseCase
+ * @see BeachReviewsQuery BeachReviewsQuery
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
 public class ViewBeachReviewsService implements ViewBeachReviewsUseCase {
@@ -24,10 +27,11 @@ public class ViewBeachReviewsService implements ViewBeachReviewsUseCase {
     }
 
     /**
-     * Genera una lista con tutte le Review di quella determinata spiaggia
+     * Genera una lista con tutte le Review di quella determinata spiaggia.
      *
      * @param beachId ID della spiaggio
      * @return lista di recensioni fatte su quella spiaggia
+     * @see BeachReviewDto BeachReviewDto
      */
     public List<BeachReviewDto> getBeachReviews(Integer beachId) {
         return transactionManager.executeInTransaction(context -> {
@@ -36,7 +40,7 @@ public class ViewBeachReviewsService implements ViewBeachReviewsUseCase {
     }
 
     /**
-     * Calcola la valutazione media della spiaggia dalle sue recensioni
+     * Calcola la valutazione media della spiaggia dalle sue recensioni.
      *
      * @param beachId ID della spiaggia
      * @return la valutazione media della spiaggia

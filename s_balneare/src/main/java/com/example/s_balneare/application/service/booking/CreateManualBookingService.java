@@ -9,6 +9,7 @@ import com.example.s_balneare.application.port.out.booking.AvailabilityQuery;
 import com.example.s_balneare.application.port.out.booking.BookedInventory;
 import com.example.s_balneare.application.port.out.booking.BookedParkingSpaces;
 import com.example.s_balneare.application.port.out.booking.BookingRepository;
+import com.example.s_balneare.application.port.out.moderation.BanRepository;
 import com.example.s_balneare.domain.beach.Beach;
 import com.example.s_balneare.domain.beach.BeachInventory;
 import com.example.s_balneare.domain.beach.Parking;
@@ -19,34 +20,38 @@ import com.example.s_balneare.domain.booking.PriceCalculator;
 
 /**
  * Implementazione dello Use Case di aggiunta prenotazione (fatta da un Owner) nel DB:
- * Interagisce con BeachRepository per trovare la spiaggia e per verificare che gli Spot appartengono alla spiaggia stessa;
- * Successivamente usa AvailabilityQuery per trovare i posti occupati di quel giorno in quella spiaggia;
- * Viene alla fine usata BookingRepository per salvare la nuova prenotazione.
- * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata
+ * <p>Interagisce con BeachRepository per trovare la spiaggia e per verificare che gli Spot appartengono alla spiaggia stessa;
+ * <p>Successivamente usa AvailabilityQuery per trovare i posti occupati di quel giorno in quella spiaggia;
+ * <p>Usa BanRepository per verificare lo stato della spiaggia dal punto di vista delle restrizioni;
+ * <p>Viene alla fine usata BookingRepository per salvare la nuova prenotazione.
+ * <p>Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
  *
  * @see CreateBookingUseCase CreateBookingUseCase
  * @see TransactionManager TransactionManager
  * @see BeachRepository BeachRepository
  * @see BookingRepository BookingRepository
  * @see AvailabilityQuery AvailabilityQuery
+ * @see CreateManualBookingCommand CreateManualBookingCommand
  */
 public class CreateManualBookingService implements CreateManualBookingUseCase {
     private final BeachRepository beachRepository;
     private final BookingRepository bookingRepository;
     private final AvailabilityQuery availabilityQuery;
+    private final BanRepository banRepository;
     private final TransactionManager transactionManager;
 
     public CreateManualBookingService(BeachRepository beachRepository,
                                       BookingRepository bookingRepository,
                                       AvailabilityQuery availabilityQuery,
+                                      BanRepository banRepository,
                                       TransactionManager transactionManager) {
         this.beachRepository = beachRepository;
         this.bookingRepository = bookingRepository;
         this.availabilityQuery = availabilityQuery;
+        this.banRepository = banRepository;
         this.transactionManager = transactionManager;
     }
 
-    //TODO: aggiungere controllo se owner bannato dalla spiaggia! (dopo aver fatto BanRepository)
     public Integer createManualBooking(CreateManualBookingCommand command) {
         return transactionManager.executeInTransaction(context -> {
             //passo 1: estraggo la Beach dall'ownerId
@@ -54,22 +59,27 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
                     .orElseThrow(() -> new IllegalStateException("ERROR: Owner does not have a registered beach"));
             //controllo se spiaggia attiva
             if (!beach.isActive()) {
-                throw new IllegalStateException("ERROR: Cannot create bookings for an inactive beach.");
+                throw new IllegalStateException("ERROR: cannot create bookings for an inactive beach");
             }
             Integer beachId = beach.getId();
 
-            //passo 2: recupero i posti parcheggio occupati in quel giorno
+            //passo 2: controllo gestore non sia bannato dall'app
+            if (banRepository.isBannedFromApp(command.ownerId(), context)) {
+                throw new IllegalStateException("ERROR: owner banned from the app");
+            }
+
+            //passo 3: recupero i posti parcheggio occupati in quel giorno
             BookedParkingSpaces booked = availabilityQuery.getBookedParking(beachId, command.date(), null, context);
             BookingParking requestedParking = new BookingParking(
                     command.autoPark(), command.motoPark(), command.bikePark(), command.electricPark()
             );
 
-            //passo 3: controllo se ho posti liberi per questa prenotazione (ovvero se posti disponibili >= posti richiesti)
+            //passo 4: controllo se ho posti liberi per questa prenotazione (ovvero se posti disponibili >= posti richiesti)
             if (!isParkingAvailable(beach.getParking(), booked, requestedParking)) {
                 throw new IllegalStateException("ERROR: not enough parking capacity for the selected date");
             }
 
-            //passo 4: controllo disponibilità extra oggetti
+            //passo 5: controllo disponibilità extra oggetti
             BookedInventory bookedInv = availabilityQuery.getBookedInventory(beach.getId(), command.date(), null, context);
             BeachInventory cap = beach.getBeachInventory();
             if ((cap.countExtraSdraio() - bookedInv.sdraio() < command.extraSdraio()) ||
@@ -79,12 +89,12 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
                 throw new IllegalStateException("ERROR: not enough inventory items available");
             }
 
-            //passo 5: verifico se gli spot appartengono effettivamente alla spiaggia
+            //passo 6: verifico se gli spot appartengono effettivamente alla spiaggia
             if (!beachRepository.doSpotsBelongToBeach(beachId, command.spotIds(), context)) {
                 throw new SecurityException("ERROR: one or more spots do not belong to the beach");
             }
 
-            //passo 6: creo la prenotazione
+            //passo 7: creo la prenotazione
             Booking booking = new Booking(
                     0,
                     beachId,
@@ -102,10 +112,10 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
                     BookingStatus.CONFIRMED
             );
 
-            //passo 7: calcolo il prezzo totale della prenotazione
+            //passo 8: calcolo il prezzo totale della prenotazione
             booking.updateTotalPrice(PriceCalculator.calculateTotal(booking, beach));
 
-            //passo 8: salvo nel database
+            //passo 9: salvo nel database
             return bookingRepository.save(booking, context);
         });
     }
@@ -113,7 +123,7 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
     /**
      * Metodo privato che va a fare questo calcolo:
      * numero parcheggi totali - numero parcheggi prenotati >= numero parcheggi richiesti.
-     * Questa operazione viene fatta per ciascuna categoria di parcheggio.
+     * <p>Questa operazione viene fatta per ciascuna categoria di parcheggio.
      *
      * @param capacity  Parcheggio della spiaggia
      * @param booked    Parcheggi prenotati in quella data
