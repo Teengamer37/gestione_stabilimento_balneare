@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/// Definisce una prenotazione effettuata da un cliente per una specifica spiaggia e data
 public class Booking {
     //dati booking
     private final Integer id;
@@ -14,7 +15,7 @@ public class Booking {
     private final LocalDate date;
 
     //oggetti booking
-    private List<Integer> spotIds;
+    private final List<Integer> spotIds;
     private int extraSdraio;
     private int extraLettini;
     private int extraSedie;
@@ -36,7 +37,8 @@ public class Booking {
         checkBeachId(beachId);
         this.beachId = beachId;
 
-        if(customerId != null) {
+        //gestione booking lato Customer e/o lato Owner
+        if (customerId != null) {
             checkCustomerId(customerId);
             this.customerId = customerId;
             this.callerName = null;
@@ -81,7 +83,7 @@ public class Booking {
     }
 
 
-    // getters (NO SETTERS)
+    //getters
     public Integer getId() {
         return id;
     }
@@ -129,7 +131,7 @@ public class Booking {
     //---- METODI DI BUSINESS ----
 
     /**
-     * Conferma booking solo se status == PENDING
+     * Conferma booking solo se status == PENDING.
      */
     public void confirmBooking() {
         checkStatusIsPending("be confirmed");
@@ -137,7 +139,7 @@ public class Booking {
     }
 
     /**
-     * Rifiuta booking solo se status == PENDING
+     * Rifiuta booking solo se status == PENDING.
      */
     public void rejectBooking() {
         checkStatusIsPending("be rejected");
@@ -145,7 +147,7 @@ public class Booking {
     }
 
     /**
-     * Cancella booking solo se status == PENDING || CONFIRMED
+     * Cancella booking solo se status == PENDING || CONFIRMED.
      */
     public void cancelBooking() {
         checkStatusPendingOrConfirmed("be cancelled");
@@ -153,11 +155,12 @@ public class Booking {
     }
 
     /**
-     * Aggiorna extra sdraio con controlli
-     * @param quantity Numero di sdraio da aggiungere
+     * Aggiorna extra sdraio con controlli.
+     *
+     * @param quantity Nuovo numero di sdraio da prenotare
      */
     public void updateExtraSdraio(int quantity) {
-        checkStatusPendingOrConfirmed("add extra quantity");
+        checkStatusPendingOrConfirmed("update extra quantity");
 
         extraSdraio = quantity;
         //controllo stato booking (se CONFIRMED, ritorna a PENDING)
@@ -165,40 +168,44 @@ public class Booking {
     }
 
     /**
-     * Aggiorna extra lettini con controlli
-     * @param quantity Numero di lettini da aggiungere
+     * Aggiorna extra lettini con controlli.
+     *
+     * @param quantity Nuovo numero di lettini da prenotare
      */
     public void updateExtraLettini(int quantity) {
-        checkStatusPendingOrConfirmed("add extra quantity");
+        checkStatusPendingOrConfirmed("update extra quantity");
 
         extraLettini = quantity;
         revertToPendingIfConfirmed();
     }
 
     /**
-     * Aggiorna extra sedie con controlli
-     * @param quantity Numero di sedie da aggiungere
+     * Aggiorna extra sedie con controlli.
+     *
+     * @param quantity Nuovo numero di sedie da prenotare
      */
     public void updateExtraSedie(int quantity) {
-        checkStatusPendingOrConfirmed("add extra quantity");
+        checkStatusPendingOrConfirmed("update extra quantity");
 
         extraSedie = quantity;
         revertToPendingIfConfirmed();
     }
 
     /**
-     * Aggiorna camerini con controlli
-     * @param quantity Numero di camerini da aggiungere
+     * Aggiorna camerini con controlli.
+     *
+     * @param quantity Nuovo numero di camerini da prenotare
      */
     public void updateCamerini(int quantity) {
-        checkStatusPendingOrConfirmed("add extra quantity");
+        checkStatusPendingOrConfirmed("update extra quantity");
 
         camerini = quantity;
         revertToPendingIfConfirmed();
     }
 
     /**
-     * Aggiorna il prezzo totale del Booking
+     * Aggiorna il prezzo totale del Booking.
+     *
      * @param totalPrice Prezzo totale aggiornato
      */
     public void updateTotalPrice(double totalPrice) {
@@ -207,12 +214,13 @@ public class Booking {
     }
 
     /**
-     * Aggiorna gli spot e i parcheggi prenotati nel Booking
+     * Aggiorna gli spot e i parcheggi prenotati nel Booking.
+     *
      * @param updatedSpotIds Lista di spot aggiornati
      * @param updatedParking Parcheggi aggiornati
      */
     public void updateSpotsAndParking(List<Integer> updatedSpotIds, BookingParking updatedParking) {
-        checkStatusPendingOrConfirmed("be updated");
+        checkStatusPendingOrConfirmed("update spots and parking");
         checkSpotIds(updatedSpotIds);
 
         //verifico che i nuovi parcheggi siano validi
@@ -240,14 +248,20 @@ public class Booking {
 
     //---- METODI CHECKERS ----
     private void checkBeachId(Integer beachId) {
-        if (beachId == null || beachId <= 0) throw new IllegalArgumentException("ERROR: beachId not valid for booking " + id);
+        if (beachId == null || beachId <= 0)
+            throw new IllegalArgumentException("ERROR: beachId not valid for booking " + id);
     }
+
     private void checkCustomerId(Integer customerId) {
-        if (customerId == null || customerId <= 0) throw new IllegalArgumentException("ERROR: customerId not valid for booking " + id);
+        if (customerId == null || customerId <= 0)
+            throw new IllegalArgumentException("ERROR: customerId not valid for booking " + id);
     }
+
     private void checkCallerName(String callerName) {
-        if (callerName == null || callerName.isBlank()) throw new IllegalArgumentException("ERROR: callerName not valid for booking " + id);
+        if (callerName == null || callerName.isBlank())
+            throw new IllegalArgumentException("ERROR: callerName not valid for booking " + id);
     }
+
     private String validateCallerPhone(String callerPhone) {
         if (callerPhone == null) throw new IllegalArgumentException("ERROR: callerPhone cannot be null");
         String cleaned = callerPhone.replaceAll("\\s", "");
@@ -256,29 +270,37 @@ public class Booking {
         if (!cleaned.matches("^\\+\\d+$")) throw new IllegalArgumentException("ERROR: callerPhone not valid");
         return cleaned;
     }
+
     private void checkDate(LocalDate date) {
         if (date == null) throw new IllegalArgumentException("ERROR: date cannot be null for booking " + id);
     }
+
     private void checkSpotIds(List<Integer> spotIds) {
-        if (spotIds == null || spotIds.isEmpty()) throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + id);
+        if (spotIds == null || spotIds.isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one spot must be selected for booking " + id);
         for (Integer spotId : spotIds) {
-            if (spotId == null || spotId <= 0) throw new IllegalArgumentException("ERROR: at least one spotId is not valid for booking " + id);
+            if (spotId == null || spotId <= 0)
+                throw new IllegalArgumentException("ERROR: at least one spotId is not valid for booking " + id);
         }
     }
+
     private void checkInitialQuantity(int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("ERROR: extra quantity must be >= 0 for booking " + id);
         }
     }
+
     private void checkTotalPrice(double totalPrice) {
         if (totalPrice < 0)
             throw new IllegalArgumentException("ERROR: total price must be >= 0 for booking " + id);
     }
+
     private void checkStatusIsPending(String action) {
         if (status != BookingStatus.PENDING) {
             throw new IllegalStateException("ERROR: booking " + id + " has to be pending in order to " + action);
         }
     }
+
     private void checkStatusPendingOrConfirmed(String action) {
         if (status == BookingStatus.REJECTED || status == BookingStatus.CANCELLED) {
             throw new IllegalStateException("ERROR: booking " + id + " has to be either pending or confirmed in order to " + action);

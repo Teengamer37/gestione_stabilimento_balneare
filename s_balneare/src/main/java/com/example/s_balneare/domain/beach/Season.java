@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/// Definisce una stagione specifica per una spiaggia
 public record Season(
         String name,
         LocalDate startDate,
@@ -11,21 +12,27 @@ public record Season(
         Pricing pricing,
         List<ZoneTariff> zoneTariffs
 ) {
-
     //costruttore compatto per assicurarsi l'integrità dei valori
     public Season {
         if (name == null || name.isBlank()) throw new IllegalArgumentException("ERROR: name cannot be blank");
         if (name.length() > 50) throw new IllegalArgumentException("ERROR: name cannot exceed 50 characters");
 
         if (startDate == null || endDate == null) throw new IllegalArgumentException("ERROR: dates cannot be null");
-        if (!startDate.isBefore(endDate)) throw new IllegalArgumentException("ERROR: endDate must be strictly after startDate");
+        if (!startDate.isBefore(endDate))
+            throw new IllegalArgumentException("ERROR: endDate must be strictly after startDate");
 
         if (pricing == null) throw new IllegalArgumentException("ERROR: pricing cannot be null");
 
-        if (zoneTariffs == null || zoneTariffs.isEmpty()) throw new IllegalArgumentException("ERROR: at least one zoneTariff must be set for season");
+        if (zoneTariffs == null || zoneTariffs.isEmpty())
+            throw new IllegalArgumentException("ERROR: at least one zoneTariff must be set for season");
         for (ZoneTariff zoneTariff : zoneTariffs) {
             if (zoneTariff == null) throw new IllegalArgumentException("ERROR: at least one zoneTariff is not valid");
         }
+    }
+
+    //metodo per usare il pattern Builder per creare/manipolare Season
+    public static Builder builder() {
+        return new Builder();
     }
 
     //metodi Business
@@ -50,10 +57,6 @@ public record Season(
     }
 
     //pattern Builder
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static class Builder {
         private String name;
         private LocalDate startDate;
@@ -61,7 +64,8 @@ public record Season(
         private Pricing pricing;
         private List<ZoneTariff> zoneTariffs = new ArrayList<>();
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(Season original) {
@@ -72,10 +76,26 @@ public record Season(
             this.zoneTariffs = new ArrayList<>(original.zoneTariffs());
         }
 
-        public Builder name(String val) { name = val; return this; }
-        public Builder startDate(LocalDate val) { startDate = val; return this; }
-        public Builder endDate(LocalDate val) { endDate = val; return this; }
-        public Builder pricing(Pricing val) { pricing = val; return this; }
+        public Builder name(String val) {
+            name = val;
+            return this;
+        }
+
+        public Builder startDate(LocalDate val) {
+            startDate = val;
+            return this;
+        }
+
+        public Builder endDate(LocalDate val) {
+            endDate = val;
+            return this;
+        }
+
+        public Builder pricing(Pricing val) {
+            pricing = val;
+            return this;
+        }
+
         public Builder zoneTariffs(List<ZoneTariff> val) {
             if (val != null) this.zoneTariffs = new ArrayList<>(val);
             return this;

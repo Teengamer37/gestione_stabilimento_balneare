@@ -8,13 +8,15 @@ import com.example.s_balneare.domain.layout.Spot;
 import com.example.s_balneare.domain.layout.SpotType;
 import com.example.s_balneare.domain.layout.Zone;
 
+/// È un Domain Service che calcola il prezzo totale di una prenotazione
 public class PriceCalculator {
     /**
      * Calcola il prezzo totale di una prenotazione basandosi sul tariffario della spiaggia.
+     *
      * @param booking La prenotazione (con le quantità e gli spot selezionati)
-     * @param beach L'aggregato Beach completo (contenente Stagioni, Zone, Tariffe e Spot fisici)
+     * @param beach   L'aggregato Beach completo (contenente Stagioni, Zone, Tariffe e Spot fisici)
      * @return il costo totale
-     * @throws IllegalStateException se il Booking è corrotto/non corrisponde alla spiaggia
+     * @throws IllegalStateException    se il Booking è corrotto/non corrisponde alla spiaggia
      * @throws IllegalArgumentException se il Booking contiene Spot che non esistono nella spiaggia
      */
     public static double calculateTotal(Booking booking, Beach beach) {
@@ -77,7 +79,6 @@ public class PriceCalculator {
                 total += tariff.priceTenda();
             }
         }
-
         return total;
     }
 }

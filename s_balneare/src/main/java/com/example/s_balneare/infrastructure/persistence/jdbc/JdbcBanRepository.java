@@ -25,12 +25,12 @@ public class JdbcBanRepository implements BanRepository {
         String sql = "INSERT INTO bans (bannedId, banType, bannedFromBeachId, adminId, reason, createdAt) VALUES (?, ?, ?, ?, ?, ?) ";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setInt(1, ban.getBannedId());
-            statement.setString(2, ban.getBanType().name());
-            statement.setInt(3, ban.getBannedFromBeachId());
-            statement.setInt(4, ban.getAdminId());
-            statement.setString(5, ban.getReason());
-            statement.setTimestamp(6, java.sql.Timestamp.from(ban.getCreatedAt()));
+            statement.setInt(1, ban.bannedId());
+            statement.setString(2, ban.banType().name());
+            statement.setInt(3, ban.bannedFromBeachId());
+            statement.setInt(4, ban.adminId());
+            statement.setString(5, ban.reason());
+            statement.setTimestamp(6, java.sql.Timestamp.from(ban.createdAt()));
             statement.executeUpdate();
             try (ResultSet rs = statement.getGeneratedKeys()) {
                 if (rs.next()) {

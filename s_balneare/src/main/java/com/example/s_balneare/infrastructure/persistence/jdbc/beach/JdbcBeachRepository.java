@@ -6,7 +6,6 @@ import com.example.s_balneare.domain.common.TransactionContext;
 import com.example.s_balneare.domain.layout.Zone;
 import com.example.s_balneare.infrastructure.persistence.jdbc.JdbcTransactionManager;
 
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,9 +81,9 @@ public class JdbcBeachRepository implements BeachRepository {
                 BeachGeneral general = beach.getBeachGeneral();
                 if (general == null) throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when saving a beach.");
 
-                statement.setString(1, general.getName());
-                statement.setString(2, general.getDescription());
-                statement.setString(3, general.getPhoneNumber());
+                statement.setString(1, general.name());
+                statement.setString(2, general.description());
+                statement.setString(3, general.phoneNumber());
                 statement.setInt(4, beach.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());
@@ -152,9 +151,9 @@ public class JdbcBeachRepository implements BeachRepository {
                 if (general == null)
                     throw new IllegalArgumentException("ERROR: BeachGeneral cannot be null when updating a beach.");
 
-                statement.setString(1, general.getName());
-                statement.setString(2, general.getDescription());
-                statement.setString(3, general.getPhoneNumber());
+                statement.setString(1, general.name());
+                statement.setString(2, general.description());
+                statement.setString(3, general.phoneNumber());
                 statement.setInt(4, beach.getAddressId());
                 statement.setString(5, beach.getExtraInfo());
                 statement.setBoolean(6, beach.isActive());

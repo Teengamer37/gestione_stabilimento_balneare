@@ -1,5 +1,6 @@
 package com.example.s_balneare.domain.beach;
 
+/// Definisce il listino prezzi per gli extra di una stagione
 public record Pricing(
         Integer id,     // = null se è un nuovo pricing
         double priceLettino,
@@ -8,6 +9,7 @@ public record Pricing(
         double priceParking,
         double priceCamerino
 ) {
+    //costruttore compatto per assicurarsi l'integrità dei valori
     public Pricing {
         if (priceLettino < 0 || priceSdraio < 0 || priceSedia < 0 ||
                 priceParking < 0 || priceCamerino < 0) {
@@ -18,6 +20,11 @@ public record Pricing(
     //Static Factory per un Pricing nuovo
     public static Pricing create(double lettino, double sdraio, double sedia, double parking, double camerino) {
         return new Pricing(null, lettino, sdraio, sedia, parking, camerino);
+    }
+
+    //metodo per usare il pattern Builder per creare/manipolare Pricing
+    public static Builder builder() {
+        return new Builder();
     }
 
     //metodi wither
@@ -41,10 +48,6 @@ public record Pricing(
     }
 
     //pattern Builder
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static class Builder {
         private Integer id;
         private double priceLettino;
@@ -53,7 +56,8 @@ public record Pricing(
         private double priceParking;
         private double priceCamerino;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(Pricing original) {
@@ -65,12 +69,35 @@ public record Pricing(
             this.priceCamerino = original.priceCamerino();
         }
 
-        public Builder id(Integer val) { id = val; return this; }
-        public Builder priceLettino(double val) { priceLettino = val; return this; }
-        public Builder priceSdraio(double val) { priceSdraio = val; return this; }
-        public Builder priceSedia(double val) { priceSedia = val; return this; }
-        public Builder priceParking(double val) { priceParking = val; return this; }
-        public Builder priceCamerino(double val) { priceCamerino = val; return this; }
+        public Builder id(Integer val) {
+            id = val;
+            return this;
+        }
+
+        public Builder priceLettino(double val) {
+            priceLettino = val;
+            return this;
+        }
+
+        public Builder priceSdraio(double val) {
+            priceSdraio = val;
+            return this;
+        }
+
+        public Builder priceSedia(double val) {
+            priceSedia = val;
+            return this;
+        }
+
+        public Builder priceParking(double val) {
+            priceParking = val;
+            return this;
+        }
+
+        public Builder priceCamerino(double val) {
+            priceCamerino = val;
+            return this;
+        }
 
         public Pricing build() {
             return new Pricing(id, priceLettino, priceSdraio, priceSedia, priceParking, priceCamerino);

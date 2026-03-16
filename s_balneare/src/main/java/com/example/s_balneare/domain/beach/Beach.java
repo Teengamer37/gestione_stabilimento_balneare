@@ -6,19 +6,18 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/// Definisce un'istanza di una spiaggia
 public class Beach {
     //attributi
     private final Integer id;
-    private Integer ownerId;
     private final Integer addressId;
-
+    private final List<Season> seasons;
+    private final List<Zone> zones;
+    private Integer ownerId;
     private BeachGeneral beachGeneral;
     private BeachInventory beachInventory;
     private BeachServices beachServices;
     private Parking parking;
-    private final List<Season> seasons;
-    private final List<Zone> zones;
-
     private String extraInfo;
     private boolean active;
     private boolean closed;
@@ -93,10 +92,24 @@ public class Beach {
         return closed;
     }
 
-
     //---- METODI DI BUSINESS ----
+
     /**
-     * Permette di modificare la sezione di info extra
+     * Gestisce lo stato di attività della spiaggia nella piattaforma
+     * (verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati).
+     *
+     * @param active nuovo stato di attività
+     */
+    public void setActive(boolean active) {
+        if (active) {
+            validateActivationRequirements();
+        }
+        this.active = active;
+    }
+
+    /**
+     * Permette di modificare la sezione di info extra.
+     *
      * @param info nuova sezione di extraInfo
      */
     public void updateExtraInfo(String info) {
@@ -109,7 +122,8 @@ public class Beach {
     }
 
     /**
-     * Permette di aggiungere/rimuovere un owner alla/dalla spiaggia
+     * Permette di aggiungere/rimuovere un owner alla/dalla spiaggia.
+     *
      * @param ownerId nuovo proprietario
      */
     public void updateOwnerId(Integer ownerId) {
@@ -119,14 +133,15 @@ public class Beach {
     }
 
     /**
-     * Aggiunge una stagione
+     * Aggiunge una stagione.
+     *
      * @param season nuova stagione
      */
     public void addSeason(Season season) {
         checkSeason(season);
         checkSeasonOverlap(season, null);
         seasons.add(season);
-        
+
         //aggiunge automaticamente le zone definite nella stagione se non esistono già
         for (ZoneTariff tariff : season.zoneTariffs()) {
             //cerco se la Zone definita in ZoneTariff esiste già dentro zones
@@ -141,7 +156,8 @@ public class Beach {
     }
 
     /**
-     * Aggiunge una lista di stagioni
+     * Aggiunge una lista di stagioni.
+     *
      * @param seasons nuove stagioni
      */
     public void addSeasons(List<Season> seasons) {
@@ -167,9 +183,10 @@ public class Beach {
     }
 
     /**
-     * Aggiorna una stagione esistente rispettando i vincoli di immutabilità finanziaria e temporale
+     * Aggiorna una stagione esistente rispettando i vincoli di immutabilità finanziaria e temporale.
+     *
      * @param targetSeasonName nome della stagione da aggiornare
-     * @param newEndDate nuova data di fine
+     * @param newEndDate       nuova data di fine
      * @throws IllegalArgumentException se ci sono parametri non validi
      */
     public void updateSeason(String targetSeasonName, LocalDate newEndDate) {
@@ -198,8 +215,10 @@ public class Beach {
     }
 
     /**
-     * Rimuove una stagione
+     * Rimuove una stagione.
+     *
      * @param seasonName nome della stagione da rimuovere
+     * @throws IllegalArgumentException se la stagione non esiste nell’oggetto
      */
     public void removeSeason(String seasonName) {
         checkNotActive("remove season");
@@ -211,8 +230,10 @@ public class Beach {
     }
 
     /**
-     * Rimuove una lista di stagioni
+     * Rimuove una lista di stagioni.
+     *
      * @param seasonNames nome delle stagioni da rimuovere
+     * @throws IllegalArgumentException se almeno una delle stagioni non esiste nell’oggetto
      */
     public void removeSeasons(List<String> seasonNames) {
         checkNotActive("remove seasons");
@@ -232,7 +253,8 @@ public class Beach {
     }
 
     /**
-     * Aggiunge o aggiorna una zona
+     * Aggiunge o aggiorna una zona.
+     *
      * @param zone zona da aggiungere/aggiornare
      */
     public void addZone(Zone zone) {
@@ -250,7 +272,8 @@ public class Beach {
     }
 
     /**
-     * Aggiunge o aggiorna una lista di zone
+     * Aggiunge o aggiorna una lista di zone.
+     *
      * @param newZones zone da aggiungere/aggiornare
      */
     public void addZones(List<Zone> newZones) {
@@ -269,16 +292,19 @@ public class Beach {
     }
 
     /**
-     * Rinomina una zona esistente
+     * Rinomina una zona esistente.
+     *
      * @param oldName Il nome attuale della zona
      * @param newName Il nuovo nome desiderato
+     * @throws IllegalArgumentException se il nuovo nome della zona è già stato preso da una zona già salvata nella spiaggia
+     * oppure se il nome della zona da modificare non è stato trovato nel database
      */
     public void renameZone(String oldName, String newName) {
         checkNotActive("rename zone");
 
         //controllo parametro
         if (newName == null || newName.isBlank() || newName.length() > 50) {
-            throw new IllegalArgumentException("ERROR: Invalid new zone name.");
+            throw new IllegalArgumentException("ERROR: invalid new zone name");
         }
 
         //passo 1: verifico unicità nuovo nome
@@ -303,8 +329,10 @@ public class Beach {
     }
 
     /**
-     * Rimuove una zona
+     * Rimuove una zona.
+     *
      * @param zone zona da rimuovere
+     * @throws IllegalArgumentException se la zona non esiste nell’oggetto
      */
     public void removeZone(Zone zone) {
         checkNotActive("remove zone");
@@ -318,8 +346,10 @@ public class Beach {
     }
 
     /**
-     * Rimuove una lista di zone
+     * Rimuove una lista di zone.
+     *
      * @param zonesToRemove zone da rimuovere
+     * @throws IllegalArgumentException se almeno una delle zone non esiste nell’oggetto
      */
     public void removeZones(List<Zone> zonesToRemove) {
         checkNotActive("remove zones");
@@ -339,7 +369,8 @@ public class Beach {
     }
 
     /**
-     * Verifica se la spiaggia ha tutti gli attributi settati
+     * Verifica se la spiaggia ha tutti gli attributi settati.
+     *
      * @return TRUE se possiede tutti i campi completati, FALSE altrimenti
      */
     public boolean isFullyConfigured() {
@@ -353,7 +384,9 @@ public class Beach {
 
     /**
      * Helper privato che raccoglie esattamente i dati mancanti
-     * e lancia il messaggio dettagliato
+     * e lancia il messaggio dettagliato.
+     *
+     * @throws IllegalStateException con tutti i dati mancanti
      */
     private void validateActivationRequirements() {
         List<String> missing = new ArrayList<>();
@@ -387,23 +420,13 @@ public class Beach {
     }
 
     /**
-     * Gestisce lo stato di attività della spiaggia nella piattaforma
-     * (verifica se è conforme all'attivazione, ovvero se ha tutti i campi compilati)
-     * @param active nuovo stato di attività
-     */
-    public void setActive(boolean active) {
-        if (active) {
-            validateActivationRequirements();
-        }
-        this.active = active;
-    }
-
-    /**
-     * Chiude definitivamente una spiaggia
+     * Chiude definitivamente una spiaggia.
+     *
+     * @throws IllegalStateException se la spiaggia è già chiusa
      */
     public void closeBeach() {
         if (this.closed) {
-            throw new IllegalStateException("ERROR: Beach is already closed.");
+            throw new IllegalStateException("ERROR: Beach is already closed");
         }
         this.closed = true;
         this.active = false;
@@ -437,17 +460,21 @@ public class Beach {
 
     //---- METODI CKECKERS ----
     private void checkExtraInfo(String extraInfo) {
-        if (extraInfo.length() > 512) throw new IllegalArgumentException("ERROR: extraInfo cannot exceed 512 characters");
+        if (extraInfo.length() > 512)
+            throw new IllegalArgumentException("ERROR: extraInfo cannot exceed 512 characters");
     }
+
     private void checkOwnerId(Integer ownerId) {
         //controllo prima se null, poi se ID è valido
         //(se arrivo al secondo if con un valore null, ho NullPointerException)
         if (ownerId == null) throw new IllegalArgumentException("ERROR: ownerId cannot be null");
         if (ownerId <= 0) throw new IllegalArgumentException("ERROR: ownerId not valid");
     }
+
     private void checkSeason(Season season) {
         if (season == null) throw new IllegalArgumentException("ERROR: season cannot be null");
     }
+
     private void checkSeasons(List<Season> seasons) {
         //controllo lista se vuota
         if (seasons == null || seasons.isEmpty()) throw new IllegalArgumentException("ERROR: list not valid");
@@ -456,9 +483,11 @@ public class Beach {
             if (season == null) throw new IllegalArgumentException("ERROR: at least one season in the list is null");
         }
     }
+
     private void checkZone(Zone zone) {
         if (zone == null) throw new IllegalArgumentException("ERROR: zone cannot be null");
     }
+
     private void checkZones(List<Zone> zones) {
         //controllo lista se vuota
         if (zones == null || zones.isEmpty()) throw new IllegalArgumentException("ERROR: list not valid");
@@ -467,36 +496,43 @@ public class Beach {
             if (zone == null) throw new IllegalArgumentException("ERROR: at least one zone in the list is null");
         }
     }
+
     private void checkGeneralInfo(BeachGeneral newGeneral) {
-        if (newGeneral == null) throw new IllegalArgumentException("ERROR: General info cannot be reverted to null");
+        if (newGeneral == null) throw new IllegalArgumentException("ERROR: general info cannot be reverted to null");
     }
+
     private void checkInventory(BeachInventory newInventory) {
-        if (newInventory == null) throw new IllegalArgumentException("ERROR: Inventory cannot be reverted to null");
+        if (newInventory == null) throw new IllegalArgumentException("ERROR: inventory cannot be reverted to null");
     }
+
     private void checkServices(BeachServices newServices) {
-        if (newServices == null) throw new IllegalArgumentException("ERROR: Services cannot be reverted to null");
+        if (newServices == null) throw new IllegalArgumentException("ERROR: services cannot be reverted to null");
     }
+
     private void checkParking(Parking newParking) {
-        if (newParking == null) throw new IllegalArgumentException("ERROR: Parking cannot be reverted to null");
+        if (newParking == null) throw new IllegalArgumentException("ERROR: parking cannot be reverted to null");
     }
+
     private void checkNotActive(String action) {
         if (this.closed) {
-            throw new IllegalStateException("ERROR: Cannot " + action + " because the beach is permanently CLOSED.");
+            throw new IllegalStateException("ERROR: cannot " + action + " because the beach is permanently CLOSED");
         }
         if (this.active) {
             throw new IllegalStateException("ERROR: cannot " + action + " while the beach is ACTIVE");
         }
     }
+
     private void checkSeasonOverlap(Season newSeason, Season seasonToIgnore) {
         for (Season existing : this.seasons) {
             if (seasonToIgnore != null && existing.name().equals(seasonToIgnore.name())) continue;
 
             if (!newSeason.endDate().isBefore(existing.startDate()) &&
                     !newSeason.startDate().isAfter(existing.endDate())) {
-                throw new IllegalArgumentException("ERROR: Il periodo selezionato si sovrappone a una stagione esistente: " + existing.name());
+                throw new IllegalArgumentException("ERROR: new period overlaps with existing season: " + existing.name());
             }
         }
     }
+
     private void checkIfZoneIsLockedBySeason(String zoneName) {
         boolean isZoneInSeason = seasons.stream()
                 .anyMatch(s -> s.zoneTariffs().stream()

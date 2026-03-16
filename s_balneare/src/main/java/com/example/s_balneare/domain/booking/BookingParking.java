@@ -1,5 +1,6 @@
 package com.example.s_balneare.domain.booking;
 
+/// Definisce i posti parcheggio prenotati
 public record BookingParking(
         int autoPark,
         int motoPark,
@@ -16,6 +17,11 @@ public record BookingParking(
         return new BookingParking(0, 0, 0, 0);
     }
 
+    //metodo per usare il pattern Builder per creare/manipolare BookingParking
+    public static BookingParking.Builder builder() {
+        return new BookingParking.Builder();
+    }
+
     //metodi wither
     public BookingParking withAutoPark(int autoPark) {
         return new BookingParking(autoPark, motoPark, bikePark, electricPark);
@@ -30,11 +36,6 @@ public record BookingParking(
         return new BookingParking(autoPark, motoPark, bikePark, electricPark);
     }
 
-    //metodo per usare il pattern Builder per creare/manipolare Parking
-    public static BookingParking.Builder builder() {
-        return new BookingParking.Builder();
-    }
-
     //pattern Builder
     public static class Builder {
         private int autoPark = 0;
@@ -42,7 +43,8 @@ public record BookingParking(
         private int bikePark = 0;
         private int electricPark = 0;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(BookingParking original) {
@@ -52,10 +54,25 @@ public record BookingParking(
             this.electricPark = original.electricPark;
         }
 
-        public BookingParking.Builder autoPark(int val) { autoPark = val; return this; }
-        public BookingParking.Builder motoPark(int val) { motoPark = val; return this; }
-        public BookingParking.Builder bikePark(int val) { bikePark = val; return this; }
-        public BookingParking.Builder electricPark(int val) { electricPark = val; return this; }
+        public BookingParking.Builder autoPark(int val) {
+            autoPark = val;
+            return this;
+        }
+
+        public BookingParking.Builder motoPark(int val) {
+            motoPark = val;
+            return this;
+        }
+
+        public BookingParking.Builder bikePark(int val) {
+            bikePark = val;
+            return this;
+        }
+
+        public BookingParking.Builder electricPark(int val) {
+            electricPark = val;
+            return this;
+        }
 
         public BookingParking build() {
             return new BookingParking(autoPark, motoPark, bikePark, electricPark);

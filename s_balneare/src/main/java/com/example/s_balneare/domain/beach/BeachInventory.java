@@ -1,5 +1,6 @@
 package com.example.s_balneare.domain.beach;
 
+/// Contiene l'inventario degli oggetti disponibili in una spiaggia
 public record BeachInventory(
         int countOmbrelloni,
         int countTende,
@@ -19,6 +20,11 @@ public record BeachInventory(
     //metodo Factory statico per inizializzare l'oggetto beachInventory
     public static BeachInventory empty() {
         return new BeachInventory(0, 0, 0, 0, 0, 0);
+    }
+
+    //metodo Builder per costruire l'oggetto col pattern Builder
+    public static Builder builder() {
+        return new Builder();
     }
 
     //metodi wither
@@ -41,11 +47,6 @@ public record BeachInventory(
         return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
 
-    //metodo Builder per costruire l'oggetto col pattern Builder
-    public static Builder builder() {
-        return new Builder();
-    }
-
     //pattern Builder per creazione BeachInventory facilitata
     public static class Builder {
         private int countOmbrelloni = 0;
@@ -55,7 +56,8 @@ public record BeachInventory(
         private int countExtraSedie = 0;
         private int countCamerini = 0;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(BeachInventory original) {
@@ -67,12 +69,35 @@ public record BeachInventory(
             this.countCamerini = original.countCamerini;
         }
 
-        public Builder countOmbrelloni(int val) { countOmbrelloni = val; return this; }
-        public Builder countTende(int val) { countTende = val; return this; }
-        public Builder countExtraSdraio(int val) { countExtraSdraio = val; return this; }
-        public Builder countExtraLettini(int val) { countExtraLettini = val; return this; }
-        public Builder countExtraSedie(int val) { countExtraSedie = val; return this; }
-        public Builder countCamerini(int val) { countCamerini = val; return this; }
+        public Builder countOmbrelloni(int val) {
+            countOmbrelloni = val;
+            return this;
+        }
+
+        public Builder countTende(int val) {
+            countTende = val;
+            return this;
+        }
+
+        public Builder countExtraSdraio(int val) {
+            countExtraSdraio = val;
+            return this;
+        }
+
+        public Builder countExtraLettini(int val) {
+            countExtraLettini = val;
+            return this;
+        }
+
+        public Builder countExtraSedie(int val) {
+            countExtraSedie = val;
+            return this;
+        }
+
+        public Builder countCamerini(int val) {
+            countCamerini = val;
+            return this;
+        }
 
         public BeachInventory build() {
             return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);

@@ -1,7 +1,5 @@
 package com.example.s_balneare.domain.common;
 
-//interfaccia "vuota"
-//serve solo come token per passare lo stato della transazione senza importare java.sql.Connection
+/// È un'interfaccia "marker" o "token" utilizzata per rappresentare il contesto di una transazione
 public interface TransactionContext {
-
 }

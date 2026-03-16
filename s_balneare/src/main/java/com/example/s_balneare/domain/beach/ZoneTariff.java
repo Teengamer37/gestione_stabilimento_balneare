@@ -1,18 +1,27 @@
 package com.example.s_balneare.domain.beach;
 
+/// Definisce le tariffe per gli spot (ombrelloni/tende) in una specifica zona per una stagione
 public record ZoneTariff(
         String zoneName,
         double priceOmbrellone,
         double priceTenda
 ) {
+    //costruttore compatto per assicurarsi l'integrità dei valori
     public ZoneTariff {
-        if (zoneName == null || zoneName.isBlank()) throw new IllegalArgumentException("ERROR: zoneName cannot be blank");
-        if (priceOmbrellone < 0 || priceTenda < 0) throw new IllegalArgumentException("ERROR: prices cannot be negative");
+        if (zoneName == null || zoneName.isBlank())
+            throw new IllegalArgumentException("ERROR: zoneName cannot be blank");
+        if (priceOmbrellone < 0 || priceTenda < 0)
+            throw new IllegalArgumentException("ERROR: prices cannot be negative");
     }
 
     //Static Factory per un ZoneTariff nuovo
     public static ZoneTariff create(String zoneName, double ombrellone, double tenda) {
         return new ZoneTariff(zoneName, ombrellone, tenda);
+    }
+
+    //metodo per usare il pattern Builder per creare/manipolare ZoneTariff
+    public static Builder builder() {
+        return new Builder();
     }
 
     //metodi wither
@@ -27,16 +36,13 @@ public record ZoneTariff(
     }
 
     //pattern Builder
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static class Builder {
         private String zoneName;
         private double priceOmbrellone;
         private double priceTenda;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(ZoneTariff original) {
@@ -45,9 +51,20 @@ public record ZoneTariff(
             this.priceTenda = original.priceTenda();
         }
 
-        public Builder zoneName(String val) { zoneName = val; return this; }
-        public Builder priceOmbrellone(double val) { priceOmbrellone = val; return this; }
-        public Builder priceTenda(double val) { priceTenda = val; return this; }
+        public Builder zoneName(String val) {
+            zoneName = val;
+            return this;
+        }
+
+        public Builder priceOmbrellone(double val) {
+            priceOmbrellone = val;
+            return this;
+        }
+
+        public Builder priceTenda(double val) {
+            priceTenda = val;
+            return this;
+        }
 
         public ZoneTariff build() {
             return new ZoneTariff(zoneName, priceOmbrellone, priceTenda);

@@ -1,5 +1,6 @@
 package com.example.s_balneare.domain.beach;
 
+/// Definisce i servizi offerti da una spiaggia
 public record BeachServices(
         boolean bathrooms,
         boolean showers,
@@ -14,7 +15,12 @@ public record BeachServices(
         return new BeachServices(false, false, false, false, false, false, false);
     }
 
-    //metodi singoli per fare update all'oggetto
+    //pattern Builder per creazione veloce dell'oggetto
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    //metodi singoli per fare update all'oggetto (metodi wither)
     public BeachServices withBathrooms(boolean bathrooms) {
         return new BeachServices(bathrooms, showers, pool, bar, restaurant, wifi, volleyballField);
     }
@@ -37,11 +43,7 @@ public record BeachServices(
         return new BeachServices(bathrooms, showers, pool, bar, restaurant, wifi, volleyballField);
     }
 
-    //pattern Builder per creazione veloce dell'oggetto
-    public static Builder builder() {
-        return new Builder();
-    }
-
+    //pattern Builder per creazione BeachServices facilitata
     public static class Builder {
         private boolean bathrooms = false;
         private boolean showers = false;
@@ -51,7 +53,8 @@ public record BeachServices(
         private boolean wifi = false;
         private boolean volleyballField = false;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(BeachServices original) {
@@ -64,13 +67,40 @@ public record BeachServices(
             this.volleyballField = original.volleyballField;
         }
 
-        public Builder bathrooms(boolean val) { bathrooms = val; return this; }
-        public Builder showers(boolean val) { showers = val; return this; }
-        public Builder pool(boolean val) { pool = val; return this; }
-        public Builder bar(boolean val) { bar = val; return this; }
-        public Builder restaurant(boolean val) { restaurant = val; return this; }
-        public Builder wifi(boolean val) { wifi = val; return this; }
-        public Builder volleyballField(boolean val) { volleyballField = val; return this; }
+        public Builder bathrooms(boolean val) {
+            bathrooms = val;
+            return this;
+        }
+
+        public Builder showers(boolean val) {
+            showers = val;
+            return this;
+        }
+
+        public Builder pool(boolean val) {
+            pool = val;
+            return this;
+        }
+
+        public Builder bar(boolean val) {
+            bar = val;
+            return this;
+        }
+
+        public Builder restaurant(boolean val) {
+            restaurant = val;
+            return this;
+        }
+
+        public Builder wifi(boolean val) {
+            wifi = val;
+            return this;
+        }
+
+        public Builder volleyballField(boolean val) {
+            volleyballField = val;
+            return this;
+        }
 
         public BeachServices build() {
             return new BeachServices(bathrooms, showers, pool, bar, restaurant, wifi, volleyballField);

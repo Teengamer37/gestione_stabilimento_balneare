@@ -1,19 +1,26 @@
 package com.example.s_balneare.domain.layout;
 
+/// Definisce un singolo spot all'interno di una zona della spiaggia
 public record Spot(
         Integer id,   // = null se Spot nuovo
         SpotType type,
         int row,
         int column
 ) {
+    //costruttore compatto per assicurarsi l'integrità dei valori
     public Spot {
-        if (type == null) throw new IllegalArgumentException("ERROR: Spot type cannot be null");
+        if (type == null) throw new IllegalArgumentException("ERROR: spot type cannot be null");
         if (row < 0 || column < 0) throw new IllegalArgumentException("ERROR: row and column cannot be negative");
     }
 
     //Static Factory per uno Spot nuovo
     public static Spot create(SpotType type, int row, int column) {
         return new Spot(null, type, row, column);
+    }
+
+    //metodo per usare il pattern Builder per creare/manipolare Spot
+    public static Builder builder() {
+        return new Builder();
     }
 
     //metodi wither
@@ -31,17 +38,14 @@ public record Spot(
     }
 
     //pattern Builder
-    public static Builder builder() {
-        return new Builder();
-    }
-
     public static class Builder {
         private Integer id;
         private SpotType type;
         private int row;
         private int column;
 
-        public Builder() {}
+        public Builder() {
+        }
 
         //costruttore copia
         public Builder(Spot original) {
@@ -51,10 +55,25 @@ public record Spot(
             this.column = original.column();
         }
 
-        public Builder id(Integer val) { id = val; return this; }
-        public Builder type(SpotType val) { type = val; return this; }
-        public Builder row(int val) { row = val; return this; }
-        public Builder column(int val) { column = val; return this; }
+        public Builder id(Integer val) {
+            id = val;
+            return this;
+        }
+
+        public Builder type(SpotType val) {
+            type = val;
+            return this;
+        }
+
+        public Builder row(int val) {
+            row = val;
+            return this;
+        }
+
+        public Builder column(int val) {
+            column = val;
+            return this;
+        }
 
         public Spot build() {
             return new Spot(id, type, row, column);

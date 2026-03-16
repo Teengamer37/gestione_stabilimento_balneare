@@ -2,59 +2,19 @@ package com.example.s_balneare.domain.moderation;
 
 import java.time.Instant;
 
-public class Ban {
-    private final Integer id;
-    private final Integer bannedId;
-    private final BanType banType;
-    private final Integer bannedFromBeachId;
-    private final Integer adminId;
-
-    private final String reason;
-    private final Instant createdAt;
-
-    public Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId, String reason, Instant createdAt) {
+/// Rappresenta un'azione di ban emessa da un amministratore
+public record Ban(Integer id, Integer bannedId, BanType banType, Integer bannedFromBeachId, Integer adminId,
+                  String reason, Instant createdAt) {
+    //costruttore compatto per assicurarsi l'integrità dei valori
+    public Ban {
         checkBannedId(bannedId);
         checkBannedFromBeachId(bannedFromBeachId, banType);
         checkAdminId(adminId);
         checkReason(reason);
         checkCreatedAt(createdAt);
-        this.id = id;
-        this.bannedId = bannedId;
-        this.banType = banType;
-        this.bannedFromBeachId = bannedFromBeachId;
-        this.adminId = adminId;
-        this.reason = reason;
-        this.createdAt = createdAt;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public Integer getBannedId() {
-        return bannedId;
-    }
-
-    public BanType getBanType() {
-        return banType;
-    }
-
-    public Integer getBannedFromBeachId() {
-        return bannedFromBeachId;
-    }
-
-    public Integer getAdminId() {
-        return adminId;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
+    //---- METODI CHECKERS ----
     private void checkBannedId(Integer bannedId) {
         if (bannedId == null || bannedId <= 0) throw new IllegalArgumentException("ERROR: bannedId not valid");
     }
@@ -77,5 +37,4 @@ public class Ban {
     private void checkCreatedAt(Instant createdAt) {
         if (createdAt == null) throw new IllegalArgumentException("ERROR: createdAt must not be null");
     }
-
 }
