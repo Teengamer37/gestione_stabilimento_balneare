@@ -137,7 +137,6 @@ CREATE TABLE spots (
     `column` INT NOT NULL,
     zoneName VARCHAR(50) NOT NULL,
     beachId INT NOT NULL,
-    UNIQUE (`row`, `column`, zoneName, beachId),
     FOREIGN KEY (zoneName, beachId) REFERENCES zones(name, beachId) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -159,9 +158,7 @@ CREATE TABLE bookings (
     totalPrice DECIMAL(10,2) NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
     FOREIGN KEY (beachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (customerId) REFERENCES customers(id) ON DELETE SET NULL ON UPDATE CASCADE,
-    UNIQUE (beachId, customerId, date),
-    UNIQUE (id, date)
+    FOREIGN KEY (customerId) REFERENCES customers(id) ON DELETE SET NULL ON UPDATE CASCADE
 );
 
 CREATE TABLE booking_spots (
@@ -170,8 +167,7 @@ CREATE TABLE booking_spots (
     spotId INT NOT NULL,
     PRIMARY KEY (bookingId, spotId),
     FOREIGN KEY (bookingId) REFERENCES bookings(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (spotId) REFERENCES spots(id) ON DELETE CASCADE ON UPDATE CASCADE,
-    UNIQUE (spotId, date)
+    FOREIGN KEY (spotId) REFERENCES spots(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE bans (
@@ -214,17 +210,36 @@ CREATE TABLE reports (
 
 
 -- VINCOLI AGGIUNTIVI (CONTROLLI)
+ALTER TABLE spots
+    -- Spot deve essere unico nella zona
+    ADD CONSTRAINT uq_spots UNIQUE (`row`, `column`, zoneName, beachId);
+
+ALTER TABLE bookings
+    -- Un utente può effettuare una sola prenotazione per una spiaggia in quella data
+    ADD CONSTRAINT uq_booking_beach_customer_date UNIQUE (beachId, customerId, date),
+    -- Crea vincolo tra la prenotazione e la data, utile per bookings_spots
+    ADD CONSTRAINT UNIQUE uq_bookingsSpot (id, date);
+
+ALTER TABLE booking_spots
+    -- Spot può avere una sola prenotazione nella solita data
+    ADD CONSTRAINT uq_bookingSpot_date UNIQUE (spotId, date);
+
 ALTER TABLE bans
+    -- Un utente può ricevere una sola volta un ban permanente da una spiaggia o dall'applicazione
     ADD CONSTRAINT uq_ban_single_active UNIQUE (bannedId,bannedFromBeachId,banType);
 
 ALTER TABLE reviews
+    -- Un utente può lasciare una sola recensione per la spiaggia
     ADD CONSTRAINT uq_review_per_customer UNIQUE (beachId,customerId);
 
 ALTER TABLE seasons
+    -- La spiaggia può avere una sola stagione che inizia o finisce in quelle specifiche date
     ADD CONSTRAINT uq_season_dates_beach UNIQUE (beachId,startDate,endDate);
 
 ALTER TABLE reports
+    -- Per evitare spam di reports da parte di un utente
     ADD CONSTRAINT uq_report_unique UNIQUE (reporterId,reportedId,createdAt),
+    -- Un utente può reportare la prenotazione una sola volta soltanto
     ADD CONSTRAINT uq_reporter_booking UNIQUE (reporterId, bookingId);
 
 
