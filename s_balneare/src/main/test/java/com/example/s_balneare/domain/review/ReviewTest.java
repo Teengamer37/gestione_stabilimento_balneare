@@ -52,7 +52,7 @@ class ReviewTest {
         assertThrows(IllegalArgumentException.class, () ->
                 new Review(1, 10, 20, 5, null, NOW));
 
-        String tooLongComment = "a".repeat(1030);
+        String tooLongComment = "marco".repeat(250);
         assertThrows(IllegalArgumentException.class, () ->
                 new Review(1, 10, 20, 5, tooLongComment, NOW));
     }

@@ -19,6 +19,12 @@ public final class Admin extends User {
     public boolean isOTP() {
         return OTP;
     }
+
+    /**
+     * Attiva/disattiva OTP per forzare il cambio password.
+     *
+     * @param OTP nuovo stato OTP
+     */
     public void updateOTP(boolean OTP) {
         this.OTP = OTP;
     }

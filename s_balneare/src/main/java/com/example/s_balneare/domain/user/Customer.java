@@ -42,8 +42,7 @@ public final class Customer extends User {
      * @param newPhone Nuovo numero di telefono
      */
     public void changePhoneNumber(String newPhone) {
-        validatePhoneNumber(newPhone);
-        this.phoneNumber = newPhone;
+        this.phoneNumber = validatePhoneNumber(newPhone);
     }
 
     /**
