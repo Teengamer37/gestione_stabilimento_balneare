@@ -38,6 +38,9 @@ public record Address(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(Address address) {
+        return new Builder(address);
+    }
 
     //metodi wither
     public Address withId(Integer id) {
