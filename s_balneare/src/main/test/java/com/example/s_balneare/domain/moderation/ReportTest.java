@@ -38,7 +38,7 @@ class ReportTest {
     void constructor_ThrowsException_IfDescriptionIsInvalid() {
         assertThrows(IllegalArgumentException.class, () ->
                 new Report(1, 10, 20, ReportTargetType.USER, "   ", now, ReportStatus.PENDING, 500));
-
+        
         String longDesc = "a".repeat(1025);
         assertThrows(IllegalArgumentException.class, () ->
                 new Report(1, 10, 20, ReportTargetType.USER, longDesc, now, ReportStatus.PENDING, 500));
@@ -73,7 +73,7 @@ class ReportTest {
     @Test
     void approve_ThrowsException_WhenAlreadyProcessed() {
         Report report = new Report(1, 10, 20, ReportTargetType.USER, "Ha offeso tutto lo staff", now, ReportStatus.APPROVED, 500);
-
+        
         assertThrows(IllegalStateException.class, report::approve);
     }
 
@@ -87,7 +87,7 @@ class ReportTest {
     @Test
     void reject_ThrowsException_WhenAlreadyProcessed() {
         Report report = new Report(1, 10, 20, ReportTargetType.USER, "Vengono con un Diesel quando hanno prenotato un posto per veicoli elettrici", now, ReportStatus.REJECTED, 500);
-        
+
         assertThrows(IllegalStateException.class, report::reject);
     }
 }
