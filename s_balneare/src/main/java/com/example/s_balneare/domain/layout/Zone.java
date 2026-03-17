@@ -26,6 +26,9 @@ public record Zone(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(Zone zone) {
+        return new Builder(zone);
+    }
 
     //metodi wither
     public Zone withName(String newName) {

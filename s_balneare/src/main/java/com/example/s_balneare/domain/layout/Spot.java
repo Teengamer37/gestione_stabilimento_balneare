@@ -22,6 +22,9 @@ public record Spot(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(Spot spot) {
+        return new Builder(spot);
+    }
 
     //metodi wither
     public Spot withId(Integer newId) {
