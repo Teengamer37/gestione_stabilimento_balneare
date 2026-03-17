@@ -1,6 +1,7 @@
 package com.example.s_balneare.domain.beach;
 
 import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PricingTest {

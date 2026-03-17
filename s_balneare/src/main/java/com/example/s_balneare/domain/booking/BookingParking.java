@@ -20,6 +20,9 @@ public record BookingParking(
     public static BookingParking.Builder builder() {
         return new BookingParking.Builder();
     }
+    public static BookingParking.Builder builder(BookingParking bookingParking) {
+        return new BookingParking.Builder(bookingParking);
+    }
 
     //metodi wither
     public BookingParking withAutoPark(int autoPark) {
