@@ -302,6 +302,53 @@ class ManageBeachServiceTest {
         verify(beachRepository, times(1)).renameZone(eq(1), eq("Zona 2"), eq("Zona VIP"), any());
     }
 
+    @Test
+    void removeZone_ThrowsException_IfLockedBySeason() {
+        //creo nuova Beach
+        Beach mockBeach = createValidInactiveBeach();
+        when(beachRepository.findById(eq(1), any())).thenReturn(Optional.of(mockBeach));
+
+        //tento di rimuovere la zona bloccata
+        Zone zoneToRemove = Zone.create("Zone 1");
+        assertThrows(IllegalStateException.class, () ->
+                manageBeachService.removeZone(1, zoneToRemove));
+
+        //verifico che il repository non sia stato aggiornato
+        verify(beachRepository, never()).update(any(), any());
+    }
+
+    @Test
+    void removeZones_Succeeds_ForList() {
+        Beach mockBeach = createValidInactiveBeach();
+        //aggiungo una seconda zona libera
+        mockBeach.addZone(Zone.create("Zona Libera"));
+        when(beachRepository.findById(eq(1), any())).thenReturn(Optional.of(mockBeach));
+
+        //rimuovo la zona
+        List<Zone> zonesToRemove = List.of(Zone.create("Zona Libera"));
+        manageBeachService.removeZones(1, zonesToRemove);
+
+        //verifico aggiornamento
+        verify(beachRepository).update(eq(mockBeach), any(TransactionContext.class));
+        assertEquals(1, mockBeach.getZones().size());
+    }
+
+    @Test
+    void addZones_Succeeds_ForList() {
+        //creo nuova Beach
+        Beach mockBeach = createValidInactiveBeach();
+        when(beachRepository.findById(eq(1), any())).thenReturn(Optional.of(mockBeach));
+
+        //aggiungo 2 zone
+        List<Zone> newZones = List.of(Zone.create("Z2"), Zone.create("Z3"));
+        manageBeachService.addZones(1, newZones);
+
+        //verifico l'aggiunta
+        verify(beachRepository).update(eq(mockBeach), any(TransactionContext.class));
+        assertTrue(mockBeach.getZones().stream().anyMatch(z -> z.name().equals("Z2")));
+        assertTrue(mockBeach.getZones().stream().anyMatch(z -> z.name().equals("Z3")));
+    }
+
     // ==========================================
     // TEST ECCEZIONI DI RECUPERO
     // ==========================================
