@@ -52,11 +52,11 @@ public class CloseBeachService implements CloseBeachUseCase {
                 throw new SecurityException("ERROR: ownerId is not the owner of this beach");
             }
 
-            //passo 3: annullo i booking futuri
-            bookingRepository.cancelFutureBookingsForBeach(beachId, LocalDate.now(), context);
-
-            //passo 4: chiudo la spiaggia e salvo
+            //passo 3: chiudo la spiaggia
             beach.closeBeach();
+
+            //passo 4: annullo i booking futuri e salvo
+            bookingRepository.cancelFutureBookingsForBeach(beachId, LocalDate.now(), context);
             beachRepository.update(beach, context);
         });
     }

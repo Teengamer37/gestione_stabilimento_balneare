@@ -17,7 +17,7 @@ import com.example.s_balneare.domain.user.User;
  * @see UserRepository UserRepositry
  * @see TransactionManager TransactionManager per le transazioni SQL
  */
-public class ManageUserService<T extends User> {
+public abstract class ManageUserService<T extends User> {
     protected final UserRepository<T> userRepository;
     protected final TransactionManager transactionManager;
 
