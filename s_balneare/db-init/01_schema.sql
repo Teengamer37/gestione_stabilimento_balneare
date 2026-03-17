@@ -82,8 +82,6 @@ CREATE TABLE beach_services (
 
 CREATE TABLE beach_inventories (
     beachId INT PRIMARY KEY,
-    countOmbrelloni INT NOT NULL,
-    countTende INT NOT NULL,
     countExtraSdraio INT NOT NULL,
     countExtraLettini INT NOT NULL,
     countExtraSedie INT NOT NULL,
@@ -250,8 +248,6 @@ ALTER TABLE parkings
     ADD CONSTRAINT chk_nElectricPark_nonneg CHECK (nElectricPark >= 0);
 
 ALTER TABLE beach_inventories
-    ADD CONSTRAINT chk_ombrelloni_nonneg CHECK (countOmbrelloni >= 0),
-    ADD CONSTRAINT chk_tende_nonneg CHECK (countTende >= 0),
     ADD CONSTRAINT chk_extra_sdraio_nonneg CHECK (countExtraSdraio >= 0),
     ADD CONSTRAINT chk_extra_lettini_nonneg CHECK (countExtraLettini >= 0),
     ADD CONSTRAINT chk_extra_sedie_nonneg CHECK (countExtraSedie >= 0),
