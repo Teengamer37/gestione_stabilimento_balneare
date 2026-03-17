@@ -19,6 +19,9 @@ public record BeachServices(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(BeachServices services) {
+        return new Builder(services);
+    }
 
     //metodi singoli per fare update all'oggetto (metodi wither)
     public BeachServices withBathrooms(boolean bathrooms) {

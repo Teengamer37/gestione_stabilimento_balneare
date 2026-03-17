@@ -24,12 +24,10 @@ class JdbcBeachInventoryDao {
     void upsert(Integer beachId, BeachInventory inv, Connection connection) throws SQLException {
         //UPDATE se nel caso abbiamo già un beach_inventories istanziato nel DB
         String updateSql = "UPDATE beach_inventories " +
-                "SET countOmbrelloni = ?, countTende = ?, countExtraSdraio = ?, countExtraLettini = ?, countExtraSedie = ?, countCamerini = ? " +
+                "SET countExtraSdraio = ?, countExtraLettini = ?, countExtraSedie = ?, countCamerini = ? " +
                 "WHERE beachId = ?";
 
         try (PreparedStatement st = connection.prepareStatement(updateSql)) {
-            st.setInt(1, inv.countOmbrelloni());
-            st.setInt(2, inv.countTende());
             st.setInt(3, inv.countExtraSdraio());
             st.setInt(4, inv.countExtraLettini());
             st.setInt(5, inv.countExtraSedie());
@@ -55,13 +53,11 @@ class JdbcBeachInventoryDao {
      */
     void insert(Integer beachId, BeachInventory inv, Connection connection) throws SQLException {
         //INSERT nuovo elemento beach_inventories
-        String insertSql = "INSERT INTO beach_inventories (beachId, countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO beach_inventories (beachId, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement insertSt = connection.prepareStatement(insertSql)) {
             insertSt.setInt(1, beachId);
-            insertSt.setInt(2, inv.countOmbrelloni());
-            insertSt.setInt(3, inv.countTende());
             insertSt.setInt(4, inv.countExtraSdraio());
             insertSt.setInt(5, inv.countExtraLettini());
             insertSt.setInt(6, inv.countExtraSedie());

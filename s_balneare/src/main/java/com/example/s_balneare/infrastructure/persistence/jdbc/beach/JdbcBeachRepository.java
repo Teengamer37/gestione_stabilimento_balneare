@@ -369,12 +369,10 @@ public class JdbcBeachRepository implements BeachRepository {
 
                 //passo 2: ricostruisco BeachInventory (gestisco anche se non inizializzato)
                 BeachInventory inventory = null;
-                Integer countOmbrelloni = (Integer) rs.getObject("countOmbrelloni");
-                if (countOmbrelloni != null) {
+                Integer countExtraSdraio = (Integer) rs.getObject("countExtraSdraio");
+                if (countExtraSdraio != null) {
                     inventory = new BeachInventory(
-                            countOmbrelloni,
-                            rs.getInt("countTende"),
-                            rs.getInt("countExtraSdraio"),
+                            countExtraSdraio,
                             rs.getInt("countExtraLettini"),
                             rs.getInt("countExtraSedie"),
                             rs.getInt("countCamerini")
@@ -430,7 +428,7 @@ public class JdbcBeachRepository implements BeachRepository {
     }
 
     /**
-     * Cerca tutte le stagioni associate ad una spiaggia.
+     * Cerca tutte le stagioni associate a una spiaggia.
      *
      * @param beachId ID della spiaggia da cercare per le stagioni
      * @param context Connessione JDBC

@@ -2,8 +2,6 @@ package com.example.s_balneare.domain.beach;
 
 /// Contiene l'inventario degli oggetti disponibili in una spiaggia
 public record BeachInventory(
-        int countOmbrelloni,
-        int countTende,
         int countExtraSdraio,
         int countExtraLettini,
         int countExtraSedie,
@@ -11,15 +9,14 @@ public record BeachInventory(
 ) {
     //costruttore compatto per assicurarsi l'integrità dei valori
     public BeachInventory {
-        if (countOmbrelloni < 0 || countTende < 0 || countExtraSdraio < 0 ||
-                countExtraLettini < 0 || countExtraSedie < 0 || countCamerini < 0) {
+        if (countExtraSdraio < 0 || countExtraLettini < 0 || countExtraSedie < 0 || countCamerini < 0) {
             throw new IllegalArgumentException("ERROR: inventory counts cannot be negative");
         }
     }
 
     //metodo Factory statico per inizializzare l'oggetto beachInventory
     public static BeachInventory empty() {
-        return new BeachInventory(0, 0, 0, 0, 0, 0);
+        return new BeachInventory(0, 0, 0, 0);
     }
 
     //metodo Builder per costruire l'oggetto col pattern Builder
@@ -28,29 +25,21 @@ public record BeachInventory(
     }
 
     //metodi wither
-    public BeachInventory withCountOmbrelloni(int countOmbrelloni) {
-        return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
-    }
-    public BeachInventory withCountTende(int countTende) {
-        return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
-    }
     public BeachInventory withCountExtraSdraio(int countExtraSdraio) {
-        return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
+        return new BeachInventory(countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
     public BeachInventory withCountExtraLettini(int countExtraLettini) {
-        return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
+        return new BeachInventory(countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
     public BeachInventory withCountExtraSedie(int countExtraSedie) {
-        return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
+        return new BeachInventory(countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
     public BeachInventory withCountCamerini(int countCamerini) {
-        return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
+        return new BeachInventory(countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
     }
 
     //pattern Builder per creazione BeachInventory facilitata
     public static class Builder {
-        private int countOmbrelloni = 0;
-        private int countTende = 0;
         private int countExtraSdraio = 0;
         private int countExtraLettini = 0;
         private int countExtraSedie = 0;
@@ -61,22 +50,10 @@ public record BeachInventory(
 
         //costruttore copia
         public Builder(BeachInventory original) {
-            this.countOmbrelloni = original.countOmbrelloni;
-            this.countTende = original.countTende;
             this.countExtraSdraio = original.countExtraSdraio;
             this.countExtraLettini = original.countExtraLettini;
             this.countExtraSedie = original.countExtraSedie;
             this.countCamerini = original.countCamerini;
-        }
-
-        public Builder countOmbrelloni(int val) {
-            countOmbrelloni = val;
-            return this;
-        }
-
-        public Builder countTende(int val) {
-            countTende = val;
-            return this;
         }
 
         public Builder countExtraSdraio(int val) {
@@ -100,7 +77,7 @@ public record BeachInventory(
         }
 
         public BeachInventory build() {
-            return new BeachInventory(countOmbrelloni, countTende, countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
+            return new BeachInventory(countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini);
         }
     }
 }

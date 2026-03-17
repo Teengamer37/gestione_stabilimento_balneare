@@ -26,6 +26,9 @@ public record Pricing(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(Pricing pricing) {
+        return new Builder(pricing);
+    }
 
     //metodi wither
     public Pricing withId(Integer id) {

@@ -23,6 +23,9 @@ public record ZoneTariff(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(ZoneTariff zoneTariff) {
+        return new Builder(zoneTariff);
+    }
 
     //metodi wither
     public ZoneTariff withZoneName(String zoneName) {

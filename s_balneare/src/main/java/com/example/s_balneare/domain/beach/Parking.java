@@ -23,6 +23,9 @@ public record Parking(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(Parking parking) {
+        return new Builder(parking);
+    }
 
     //metodi wither
     public Parking withNAutoPark(int nAutoPark) {

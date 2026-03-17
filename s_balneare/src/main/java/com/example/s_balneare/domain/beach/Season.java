@@ -34,6 +34,9 @@ public record Season(
     public static Builder builder() {
         return new Builder();
     }
+    public static Builder builder(Season season) {
+        return new Builder(season);
+    }
 
     //metodi Business
     public boolean includes(LocalDate date) {
