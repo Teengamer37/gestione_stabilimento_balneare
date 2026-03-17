@@ -9,11 +9,10 @@ package com.example.s_balneare.application.port.out.booking;
 public record BookedParkingSpaces(
         int bookedAuto,
         int bookedMoto,
-        int bookedBike,
         int bookedElectric
 ) {
     public BookedParkingSpaces {
-        if (bookedAuto < 0 || bookedMoto < 0 || bookedBike < 0 || bookedElectric < 0)
+        if (bookedAuto < 0 || bookedMoto < 0 || bookedElectric < 0)
             throw new IllegalArgumentException("ERROR: booked parking spaces cannot be negative");
     }
 }

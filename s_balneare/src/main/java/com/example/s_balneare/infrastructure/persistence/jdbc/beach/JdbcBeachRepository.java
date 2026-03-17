@@ -264,7 +264,7 @@ public class JdbcBeachRepository implements BeachRepository {
 
         String sql = "SELECT b.*, " +
                 "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
-                "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
+                "p.nAutoPark, p.nMotoPark, p.nElectricPark, p.CCTV " +
                 "FROM beaches b " +
                 "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
                 "LEFT JOIN parkings p ON b.id = p.beachId " +
@@ -304,7 +304,6 @@ public class JdbcBeachRepository implements BeachRepository {
                         parking = new Parking(
                                 nAutoPark,
                                 rs.getInt("nMotoPark"),
-                                rs.getInt("nBikePark"),
                                 rs.getInt("nElectricPark"),
                                 rs.getBoolean("CCTV")
                         );
@@ -348,7 +347,7 @@ public class JdbcBeachRepository implements BeachRepository {
         String sql = "SELECT b.*, " +
                 "bi.countOmbrelloni, bi.countTende, bi.countExtraSdraio, bi.countExtraLettini, bi.countExtraSedie, bi.countCamerini, " +
                 "bs.bathrooms, bs.showers, bs.pool, bs.bar, bs.restaurant, bs.wifi, bs.volleyballField, " +
-                "p.nAutoPark, p.nMotoPark, p.nBikePark, p.nElectricPark, p.CCTV " +
+                "p.nAutoPark, p.nMotoPark, p.nElectricPark, p.CCTV " +
                 "FROM beaches b " +
                 "LEFT JOIN beach_inventories bi ON b.id = bi.beachId " +
                 "LEFT JOIN beach_services bs ON b.id = bs.beachId " +
@@ -404,7 +403,6 @@ public class JdbcBeachRepository implements BeachRepository {
                     parking = new Parking(
                             nAutoPark,
                             rs.getInt("nMotoPark"),
-                            rs.getInt("nBikePark"),
                             rs.getInt("nElectricPark"),
                             rs.getBoolean("CCTV")
                     );

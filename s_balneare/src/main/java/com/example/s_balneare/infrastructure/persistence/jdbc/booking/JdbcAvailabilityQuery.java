@@ -60,7 +60,6 @@ public class JdbcAvailabilityQuery implements AvailabilityQuery {
         String sql = "SELECT " +
                 "COALESCE(SUM(autoPark), 0) AS sumAuto, " +
                 "COALESCE(SUM(motoPark), 0) AS sumMoto, " +
-                "COALESCE(SUM(bikePark), 0) AS sumBike, " +
                 "COALESCE(SUM(electricPark), 0) AS sumElectric " +
                 "FROM bookings " +
                 "WHERE beachId = ? AND date = ? AND status IN ('PENDING', 'CONFIRMED') " +
@@ -77,7 +76,6 @@ public class JdbcAvailabilityQuery implements AvailabilityQuery {
                     return new BookedParkingSpaces(
                             rs.getInt("sumAuto"),
                             rs.getInt("sumMoto"),
-                            rs.getInt("sumBike"),
                             rs.getInt("sumElectric")
                     );
                 }
@@ -86,7 +84,7 @@ public class JdbcAvailabilityQuery implements AvailabilityQuery {
             throw new RuntimeException("ERROR: unable to check parking availability", e);
         }
         //paracadute di sicurezza se non trovo nulla
-        return new BookedParkingSpaces(0, 0, 0, 0);
+        return new BookedParkingSpaces(0, 0, 0);
     }
 
     /**

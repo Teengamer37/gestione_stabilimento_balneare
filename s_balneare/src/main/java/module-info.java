@@ -1,7 +1,6 @@
 module com.example.s_balneare {
     requires java.sql;
     requires java.desktop;
-    requires org.postgresql.jdbc;
     requires java.xml.crypto;
     requires bcrypt;
 

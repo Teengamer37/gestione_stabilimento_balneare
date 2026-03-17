@@ -80,7 +80,6 @@ Ogni oggetto creato contiene:
 
 > - `nAutoPark` (numero di posti auto; >= 0),
 > - `nMotoPark` (numero di posti moto; >= 0),
-> - `nBikePark` (numero di posti bici; >= 0),
 > - `nElectricPark` (numero di posti per auto elettriche; >= 0),
 > - `CCTV` (presenza di videosorveglianza).
 
@@ -177,14 +176,9 @@ Definisce i posti parcheggio prenotati. Nel DDD, è considerata un **Value Objec
 
 Ogni oggetto creato contiene:
 
-> - `bookingId` (ID della prenotazione a cui si riferisce il parcheggio),
-> - `parkingType` (tipo di parcheggio prenotato: Auto, Moto, Bici, Elettrica),
-> - `numberOfSpots` (numero di posti auto prenotati per quel tipo; >= 0).
-
-BUSINESS LOGIC:
-
-> - `bookingId` deve essere valido (maggiore di 0).
-> - `numberOfSpots` deve essere >= 0.
+> - `autoPark` (numero di posti auto prenotati; >= 0),
+> - `motoPark` (numero di posti moto prenotati; >= 0),
+> - `electricPark` (numero di posti per auto elettriche prenotati; >= 0).
 
 ### Classe PriceCalculator.java
 

@@ -24,16 +24,15 @@ class JdbcParkingDao {
     void upsert(Integer beachId, Parking parking, Connection connection) throws SQLException {
         //UPDATE se nel caso abbiamo già un parking istanziato nel DB
         String updateSql = "UPDATE parkings " +
-                "SET nAutoPark = ?, nMotoPark = ?, nBikePark = ?, nElectricPark = ?, CCTV = ? " +
+                "SET nAutoPark = ?, nMotoPark = ?, nElectricPark = ?, CCTV = ? " +
                 "WHERE beachId = ?";
 
         try (PreparedStatement st = connection.prepareStatement(updateSql)) {
             st.setInt(1, parking.nAutoPark());
             st.setInt(2, parking.nMotoPark());
-            st.setInt(3, parking.nBikePark());
-            st.setInt(4, parking.nElectricPark());
-            st.setBoolean(5, parking.CCTV());
-            st.setInt(6, beachId);
+            st.setInt(3, parking.nElectricPark());
+            st.setBoolean(4, parking.CCTV());
+            st.setInt(5, beachId);
 
             int rows = st.executeUpdate();
 
@@ -54,16 +53,15 @@ class JdbcParkingDao {
      */
     void insert(Integer beachId, Parking parking, Connection connection) throws SQLException {
         //INSERT nuovo elemento parkings
-        String insertSql = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nBikePark, nElectricPark, CCTV) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+        String insertSql = "INSERT INTO parkings (beachId, nAutoPark, nMotoPark, nElectricPark, CCTV) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement insertSt = connection.prepareStatement(insertSql)) {
             insertSt.setInt(1, beachId);
             insertSt.setInt(2, parking.nAutoPark());
             insertSt.setInt(3, parking.nMotoPark());
-            insertSt.setInt(4, parking.nBikePark());
-            insertSt.setInt(5, parking.nElectricPark());
-            insertSt.setBoolean(6, parking.CCTV());
+            insertSt.setInt(4, parking.nElectricPark());
+            insertSt.setBoolean(5, parking.CCTV());
             insertSt.executeUpdate();
         }
     }

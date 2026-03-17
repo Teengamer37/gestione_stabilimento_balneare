@@ -225,7 +225,6 @@ public class BookingService implements BookingUseCase {
         if (capacity == null) return false;
         return (capacity.nAutoPark() - booked.bookedAuto() >= requested.autoPark()) &&
                 (capacity.nMotoPark() - booked.bookedMoto() >= requested.motoPark()) &&
-                (capacity.nBikePark() - booked.bookedBike() >= requested.bikePark()) &&
                 (capacity.nElectricPark() - booked.bookedElectric() >= requested.electricPark());
     }
 }

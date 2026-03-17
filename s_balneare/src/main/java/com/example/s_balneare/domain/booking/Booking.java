@@ -224,8 +224,7 @@ public class Booking {
         checkSpotIds(updatedSpotIds);
 
         //verifico che i nuovi parcheggi siano validi
-        if (updatedParking.autoPark() < 0 || updatedParking.motoPark() < 0 ||
-                updatedParking.bikePark() < 0 || updatedParking.electricPark() < 0) {
+        if (updatedParking.autoPark() < 0 || updatedParking.motoPark() < 0 || updatedParking.electricPark() < 0) {
             throw new IllegalArgumentException("ERROR: parking values cannot be negative");
         }
         this.parking = updatedParking;

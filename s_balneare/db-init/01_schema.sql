@@ -63,7 +63,6 @@ CREATE TABLE parkings (
     beachId INT PRIMARY KEY,
     nAutoPark INT NOT NULL,
     nMotoPark INT NOT NULL,
-    nBikePark INT NOT NULL,
     nElectricPark INT NOT NULL,
     CCTV BOOLEAN NOT NULL,
     FOREIGN KEY (beachId) REFERENCES beaches(id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -156,7 +155,6 @@ CREATE TABLE bookings (
     camerini INT NOT NULL DEFAULT 0,
     autoPark INT NOT NULL DEFAULT 0,
     motoPark INT NOT NULL DEFAULT 0,
-    bikePark INT NOT NULL DEFAULT 0,
     electricPark INT NOT NULL DEFAULT 0,
     totalPrice DECIMAL(10,2) NOT NULL,
     status ENUM('PENDING', 'CONFIRMED', 'REJECTED', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
@@ -234,7 +232,6 @@ ALTER TABLE reports
 ALTER TABLE parkings
     ADD CONSTRAINT chk_nAutoPark_nonneg CHECK (nAutoPark >= 0),
     ADD CONSTRAINT chk_nMotoPark_nonneg CHECK (nMotoPark >= 0),
-    ADD CONSTRAINT chk_nBikePark_nonneg CHECK (nBikePark >= 0),
     ADD CONSTRAINT chk_nElectricPark_nonneg CHECK (nElectricPark >= 0);
 
 ALTER TABLE beach_inventories
@@ -263,7 +260,6 @@ ALTER TABLE bookings
     ADD CONSTRAINT chk_camerini_booking_nonneg CHECK (camerini >= 0),
     ADD CONSTRAINT chk_autoPark_booking_nonneg CHECK (autoPark >= 0),
     ADD CONSTRAINT chk_motoPark_booking_nonneg CHECK (motoPark >= 0),
-    ADD CONSTRAINT chk_bikePark_booking_nonneg CHECK (bikePark >= 0),
     ADD CONSTRAINT chk_electricPark_booking_nonneg CHECK (electricPark >= 0);
 
 ALTER TABLE spots

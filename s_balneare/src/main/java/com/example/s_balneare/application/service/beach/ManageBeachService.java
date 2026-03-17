@@ -110,7 +110,6 @@ public class ManageBeachService implements ManageBeachUseCase {
             //check se le nuove modifiche vanno a lasciare o meno posti "vacanti" a certe prenotazioni
             if (newParking.nAutoPark() < maxParked.bookedAuto() ||
                     newParking.nMotoPark() < maxParked.bookedMoto() ||
-                    newParking.nBikePark() < maxParked.bookedBike() ||
                     newParking.nElectricPark() < maxParked.bookedElectric()) {
                 throw new IllegalStateException("ERROR: new parking capacity leaves some bookings with vacant parking spaces");
             }

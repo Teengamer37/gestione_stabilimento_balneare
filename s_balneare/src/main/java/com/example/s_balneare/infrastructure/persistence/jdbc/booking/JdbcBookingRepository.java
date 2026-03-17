@@ -54,8 +54,8 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //query
         String sql = "INSERT INTO bookings(beachId, customerId, callerName, callerPhone, date, extraSdraio, extraLettini, extraSedie, camerini, " +
-                "autoPark, motoPark, bikePark, electricPark, totalPrice, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "autoPark, motoPark, electricPark, totalPrice, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
             int newId;
@@ -78,11 +78,10 @@ public class JdbcBookingRepository implements BookingRepository {
                 BookingParking parking = booking.getParking();
                 statement.setInt(8, parking != null ? parking.autoPark() : 0);
                 statement.setInt(9, parking != null ? parking.motoPark() : 0);
-                statement.setInt(10, parking != null ? parking.bikePark() : 0);
-                statement.setInt(11, parking != null ? parking.electricPark() : 0);
+                statement.setInt(10, parking != null ? parking.electricPark() : 0);
 
-                statement.setDouble(12, booking.getTotalPrice());
-                statement.setString(13, booking.getStatus().name());
+                statement.setDouble(11, booking.getTotalPrice());
+                statement.setString(12, booking.getStatus().name());
                 statement.executeUpdate();
 
                 //prendo nuovo id generato dal DB
@@ -162,7 +161,7 @@ public class JdbcBookingRepository implements BookingRepository {
 
         //passo 1: aggiorno tabella bookings
         String sql = "UPDATE bookings SET extraSdraio = ?, extraLettini = ?, extraSedie = ?, camerini = ?, " +
-                "autoPark = ?, motoPark = ?, bikePark = ?, electricPark = ?, totalPrice = ?, status = ? WHERE id = ?";
+                "autoPark = ?, motoPark = ?, electricPark = ?, totalPrice = ?, status = ? WHERE id = ?";
 
         //settaggio valori nella query + esecuzione query
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -176,13 +175,12 @@ public class JdbcBookingRepository implements BookingRepository {
             BookingParking parking = booking.getParking();
             statement.setInt(5, parking != null ? parking.autoPark() : 0);
             statement.setInt(6, parking != null ? parking.motoPark() : 0);
-            statement.setInt(7, parking != null ? parking.bikePark() : 0);
-            statement.setInt(8, parking != null ? parking.electricPark() : 0);
+            statement.setInt(7, parking != null ? parking.electricPark() : 0);
 
             //aggiunta prezzo totale e status
-            statement.setDouble(9, booking.getTotalPrice());
-            statement.setString(10, booking.getStatus().name());
-            statement.setInt(11, booking.getId());
+            statement.setDouble(8, booking.getTotalPrice());
+            statement.setString(9, booking.getStatus().name());
+            statement.setInt(10, booking.getId());
             statement.executeUpdate();
 
             //passo 2: aggiorno tabella booking_spots (cancello i vecchi spots, inserisco i nuovi spots)
@@ -257,7 +255,6 @@ public class JdbcBookingRepository implements BookingRepository {
                 BookingParking parking = new BookingParking(
                         rs.getInt("autoPark"),
                         rs.getInt("motoPark"),
-                        rs.getInt("bikePark"),
                         rs.getInt("electricPark")
                 );
 
@@ -393,7 +390,7 @@ public class JdbcBookingRepository implements BookingRepository {
 
                         BookingParking parking = new BookingParking(
                                 rs.getInt("autoPark"), rs.getInt("motoPark"),
-                                rs.getInt("bikePark"), rs.getInt("electricPark")
+                                rs.getInt("electricPark")
                         );
 
                         Booking booking = new Booking(id, beachId, customerId, null, null, date, new ArrayList<>(),
@@ -458,7 +455,7 @@ public class JdbcBookingRepository implements BookingRepository {
 
                         BookingParking parking = new BookingParking(
                                 rs.getInt("autoPark"), rs.getInt("motoPark"),
-                                rs.getInt("bikePark"), rs.getInt("electricPark")
+                                rs.getInt("electricPark")
                         );
 
                         Booking booking = new Booking(
@@ -673,13 +670,11 @@ public class JdbcBookingRepository implements BookingRepository {
         String sql = "SELECT " +
                 "COALESCE(MAX(dailyAuto), 0) as maxAuto, " +
                 "COALESCE(MAX(dailyMoto), 0) as maxMoto, " +
-                "COALESCE(MAX(dailyBike), 0) as maxBike, " +
                 "COALESCE(MAX(dailyElec), 0) as maxElec " +
                 "FROM (" +
                 "SELECT date, " +
                 "SUM(autoPark) as dailyAuto, " +
                 "SUM(motoPark) as dailyMoto, " +
-                "SUM(bikePark) as dailyBike, " +
                 "SUM(electricPark) as dailyElec " +
                 "FROM bookings " +
                 "WHERE beachId = ? AND date >= ? AND status IN ('PENDING', 'CONFIRMED') " +
@@ -693,7 +688,7 @@ public class JdbcBookingRepository implements BookingRepository {
                 if (rs.next()) {
                     return new BookedParkingSpaces(
                             rs.getInt("maxAuto"), rs.getInt("maxMoto"),
-                            rs.getInt("maxBike"), rs.getInt("maxElec")
+                            rs.getInt("maxElec")
                     );
                 }
             }
@@ -701,7 +696,7 @@ public class JdbcBookingRepository implements BookingRepository {
             throw new RuntimeException("ERROR: unable to check max future parkings", e);
         }
         //in caso di nessun posto prenotato, passo un record di default
-        return new BookedParkingSpaces(0, 0, 0, 0);
+        return new BookedParkingSpaces(0, 0, 0);
     }
 
     /**

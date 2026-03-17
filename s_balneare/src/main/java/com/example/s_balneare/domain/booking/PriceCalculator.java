@@ -38,7 +38,7 @@ public class PriceCalculator {
         //passo 3: calcolo costo Parking (tariffa fissa per veicolo basata su priceParking)
         if (booking.getParking() != null) {
             BookingParking p = booking.getParking();
-            int totalVehicles = p.autoPark() + p.motoPark() + p.bikePark() + p.electricPark();
+            int totalVehicles = p.autoPark() + p.motoPark() + p.electricPark();
             total += totalVehicles * pricing.priceParking();
         }
 

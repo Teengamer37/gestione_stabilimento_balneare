@@ -71,7 +71,7 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
             //passo 3: recupero i posti parcheggio occupati in quel giorno
             BookedParkingSpaces booked = availabilityQuery.getBookedParking(beachId, command.date(), null, context);
             BookingParking requestedParking = new BookingParking(
-                    command.autoPark(), command.motoPark(), command.bikePark(), command.electricPark()
+                    command.autoPark(), command.motoPark(), command.electricPark()
             );
 
             //passo 4: controllo se ho posti liberi per questa prenotazione (ovvero se posti disponibili >= posti richiesti)
@@ -133,7 +133,6 @@ public class CreateManualBookingService implements CreateManualBookingUseCase {
     private boolean isParkingAvailable(Parking capacity, BookedParkingSpaces booked, BookingParking requested) {
         return (capacity.nAutoPark() - booked.bookedAuto() >= requested.autoPark()) &&
                 (capacity.nMotoPark() - booked.bookedMoto() >= requested.motoPark()) &&
-                (capacity.nBikePark() - booked.bookedBike() >= requested.bikePark()) &&
                 (capacity.nElectricPark() - booked.bookedElectric() >= requested.electricPark());
     }
 }
