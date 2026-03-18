@@ -53,7 +53,7 @@ public class ReviewService implements ReviewUseCase {
      * @param command parametri necessari per la creazione di una nuova recensione
      * @return ID della recensione appena creata
      * @throws IllegalArgumentException se gli argomenti passati non esistono nel DB
-     * @throws SecurityException        se si prova a lasciare una recensione ad una spiaggia non attiva/bannata/chiusa
+     * @throws SecurityException        se si prova a lasciare una recensione a una spiaggia non attiva/bannata/chiusa
      * @throws IllegalStateException    se l'utente non ha un booking passato in stato CONFIRMED in quella spiaggia
      */
     @Override
