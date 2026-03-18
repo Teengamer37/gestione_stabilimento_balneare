@@ -63,6 +63,11 @@ public class BanService<T extends User> implements BanUseCase {
 
             //flusso di operazione se l'utente è un Owner
             if (user instanceof Owner owner) {
+                //controllo che l'utente non sia già stato bannato
+                if (banRepository.isBannedFromApp(command.bannedId(), context)) {
+                    throw new IllegalStateException("ERROR: user is already banned");
+                }
+
                 //controllo che non ci sia ID di una spiaggia
                 if (command.bannedFromBeachId() != null && command.bannedFromBeachId() > 0) {
                     throw new IllegalStateException("ERROR: Owner cannot be banned from beach");
@@ -91,6 +96,11 @@ public class BanService<T extends User> implements BanUseCase {
             } else if (user instanceof Customer customer) {
                 //controllo tipo di ban
                 if (command.banType() == BanType.BEACH) {
+                    //controllo che l'utente non sia già stato bannato da quella spiaggia
+                    if (banRepository.isBannedFromBeach(command.bannedId(), command.bannedFromBeachId(), context)) {
+                        throw new IllegalStateException("ERROR: user is already banned from this beach");
+                    }
+
                     //se tipo BEACH, elimino prenotazioni del singolo utente da quella spiaggia
                     Beach beach = beachRepository.findById(command.bannedFromBeachId(), context)
                             .orElseThrow(() -> new IllegalArgumentException("ERROR: beach doesn't exist"));
@@ -98,7 +108,12 @@ public class BanService<T extends User> implements BanUseCase {
                     //elimino prenotazioni utente da una singola spiaggia
                     bookingRepository.cancelFutureUserBookingsFromBeach(customer.getId(), beach.getId(), LocalDate.now(), context);
                 } else {
-                    //se tipo APPLICATION, elimino tutte le sue prenotazioni
+                    //se tipo APPLICATION, controllo che l'utente non sia già stato bannato
+                    if (banRepository.isBannedFromApp(command.bannedId(), context)) {
+                        throw new IllegalStateException("ERROR: user is already banned");
+                    }
+
+                    //elimino tutte le sue prenotazioni
                     bookingRepository.cancelFutureBookingsForCustomer(customer.getId(), LocalDate.now(), context);
 
                     //chiudo definitivamente l'account

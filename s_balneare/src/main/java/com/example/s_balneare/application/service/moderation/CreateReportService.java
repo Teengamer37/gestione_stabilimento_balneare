@@ -28,7 +28,7 @@ import java.util.Objects;
  * Implementazione dello Use Case di aggiunta report nel DB:<br>
  * Usa ReportRepository per aggiungere il nuovo Report nel DB;<br>
  * Usa UserRepository per assicurarsi che gli utenti influenzati esistano nel DB;<br>
- * Usa BookingRepository per associare un report ad una prenotazione;<br>
+ * Usa BookingRepository per associare un report a una prenotazione;<br>
  * Usa BeachRepository per assicurarsi l’esistenza nel DB della spiaggia interessata;<br>
  * Usa BanRepository per verificare se l’utente in questione possa generare il report.<br>
  * Viene usata la classe TransactionManager per gestire le SQL Transaction in maniera astratta, indipendente dalla libreria utilizzata.
@@ -74,8 +74,8 @@ public class CreateReportService<T extends User> implements CreateReportUseCase 
             //passo 1: cerco se booking esiste nel DB e se è in stato CONFIRMED
             Booking booking = bookingRepository.findById(command.bookingId(), context)
                     .orElseThrow(() -> new IllegalArgumentException("ERROR: booking does not exist"));
-            if (booking.getStatus() != BookingStatus.CONFIRMED) {
-                throw new IllegalStateException("ERROR: booking not in CONFIRMED state");
+            if (booking.getStatus() != BookingStatus.CONFIRMED && booking.getStatus() != BookingStatus.PENDING) {
+                throw new IllegalStateException("ERROR: booking not in CONFIRMED or PENDING state");
             }
 
             //passo 2: controllo temporale booking

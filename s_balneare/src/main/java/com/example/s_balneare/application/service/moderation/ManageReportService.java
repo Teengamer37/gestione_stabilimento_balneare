@@ -6,7 +6,10 @@ import com.example.s_balneare.application.port.out.moderation.ReportRepository;
 import com.example.s_balneare.domain.moderation.Report;
 import com.example.s_balneare.domain.moderation.ReportStatus;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Implementazione dell'interfaccia che permette la navigazione dell'Admin sui Report.<br>
@@ -37,7 +40,7 @@ public class ManageReportService implements ManageReportUseCase {
     public Report getReport(Integer reportId) {
         return transactionManager.executeInTransaction(context -> {
             return reportRepository.findById(reportId, context)
-                    .orElseThrow(() -> new IllegalArgumentException("ERROR: This report does not exist"));
+                    .orElseThrow(() -> new IllegalArgumentException("ERROR: this report does not exist"));
         });
     }
 
@@ -61,13 +64,16 @@ public class ManageReportService implements ManageReportUseCase {
      */
     @Override
     public List<Report> getUserReports(Integer userId) {
-        transactionManager.executeInTransaction(context -> {
+        return transactionManager.executeInTransaction(context -> {
             List<Report> reported = reportRepository.findByReportedId(userId, context);
             List<Report> reporter = reportRepository.findByReporterId(userId, context);
-            reported.addAll(reporter);
-            return reported;
+
+            Set<Report> combined = new LinkedHashSet<>();
+            combined.addAll(reported);
+            combined.addAll(reporter);
+
+            return new ArrayList<>(combined);
         });
-        return List.of();
     }
 
     /**
