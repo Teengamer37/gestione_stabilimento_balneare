@@ -47,6 +47,7 @@ public class ManageCustomerService extends ManageUserService<Customer> {
             verifyPassword(currentPassword, currentHashedPassword);
 
             user.changePhoneNumber(phoneNumber);
+            userRepository.update(user, context);
         });
     }
 
