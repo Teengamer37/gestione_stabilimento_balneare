@@ -3,12 +3,16 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
-\usepackage{geometry}
-\usepackage{graphicx}
+\usepackage[margin=1in]{geometry}
 \usepackage{subcaption} 
 \usepackage[colorlinks=true, linkcolor=black]{hyperref}
 \usepackage{float}
 \usepackage{parskip}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage{graphicx}
 
 \geometry{margin=1.2cm}
 \graphicspath{{immagini/}}
@@ -30,20 +34,67 @@ Il progetto SunSpot nasce dall'esigenza di digitalizzare e modernizzare il setto
 
 Il sistema è stato progettato con l'idea di soddisfare le esisgenze di tre tipologie di utenti: 
 \begin{itemize}
-  \item Utente finale (Customer): a cui viene fornita la possibilità di prenotareo uno o più ombrelloni o tende con la possibilità di personalizzare la propria esperienza richiedendo lettini, sedie, sdraio extra e  cabine.
-  \item Gestore stabilimento (Owner): che dispone di innumerevoli funzionalità per la personalizzazione della propria spiaggia virtuale, partendo da una sezione per poter pubblicizzare i propri servizi arrivando alla possibilità di suddividere il proprio stabilimento in diverse aree di prezzo.
-  \item Admin, gestore dell'applicazion: con lo scopo di regolare e controllare l'ambiente commerciale messo a disposizione di gestori e utenti finali, si occupa dell'inserimento della spiaggia all'interno dell'ambiente e del rispettivo gestore e di applicare un ban qualora ce ne fosse necessità.
+	\item Utente finale (Customer): a cui viene fornita la possibilità di prenotareo uno o più ombrelloni o tende con la possibilità di personalizzare la propria esperienza richiedendo lettini, sedie, sdraio extra e  cabine.
+	\item Gestore stabilimento (Owner): che dispone di innumerevoli funzionalità per la personalizzazione della propria spiaggia virtuale, partendo da una sezione per poter pubblicizzare i propri servizi arrivando alla possibilità di suddividere il proprio stabilimento in diverse aree di prezzo.
+	\item Admin, gestore dell'applicazion: con lo scopo di regolare e controllare l'ambiente commerciale messo a disposizione di gestori e utenti finali, si occupa dell'inserimento della spiaggia all'interno dell'ambiente e del rispettivo gestore e di applicare un ban qualora ce ne fosse necessità.
 \end{itemize}
 Per garantire un ecosistema sicuro e affidabile, SunSpot integra un sistema di regolazione basato su recensioni verificate e un meccanismo di segnalazione (report) tra utenti e gestori, volto a preservare l'integrità del servizio e a migliorare costantemente l'esperienza d'uso per tutti gli attori coinvolti.
 
-\section{Ambiente e teconologie utilizzate}
+\section{Ambiente e tecnologie utilizzate}
+L'applicazione è stata sviluppata integrando tecnologie moderne e affidabili, con l'obiettivo di garantire scalabilità, sicurezza dei dati e facilità di manutenzione. Di seguito vengono descritti il linguaggio, i tool di build e le librerie principali dichiarate nel descrittore del progetto (\texttt{pom.xml}).
 
-\section{Use Case}
+\subsection{Linguaggio e Tool di Build}
+\begin{itemize}
+    \item \textbf{Java 25:} È stata scelta l'ultima versione del Java Development Kit (JDK 25) per sfruttare le più recenti ottimizzazioni del linguaggio e garantire la compatibilità con le funzionalità più avanzate della JVM.
+    \item \textbf{Maven:} Strumento di bild e gestione delle dipendenze.
+\end{itemize}
 
+\subsection{Database e Sicurezza}
+\begin{itemize}
+    \item \textbf{MySQL 8.3.0:} Per la persistenza dei dati è stato adottato il sistema relazionale MySQL. L'interfacciamento tra l'applicazione e il server database avviene tramite il driver \texttt{mysql-connector-j} (versione 8.3.0).
+    \item \textbf{BCrypt (v. 0.10.2):} Utilizza la libreria \texttt{at.favre.lib:bcrypt} per l'hashing delle credenziali, garantendo la sicurezza dei dati sensibili ed evitando la memorizzazione di password in chiaro.
+\end{itemize}
 
+\subsection{Testing e Analisi, Da fare}
+La qualità del codice e la correttezza dei flussi logici (come la gestione delle disponibilità degli ombrelloni) sono verificate attraverso una suite di test automatizzati:
+\begin{itemize}
+    \item \textbf{JUnit 5 (Jupiter):} Framework principale per l'esecuzione di test unitari e di integrazione. Permette di validare singole componenti del software in isolamento.
+    \item \textbf{Mockito 5.23.0:} Utilizzato per la simulazione (\textit{mocking}) di oggetti complessi. Mockito consente di testare la business logic dell'applicazione (es. il calcolo dei prezzi o la validazione dei ban) senza la necessità di interagire con il database reale, garantendo test rapidi e deterministici.
+\end{itemize}
 
+\subsection{Containerizzazione}
 
+	\section{Use Case}
+I seguenti template descrivono alcuni dei principali casi d’uso identificati per l’applicazione
+durante la fase di analisi e progettazione. Ogni caso d’uso è descritto utilizzando una struttura
+standardizzata, che comprende i seguenti campi:
 
+\begin{itemize}
+\item ID Use Case
+\item Nome Use Case
+\item Attori
+\item Descrizione
+\item Precondizioni
+\item Postcondizioni
+\item Flusso principale
+\item Flussi alternativi
+\item Business Rules
 
+\end{itemize}
+
+\section{Database e Persistenza, Da  fare}
+La gestione della persistenza dei dati nel progetto \textit{SunSpot} è stata progettata per garantire integrità e sicurezza, separando nettamente la logica applicativa dalla memorizzazione fisica delle informazioni. Il sistema si appoggia a un database relazionale \textbf{MySQL (v. 8.3.0)}, scelto per le sue elevate prestazioni nella gestione di carichi di lettura e scrittura tipici di un sistema di prenotazione.
+
+A differenza dell'utilizzo di framework ORM complessi, per questo progetto si è scelto di adottare un approccio basato su \textbf{JDBC (Java Database Connectivity)}. Questa scelta permette un controllo granulare sulle query SQL, ottimizzando le performance delle transazioni critiche (come la verifica della disponibilità degli ombrelloni) e riducendo l'overhead computazionale dell'applicazione.
+
+Le specifiche tecniche del layer di persistenza, derivate dalla configurazione del progetto, sono:
+\begin{itemize}
+    \item \textbf{RDBMS:} MySQL Community Server versione 8.3.0.
+    \item \textbf{Driver di Connessione:} \texttt{mysql-connector-j} (versione 8.3.0), che fornisce l'interfaccia nativa tra il codice Java 25 e il server database.
+    \item \textbf{Linguaggio di Interrogazione:} SQL standard per la definizione dello schema e la manipolazione dei dati (DML/DDL).
+    \item \textbf{Sicurezza dei Dati Sensibili:} Per la protezione delle credenziali d'accesso, il sistema non memorizza password in chiaro. Viene utilizzata la libreria \textbf{BCrypt (v. 0.10.2)} per generare hash sicuri prima della persistenza su database, garantendo la conformità ai moderni standard di sicurezza informatica.
+\end{itemize}
+
+L'architettura del database è strutturata per riflettere le entità del dominio, garantendo la coerenza dei dati attraverso vincoli di \textit{Foreign Key} e assicurando che ogni operazione di prenotazione avvenga in modo atomico e isolato.
 
 \end{document}
