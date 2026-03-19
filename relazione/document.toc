@@ -1,2 +1,5 @@
 \babel@toc {italian}{}\relax 
 \babel@toc {italian}{}\relax 
+\contentsline {section}{\numberline {1}Introduzione}{1}{section.1}%
+\contentsline {section}{\numberline {2}Ambiente e teconologie utilizzate}{1}{section.2}%
+\contentsline {section}{\numberline {3}Use Case}{1}{section.3}%
