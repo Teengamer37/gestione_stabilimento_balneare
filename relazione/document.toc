@@ -3,8 +3,12 @@
 \contentsline {section}{\numberline {1}Introduzione}{1}{section.1}%
 \contentsline {section}{\numberline {2}Ambiente e tecnologie utilizzate}{1}{section.2}%
 \contentsline {subsection}{\numberline {2.1}Linguaggio e Tool di Build}{2}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Database e Sicurezza}{2}{subsection.2.2}%
-\contentsline {subsection}{\numberline {2.3}Testing e Analisi, Da fare}{2}{subsection.2.3}%
-\contentsline {subsection}{\numberline {2.4}Containerizzazione}{2}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.2}Database e Persistenza}{2}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Librerie}{2}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}Testing e Analisi}{2}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Containerizzazione}{2}{subsection.2.5}%
 \contentsline {section}{\numberline {3}Use Case}{2}{section.3}%
-\contentsline {section}{\numberline {4}Database e Persistenza, Da fare}{2}{section.4}%
+\contentsline {section}{\numberline {4}Database}{2}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Modello ER}{3}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Dizionario dei dati}{3}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Tabella delle regole}{5}{subsection.4.3}%
