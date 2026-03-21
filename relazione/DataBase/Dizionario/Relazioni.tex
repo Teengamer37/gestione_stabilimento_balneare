@@ -1,0 +1,31 @@
+\documentclass[border=10pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{xcolor}
+\usepackage{tabularray} 
+
+\begin{document}
+
+\begin{tblr}{
+  width = 18cm, 
+  colspec = {|X[1,l,m]|X[1.5,l,m]|X[2.3,l,m]|X[1.2,l,m]|},
+  row{1} = {bg=gray!20, font=\bfseries},
+  hlines, vlines,
+  rowsep = 6pt,
+}
+    Relazioni & Descrizione & Entità coinvolte & Attributi \\
+    Bans & Gestione allontanamenti & Admins (0,N), Users (0,N), Beaches (0,N) & reason, banType, createdAt \\
+    Owns & Proprietà dello stabilimento & Owners (0,1), Beaches (1,1) & - \\
+    Reviews & Valutazioni degli utenti & Customers (0,N), Beaches (0,N) & rating, comment, createdAt \\
+    Books & Assegnazione prenotazione & Customers (0,N), Bookings (1,1) & - \\
+    Periodicity & Associazione stagionale & Beaches (0,N), Seasons (1,1) & - \\
+    Zone Tariffs & Prezzi per zona specifica & Seasons (1,1), Zones (0,N) & priceOmbrellone, priceTenda \\
+    Divided into & Partizione della spiaggia & Beaches (0,N), Zones (1,1) & - \\
+    Composed of & Layout dei posti & Zones (0,N), Spots (1,1) & - \\
+    Booking Spots & Occupazione fisica spot & Bookings (1,N), Spots (0,N) & date \\
+    Reports & Segnalazioni problemi & Users (0,N), Bookings (1,1) & status, description, createdAt \\
+\end{tblr}
+
+\end{document}

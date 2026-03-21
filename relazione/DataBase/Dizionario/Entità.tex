@@ -1,0 +1,35 @@
+\documentclass[border=10pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{xcolor}
+\usepackage{tabularray} 
+
+\begin{document}
+
+\begin{tblr}{
+  width = 19cm,
+  colspec = {|X[1.2,l,m]|X[1.7,l,m]|X[2.3,l,m]|X[1.1,l,m]|}, 
+  row{1} = {bg=gray!20, font=\bfseries, halign=c},
+  hlines, vlines,
+  rowsep = 6pt, 
+}
+    Entità & Descrizione & Attributi & ID \\
+    Users & Generalizzazione degli utenti & name, surname, username, email, hashPassword & id \\
+    Admins & Amministratori di sistema & OTP & id (\textit{Users}) \\
+    Owners & Gestori degli stabilimenti & active, OTP & id (\textit{Users}) \\
+    Customers & Utenti (Clienti) & phoneNumber, active & id (\textit{Users}) \\
+    Beaches & Stabilimenti balneari & name, description, phoneNumber, extraInfo, active, closed & id \\
+    Parkings & \textbf{Attributo composto} di Beaches. Info parcheggio & nAutoPark, nMotoPark, nElectricPark, CCTV & - \\
+    Beach Services & \textbf{Attributo composto} di Beaches. Servizi offerti & bathrooms, showers, pool, bar, restaurant, wifi & - \\
+    Beach Inventories & \textbf{Attributo composto} di Beaches. Inventario & countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini & - \\
+    Addresses & \textbf{Attributo composto}. Indirizzi di utenti e spiagge & street, streetNumber, city, zipCode, country & - \\
+    Pricings & Listino prezzi base & priceLettino, priceSdraio, priceSedia, priceParking & - \\
+    Seasons & Periodi temporali (Stagionalità) & startDate, endDate, name & name, beachId (\textit{Beaches}) \\
+    Zones & Aree geografiche della spiaggia & name & name, beachId (\textit{Beaches}) \\
+    Spots & Postazioni prenotabili & type, row, column, zoneName (\textit{Zones}), beachId (\textit{Beaches}) & id \\
+    Bookings & Dati della prenotazione & date, extraSdraio, extraLettini, extraSedie, camerini, autoPark, motoPark, electricPark, totalPrice, status, callerName, callerPhone, customerId (\textit{Customers}), beachId (\textit{Beaches}) & id \\
+\end{tblr}
+
+\end{document}

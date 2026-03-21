@@ -1,0 +1,40 @@
+\documentclass[border=10pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{xcolor}
+\usepackage{tabularray} 
+
+\begin{document}
+
+\begin{tblr}{
+  width = 18cm,
+  colspec = {|X[0.8,l,m]|X[5.2,l,m]|},
+  row{1} = {bg=gray!20, font=\bfseries, halign=c},
+  hlines, vlines,
+  rowsep = 6pt,
+}
+    Codice & Regola di Vincolo (RV) \\
+    RV1 & L'email e lo username di un utente (\textit{Users}) devono essere univoci a livello di sistema. \\
+    RV2 & Il numero di telefono (\textit{phoneNumber}) di un cliente deve essere univoco. \\
+    RV3 & Ogni spiaggia (\textit{Beaches}) deve riferirsi obbligatoriamente a un proprietario (\textit{Owners}) e a un indirizzo (\textit{Addresses}) esistenti in modo univoco. \\
+    RV4 & Il numero di posti auto, moto ed elettrici (\textit{Parkings}) deve essere maggiore o uguale a zero. \\
+    RV5 & Le quantità dell'inventario (\textit{beach\_inventories}), come ombrelloni e lettini, devono essere maggiori o uguali a zero. \\
+    RV6 & Tutti i prezzi definiti nei listini (\textit{Pricings}) e nelle tariffe per zona (\textit{zone\_tariffs}) devono essere maggiori o uguali a zero. \\
+    RV7 & La data di inizio di una stagione (\textit{startDate}) deve essere strettamente precedente alla data di fine (\textit{endDate}). \\
+    RV8 & Non possono esistere due postazioni (\textit{Spots}) con la stessa riga e colonna nella medesima zona e spiaggia. \\
+    RV9 & Le coordinate di riga (\textit{row}) e colonna (\textit{column}) di uno \textit{Spot} devono essere maggiori o uguali a zero. \\
+    RV10 & Un cliente non può effettuare più di una prenotazione (\textit{Bookings}) per la stessa spiaggia nella medesima data. \\
+    RV11 & Uno \textit{Spot} non deve essere associato a più di una prenotazione (\textit{booking\_spots}) nella stessa data. \\
+    RV12 & Le quantità di servizi extra richiesti in una prenotazione (lettini, sdraio, ecc.) devono essere maggiori o uguali a zero. \\
+    RV13 & Un utente non può ricevere più di un ban attivo (\textit{Bans}) per la stessa spiaggia o per l'intera applicazione. \\
+    RV14 & Il rating di una recensione (\textit{Reviews}) deve essere un valore intero compreso tra 1 e 5. \\
+    RV15 & Un cliente può inserire al massimo una recensione per ogni spiaggia. \\
+    RV16 & Ogni utente può emettere un solo report (\textit{Reports}) per una specifica prenotazione. \\
+    RV17 & Utilizzo identificatore surrogato (id) per Spots, deve esistere vincolo di unicità tra: \textit{row}, \textit{column}, \textit{zoneName} e \textit{beachId}. \\
+    RV18 & Utilizzo identificatore surrogato (id) per Bookings, deve esistere vincolo di unicità tra: \textit{customerId}, \textit{beachId} e \textit{date}. \\
+    RV19 & La spiaggia associata a una prenotazione (\textit{beachId} in \textit{Bookings}) deve corrispondere alla spiaggia a cui appartengono i singoli posti prenotati (\textit{beachId} in \textit{Spots}). \\
+\end{tblr}
+
+\end{document}

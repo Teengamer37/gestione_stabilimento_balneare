@@ -1,0 +1,22 @@
+\documentclass[border=10pt]{standalone}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{xcolor}
+\usepackage{tabularray} 
+
+\begin{document}
+
+\begin{tblr}{
+  width = 18cm,
+  colspec = {|X[0.8,l,m]|X[5.2,l,m]|},
+  row{1} = {bg=gray!20, font=\bfseries, halign=c},
+  hlines, vlines,
+  rowsep = 6pt,
+}
+    Codice & Regola di Derivazione (RD) \\
+    RD1 & Il prezzo totale (\textit{totalPrice}) di una prenotazione si ottiene sommando la tariffa dello spot (basata su zona e stagione) al costo dei servizi extra e dei parcheggi prenotati (quantità moltiplicata per il rispettivo prezzo unitario). \\
+\end{tblr}
+
+\end{document}

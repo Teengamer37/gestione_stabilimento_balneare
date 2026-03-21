@@ -1,9 +1,10 @@
 \documentclass[a4paper,11pt]{article}
 
+% --- PREAMBOLO ---
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \usepackage[T1]{fontenc}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=1.2cm, bottom=2cm]{geometry}
 \usepackage{subcaption} 
 \usepackage[colorlinks=true, linkcolor=black]{hyperref}
 \usepackage{float}
@@ -13,38 +14,47 @@
 \usepackage{enumitem}
 \usepackage{array}
 \usepackage{graphicx}
-\usepackage{xcolor}      % Necessario per i colori nelle tabelle
-\usepackage{tabularray}  % Necessario per far funzionare l'ambiente longtblr
+\usepackage{xcolor}      
+\usepackage{tabularray}  
+\usepackage[italian]{cleveref} % Per riferimenti automatici eleganti
 
-\geometry{margin=1.2cm}
+% Percorso delle immagini
 \graphicspath{{img/}}
-\captionsetup[figure]{position=top}
 
+% Configurazione didascalie
+\captionsetup[figure]{font=small, labelfont=bf, position=top, margin=1cm}
+
+% --- DATI DEL DOCUMENTO ---
 \title{Ingegneria del Software\\ \Large SunSpot: Gestionale per la prenotazione digitale di stabilimenti balneari} 
-\author{\\Leonardo Soldani : 7139732}
-\date{... 2026} 
+\author{Leonardo Soldani - 7139732}
+\date{Marzo 2026} 
 
+% --- INIZIO DOCUMENTO ---
 \begin{document}
+
 \maketitle
+
 \renewcommand{\contentsname}{Indice}
-\setcounter{page}{1}
-\pagestyle{plain}
 \tableofcontents
+\newpage
+
+\pagestyle{plain}
+\setcounter{page}{1}
 
 \section{Introduzione}
 Il progetto SunSpot nasce dall'esigenza di digitalizzare e modernizzare il settore degli stabilimenti balneari, un ambito che ancora oggi mostra una certa resistenza all'adozione di piattaforme web integrate. L'obiettivo principale è fornire un'infrastruttura capace di permettere all'utente di prenotare in modo rapido e intuitivo un ombrellone presso uno dei lidi aderenti al servizio, trasformando la pianificazione di una giornata al mare in un'operazione a portata di click.
 
-Il sistema è stato progettato con l'idea di soddisfare le esisgenze di tre tipologie di utenti: 
+Il sistema è stato progettato con l'idea di soddisfare le esigenze di tre tipologie di utenti: 
 \begin{itemize}
-	\item Utente finale (Customer): a cui viene fornita la possibilità di prenotareo uno o più ombrelloni o tende con la possibilità di personalizzare la propria esperienza richiedendo lettini, sedie, sdraio extra e  cabine.
-	\item Gestore stabilimento (Owner): che dispone di innumerevoli funzionalità per la personalizzazione della propria spiaggia virtuale, partendo da una sezione per poter pubblicizzare i propri servizi arrivando alla possibilità di suddividere il proprio stabilimento in diverse aree di prezzo.
-	\item Admin, gestore dell'applicazion: con lo scopo di regolare e controllare l'ambiente commerciale messo a disposizione di gestori e utenti finali, si occupa dell'inserimento della spiaggia all'interno dell'ambiente e del rispettivo gestore e di applicare un ban qualora ce ne fosse necessità.
+	\item \textbf{Utente finale (Customer)}: a cui viene fornita la possibilità di prenotare uno o più ombrelloni o tende con la possibilità di personalizzare la propria esperienza richiedendo lettini, sedie, sdraio extra e cabine.
+	\item \textbf{Gestore stabilimento (Owner)}: che dispone di innumerevoli funzionalità per la personalizzazione della propria spiaggia virtuale, partendo da una sezione per poter pubblicizzare i propri servizi arrivando alla possibilità di suddividere il proprio stabilimento in diverse aree di prezzo.
+	\item \textbf{Admin (Gestore dell'applicazione)}: con lo scopo di regolare e controllare l'ambiente commerciale messo a disposizione di gestori e utenti finali. Si occupa dell'inserimento della spiaggia all'interno dell'ambiente e del rispettivo gestore, oltre ad applicare sanzioni (ban) qualora ce ne fosse necessità.
 \end{itemize}
+
 Per garantire un ecosistema sicuro e affidabile, SunSpot integra un sistema di regolazione basato su recensioni verificate e un meccanismo di segnalazione (report) tra utenti e gestori, volto a preservare l'integrità del servizio e a migliorare costantemente l'esperienza d'uso per tutti gli attori coinvolti.
 
 \section{Ambiente e tecnologie utilizzate}
-
-L'applicazione è stata sviluppata usando le seguenti tecnologie:
+L'applicazione è stata sviluppata utilizzando le seguenti tecnologie:
 
 \subsection{Linguaggio e Tool di Build}
 \begin{itemize}
@@ -58,9 +68,10 @@ L'applicazione è stata sviluppata usando le seguenti tecnologie:
     \item \textbf{MySQL Connector/J} - Driver ufficiale per la gestione della connessione al database.
 \end{itemize}
 
-\subsection{Librerie}
+\subsection{Librerie e Containerizzazione}
 \begin{itemize}
     \item \textbf{BCrypt 0.10.2} - Utilizzata per l'hashing e la gestione sicura delle password.
+    \item \textbf{Docker \& Docker Compose 3.8} - Utilizzati per containerizzare il database MySQL, garantendo un ambiente di esecuzione isolato, persistente e facilmente riproducibile.
 \end{itemize}
 
 \subsection{Testing e Analisi}
@@ -69,151 +80,69 @@ L'applicazione è stata sviluppata usando le seguenti tecnologie:
     \item \textbf{Mockito 5.23.0} - Utilizzato per la simulazione di dipendenze durante i test (mocking).
     \item \textbf{JUnit Platform Suite} - Strumento per l'organizzazione e l'esecuzione dei test.
 \end{itemize}
-\subsection{Containerizzazione}
-\begin{itemize}
-    \item \textbf{Docker} - Utilizzato per containerizzare il database MySQL, garantendo un ambiente di esecuzione isolato, persistente e facilmente riproducibile.
-    \item \textbf{Docker Compose 3.8} - Utilizzato per la configurazione e l'avvio automatizzato del servizio database tramite il file \texttt{docker-compose.yml}.
-\end{itemize}
 
 \section{Use Case}
-I seguenti template descrivono alcuni dei principali casi d’uso identificati per l’applicazione
-durante la fase di analisi e progettazione. Ogni caso d’uso è descritto utilizzando una struttura
-standardizzata, che comprende i seguenti campi:
+I seguenti template descrivono alcuni dei principali casi d’uso identificati per l’applicazione durante la fase di analisi e progettazione. Ogni caso d’uso è descritto utilizzando una struttura standardizzata: ID, Nome, Attori, Descrizione, Precondizioni, Postcondizioni, Flusso principale, Flussi alternativi e Business Rules.
 
-\begin{itemize}
-\item ID Use Case
-\item Nome Use Case
-\item Attori
-\item Descrizione
-\item Precondizioni
-\item Postcondizioni
-\item Flusso principale
-\item Flussi alternativi
-\item Business Rules
-\end{itemize}
+\newpage
 
 \section{Database}
-Per la gestione della persistenza dei dati è stato utilizzato il DBMS \textbf{MySQL}, configurato all'interno di un ambiente di containerizzazione \textbf{Docker} per garantirne la portabilità e la coerenza tra i diversi ambienti di sviluppo. L'interazione tra l'applicazione Java e il database avviene tramite l'interfaccia \textbf{JDBC} (Java Database Connectivity), utilizzando il driver ufficiale \textbf{MySQL Connector/J} per la gestione della connessione e l'esecuzione delle istruzioni SQL.
+Per la gestione della persistenza dei dati è stato utilizzato il DBMS \textbf{MySQL}, configurato all'interno di un ambiente di containerizzazione \textbf{Docker}. L'interazione tra l'applicazione Java e il database avviene tramite l'interfaccia \textbf{JDBC}, utilizzando il driver ufficiale \textbf{MySQL Connector/J}.
 
-L'integrità del dato è assicurata a livello nativo attraverso una rigorosa definizione di vincoli (Foreign Key, Unique e Check) implementati nello script di creazione. Tale approccio permette di delegare al database la validazione delle informazioni critiche relative a utenti, stabilimenti e prenotazioni, mentre le verifiche di maggiore complessità legate alla \textbf{logica di business} sono gestite programmaticamente all'interno del codice Java dell'applicazione.
+L'integrità del dato è assicurata a livello nativo attraverso una rigorosa definizione di vincoli (Foreign Key, Unique e Check) implementati nello script di creazione. Tale approccio permette di delegare al database la validazione delle informazioni critiche, mentre le verifiche legate alla \textbf{logica di business} sono gestite programmaticamente all'interno del codice Java dell'applicazione.
 
 \subsection{Modello ER}
+Il modello Entity-Relationship (\cref{fig:modelloER}) omette la relazione diretta tra \textit{Beaches} e \textit{Bookings} per evitare ridondanze concettuali, essendo il legame già mediato dalle entità \textit{Zones} e \textit{Spots}. In fase di implementazione del database fisico, tuttavia, tale relazione è stata introdotta per ottimizzare le performance delle query di ricerca, riducendo la complessità delle operazioni di join.
+
 \begin{figure}[H] 
     \centering
-    \includegraphics[width=0.9\textwidth]{ModelloER} % Non serve l'estensione se è .png o .jpg
-    \caption{Modello Entity Relationship}
+    \includegraphics[width=1.0\textwidth]{ModelloER.pdf} 
+    \caption{Modello Entity Relationship (Schema Concettuale)}
     \label{fig:modelloER}
 \end{figure}
+
+\vspace{0.5cm}
+
 \subsection{Dizionario dei dati}
-\begin{longtblr}[
-  entry = none,
-  label = none,
-  caption = {\textbf{Entità}},
-]{
-  colspec = {|X[1.2,l,m]|X[1.7,l,m]|X[2.3,l,m]|X[0.8,l,m]|}, 
-  row{1} = {bg=blue, fg=white, font=\bfseries, halign=c}, 
-  hlines, vlines,
-  rowhead = 0,
-  rowsep = 6pt, 
-}
-    Entità & Descrizione & Attributi & ID \\
-    % --- GRUPPO USER ---
-    Users & Generalizzazione degli utenti & name, surname, username, email, hashPassword & id \\
-    Admins & Amministratori di sistema & OTP & id (\textit{Users}) \\
-    Owners & Gestori degli stabilimenti & active, OTP & id (\textit{Users}) \\
-    Customers & Utenti (Clienti) & phoneNumber, active & id (\textit{Users}) \\
-    
-    % --- GRUPPO BEACH ---
-    Beaches & Stabilimenti balneari & name, description, phoneNumber, extraInfo, active, closed, & id \\
-    Parkings & \textbf{Attributo composto} di Beaches. Info parcheggio & nAutoPark, nMotoPark, nElectricPark, CCTV & - \\
-    Beach Services & \textbf{Attributo composto} di Beaches. Servizi offerti & bathrooms, showers, pool, bar, restaurant, wifi & - \\
-    Beach Inventories & \textbf{Attributo composto} di Beaches. Inventario & countExtraSdraio, countExtraLettini, countExtraSedie, countCamerini & - \\
-    
-    % --- ADDRESSES ---
-    Addresses & \textbf{Attributo composto}. Indirizzi di utenti e spiagge & street, streetNumber, city, zipCode, country & - \\
-    
-    % --- ALTRE ENTITÀ ---
-    Pricings & Listino prezzi base & priceLettino, priceSdraio, priceSedia, priceParking & - \\
-    Seasons & Periodi temporali (Stagionalità) & startDate, endDate, name, & name, beachId (\textit{Beaches}) \\
-    Zones & Aree geografiche della spiaggia & name & name, beachId (\textit{Beaches}) \\
-    Spots & Postazioni prenotabili & type, row, column, zoneName (\textit{Zones}), beachId (\textit{Beaches}) & id \\
-    Bookings & Dati della prenotazione & date, extraSdraio, extraLettini, extraSedie, camerini, autoPark, motoPark, electricPark, totalPrice, status, callerName, callerPhone, customerId (\textit{Customers}), beachId (\textit{Beaches}) & id \\
-\end{longtblr}
+Il dizionario (\cref{fig:diz_entita,fig:diz_relazioni}) presenta per \textit{Spots} e \textit{Bookings} attributi identificativi esterni derivanti dalle relazioni con altre entità, che dovrebbero svolgere il ruolo di chiave primaria per le entità citate. Per semplificare le interrogazioni e la realizzazione del db si è optato per l'utilizzo di una chiave primaria artificiale (\textit{id}), preservando la valenza identificativa di questi attributi tramite vincoli \texttt{UNIQUE} e \texttt{NOT NULL}, come dettagliato nella tabella dei vincoli (\cref{fig:tab_vincoli}).
 
-\vspace{0.7cm}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{DataBase/Dizionario/Entità}
+    \caption{Dizionario delle Entità}
+    \label{fig:diz_entita}
+\end{figure}
 
-\begin{longtblr}[
-  entry = none,
-  label = none,
-  caption = {\textbf{Relazioni}},
-]{
-  colspec = {|X[1,l,m]|X[1.5,l,m]|X[2.3,l,m]|X[1.2,l,m]|},
-  row{1} = {bg=blue, fg=white, font=\bfseries, halign=c},
-  hlines, vlines,
-  rowhead = 0,
-  rowsep = 6pt,
-}
-    Relazioni & Descrizione & Entità coinvolte & Attributi \\
-    Bans & Gestione allontanamenti & Admins (0,N), Users (0,N), Beaches (0,N) & reason, banType, createdAt \\
-    Owns & Proprietà dello stabilimento & Owners (0,1), Beaches (1,1) & - \\
-    Reviews & Valutazioni degli utenti & Customers (0,N), Beaches (0,N) & rating, comment, createdAt \\
-    Books & Assegnazione prenotazione & Customers (0,N), Bookings (1,1) & - \\
-    Periodicity & Associazione stagionale & Beaches (0,N), Seasons (1,1) & - \\
-    Zone Tariffs & Prezzi per zona specifica & Seasons (1,1), Zones (0,N) & priceOmbrellone, priceTenda \\
-    Divided into & Partizione della spiaggia & Beaches (0,N), Zones (1,1) & - \\
-    Composed of & Layout dei posti & Zones (0,N), Spots (1,1) & - \\
-    Booking Spots & Occupazione fisica spot & Bookings (1,N), Spots (0,N) & date \\
-    Reports & Segnalazioni problemi & Users (0,N), Bookings (1,1) & status, description, createdAt \\
-\end{longtblr}
+\vspace{0.5cm}
 
-\vspace{1cm}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{DataBase/Dizionario/relazioni}
+    \caption{Dizionario delle Relazioni}
+    \label{fig:diz_relazioni}
+\end{figure}
 
-\subsection{Tabella delle regole}
+\vspace{0.5cm}
 
-\begin{longtblr}[
-  entry = none,
-  label = none,
-  caption = {\textbf{Derivazioni}},
-]{
-  colspec = {|X[0.8,l,m]|X[5.2,l,m]|},
-  row{1} = {bg=gray!20, font=\bfseries},
-  hlines, vlines,
-  rowsep = 4pt,
-}
-    Codice & Regola di Derivazione (RD) \\
-    RD1 & Il prezzo totale (\textit{totalPrice}) di una prenotazione si ottiene sommando la tariffa dello spot (basata su zona e stagione) al costo dei servizi extra e dei parcheggi prenotati (quantità moltiplicata per il rispettivo prezzo unitario). \\
-\end{longtblr}
+\subsection{Tabelle delle Regole}
+Di seguito vengono riportati i vincoli di integrità e le regole di derivazione che governano la logica della persistenza dei dati.
+In merito alla regola di RD1 (\cref{fig:tab_derivazioni}), si è scelta la persistenza dell'attributo \textit{totalPrice} nel database, al fine di ridurre il carico computazionale di consultazione dei dati.
 
-\begin{longtblr}[
-  entry = none,
-  label = none,
-  caption = {\textbf{Vincoli}},
-]{
-  colspec = {|X[0.8,l,m]|X[5.2,l,m]|},
-  row{1} = {bg=gray!20, font=\bfseries},
-  hlines, vlines,
-  rowsep = 4pt,
-}
-    Codice & Regola di Vincolo (RV) \\
-    RV1 & L'email e lo username di un utente (\textit{Users}) devono essere univoci a livello di sistema. \\
-    RV2 & Il numero di telefono (\textit{phoneNumber}) di un cliente deve essere univoco. \\
-    RV3 & Ogni spiaggia (\textit{Beaches}) deve riferirsi obbligatoriamente a un proprietario (\textit{Owners}) e a un indirizzo (\textit{Addresses}) esistenti in modo univoco. \\
-    RV4 & Il numero di posti auto, moto ed elettrici (\textit{Parkings}) deve essere maggiore o uguale a zero. \\
-    RV5 & Le quantità dell'inventario (\textit{beach\_inventories}), come ombrelloni e lettini, devono essere maggiori o uguali a zero. \\
-    RV6 & Tutti i prezzi definiti nei listini (\textit{Pricings}) e nelle tariffe per zona (\textit{zone\_tariffs}) devono essere maggiori o uguali a zero. \\
-    RV7 & La data di inizio di una stagione (\textit{startDate}) deve essere strettamente precedente alla data di fine (\textit{endDate}). \\
-    RV8 & Non possono esistere due postazioni (\textit{Spots}) con la stessa riga e colonna nella medesima zona e spiaggia. \\
-    RV9 & Le coordinate di riga (\textit{row}) e colonna (\textit{column}) di uno \textit{Spot} devono essere maggiori o uguali a zero. \\
-    RV10 & Un cliente non può effettuare più di una prenotazione (\textit{Bookings}) per la stessa spiaggia nella medesima data. \\
-    RV11 & Uno \textit{Spot} non deve essere associato a più di una prenotazione (\textit{booking\_spots}) nella stessa data. \\
-    RV12 & Le quantità di servizi extra richiesti in una prenotazione (lettini, sdraio, ecc.) devono essere maggiori o uguali a zero. \\
-    RV13 & Un utente non può ricevere più di un ban attivo (\textit{Bans}) per la stessa spiaggia o per l'intera applicazione. \\
-    RV14 & Il rating di una recensione (\textit{Reviews}) deve essere un valore intero compreso tra 1 e 5. \\
-    RV15 & Un cliente può inserire al massimo una recensione per ogni spiaggia. \\
-    RV16 & Ogni utente può emettere un solo report (\textit{Reports}) per una specifica prenotazione. \\
-    RV17 & Utilizzo identificatore surrogato (id) per Spots, deve esistere vincolo di unicità tra: \textit{row}, \textit{column}, \textit{zoneName} e \textit{beachId}. \\
-    RV18 & Utilizzo identificatore surrogato (id) per Bookings, deve esistere vincolo di unicità tra: \textit{customerId}, \textit{beachId} e \textit{date}. \\
-    RV19 & La spiaggia associata a una prenotazione (\textit{beachId} in \textit{Bookings}) deve corrispondere alla spiaggia a cui appartengono i singoli posti prenotati (\textit{beachId} in \textit{Spots}). \\
-\end{longtblr}
+\begin{figure}[H] 
+    \centering
+    \includegraphics[width=0.9\textwidth]{DataBase/Tabelle/vincoli}
+    \caption{Tabella dei vincoli di integrità (RV)}
+    \label{fig:tab_vincoli}
+\end{figure}
+
+\vspace{0.5cm}
+
+\begin{figure}[H] 
+    \centering
+    \includegraphics[width=0.9\textwidth]{DataBase/Tabelle/derivazioni} 
+    \caption{Tabella delle regole di derivazione (RD)}
+    \label{fig:tab_derivazioni}
+\end{figure}
+
 
 \end{document}
