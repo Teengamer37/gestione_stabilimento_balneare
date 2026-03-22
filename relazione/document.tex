@@ -1,14 +1,12 @@
 \documentclass[a4paper,11pt]{article}
 
-% --- PREAMBOLO ---
 \usepackage[utf8]{inputenc}
 \usepackage[italian]{babel}
 \usepackage[T1]{fontenc}
-\usepackage[margin=1.2cm, bottom=2cm]{geometry}
+\usepackage[margin=2.5cm]{geometry} % Margini aumentati per migliore leggibilità
 \usepackage{subcaption} 
 \usepackage[colorlinks=true, linkcolor=black]{hyperref}
 \usepackage{float}
-\usepackage{parskip}
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{enumitem}
@@ -16,20 +14,17 @@
 \usepackage{graphicx}
 \usepackage{xcolor}      
 \usepackage{tabularray}  
-\usepackage[italian]{cleveref} % Per riferimenti automatici eleganti
+\usepackage[italian]{cleveref}
+\usepackage{parskip} % Risolve il problema dell'indentazione mista (vedi spiegazione sotto)
 
-% Percorso delle immagini
 \graphicspath{{img/}}
 
-% Configurazione didascalie
 \captionsetup[figure]{font=small, labelfont=bf, position=top, margin=1cm}
 
-% --- DATI DEL DOCUMENTO ---
 \title{Ingegneria del Software\\ \Large SunSpot: Gestionale per la prenotazione digitale di stabilimenti balneari} 
 \author{Leonardo Soldani - 7139732}
 \date{Marzo 2026} 
 
-% --- INIZIO DOCUMENTO ---
 \begin{document}
 
 \maketitle
@@ -42,14 +37,7 @@
 \setcounter{page}{1}
 
 \section{Introduzione}
-Il progetto SunSpot nasce dall'esigenza di digitalizzare e modernizzare il settore degli stabilimenti balneari, un ambito che ancora oggi mostra una certa resistenza all'adozione di piattaforme web integrate. L'obiettivo principale è fornire un'infrastruttura capace di permettere all'utente di prenotare in modo rapido e intuitivo un ombrellone presso uno dei lidi aderenti al servizio, trasformando la pianificazione di una giornata al mare in un'operazione a portata di click.
-
-Il sistema è stato progettato con l'idea di soddisfare le esigenze di tre tipologie di utenti: 
-\begin{itemize}
-	\item \textbf{Utente finale (Customer)}: a cui viene fornita la possibilità di prenotare uno o più ombrelloni o tende con la possibilità di personalizzare la propria esperienza richiedendo lettini, sedie, sdraio extra e cabine.
-	\item \textbf{Gestore stabilimento (Owner)}: che dispone di innumerevoli funzionalità per la personalizzazione della propria spiaggia virtuale, partendo da una sezione per poter pubblicizzare i propri servizi arrivando alla possibilità di suddividere il proprio stabilimento in diverse aree di prezzo.
-	\item \textbf{Admin (Gestore dell'applicazione)}: con lo scopo di regolare e controllare l'ambiente commerciale messo a disposizione di gestori e utenti finali. Si occupa dell'inserimento della spiaggia all'interno dell'ambiente e del rispettivo gestore, oltre ad applicare sanzioni (ban) qualora ce ne fosse necessità.
-\end{itemize}
+Il progetto SunSpot nasce dall'esigenza di digitalizzare e modernizzare il settore degli stabilimenti balneari, un ambito che ancora oggi mostra una certa resistenza all'adozione di piattaforme web integrate. L'obiettivo principale è fornire un'infrastruttura capace di permettere all'utente di prenotare in modo rapido e intuitivo un ombrellone presso uno dei lidi aderenti al servizio, trasformando la pianificazione di una giornata al mare in un'operazione a portata di click, offrendo al contempo ai gestori uno strumento completo per il controllo della propria attività.
 
 Per garantire un ecosistema sicuro e affidabile, SunSpot integra un sistema di regolazione basato su recensioni verificate e un meccanismo di segnalazione (report) tra utenti e gestori, volto a preservare l'integrità del servizio e a migliorare costantemente l'esperienza d'uso per tutti gli attori coinvolti.
 
@@ -81,8 +69,42 @@ L'applicazione è stata sviluppata utilizzando le seguenti tecnologie:
     \item \textbf{JUnit Platform Suite} - Strumento per l'organizzazione e l'esecuzione dei test.
 \end{itemize}
 
-\section{Use Case}
-I seguenti template descrivono alcuni dei principali casi d’uso identificati per l’applicazione durante la fase di analisi e progettazione. Ogni caso d’uso è descritto utilizzando una struttura standardizzata: ID, Nome, Attori, Descrizione, Precondizioni, Postcondizioni, Flusso principale, Flussi alternativi e Business Rules.
+\section{Use Cases}
+
+\subsection{Utenti del sistema}
+
+Il programma coinvolge tre attori principali: Customer, Owner e Admin. Ciascuno di essi ha la possibilità di effettuare azioni specifiche per il proprio ruolo:
+
+\begin{itemize}
+	\item \textbf{Customer}: utente finale dell'applicazione, ha la possibilità di effettuare prenotazioni scegliendo l'ombrellone desiderato; può richiedere inoltre servizi extra come lettini, sdraio e sedie, o la prenotazione di un camerino. Questa tipologia di utente può rilasciare un'unica recensione per ogni spiaggia presso cui ha prenotato e può inviare un report (segnalazione) agli admin qualora riscontri violazioni delle linee guida da parte di uno stabilimento.
+	\item \textbf{Owner}:gestore dello stabilimento balneare, ha il compito di configurare il proprio lido partendo dalla segnalazione dei servizi comuni, passando per l'organizzazione geografica della spiaggia in zone con diverse fasce di prezzo, fino alla possibilità di definire stagionalità con diverse tariffe. Può inoltre effettuare un report nei confronti dei customer che hanno tenuto comportamenti scorretti, come ad esempio il mancato rispetto di una prenotazione.
+	\item \textbf{Admin}: è colui che svolge il ruolo di gestore dell'ambiente commerciale offerto dall'applicazione, accogliendo i report e valutandoli tramite l'accesso alla cronologia dei report inviati e ricevuti dagli utenti, con la possibilità di accettarli o rifiutarli. Al fine di gestire l'ambiente, l'admin utilizza lo strumento del ban, che può colpire sia i customer che gli owner/spiagge. Il ban può essere di due tipi: da una singola spiaggia (solo per i customer) oppure dall'intera applicazione (per entrambi).
+\end{itemize}
+
+\subsection{Descrizione Use Cases}
+Il programma si pone l'obiettivo di implementare un'applicazione a scopi commerciali, di conseguenza l'azione di eliminare prenotazioni, spiagge, utenti ed altre informazioni di natura fiscale risulterebbe un comportamento superficiale da parte dei programmatori. Per questo motivo, il sistema non prevede l'eliminazione fisica di record sensibili, ma utilizza un meccanismo di disattivazione logica.
+
+Di seguito (\cref{fig:UseCases}) è riportato il diagramma degli Use Cases del progetto, nelle sezioni successive verranno analizzati nel dettaglio i flussi più rilevanti.
+
+\begin{figure}[H] 
+    \centering
+    % Se il PDF è davvero vettoriale, con 1.15\textwidth si vedrà benissimo
+    \makebox[\textwidth][c]{
+        \includegraphics[width=1.15\textwidth]{DiagrammaUseCases.pdf} 
+    }
+    \caption{Diagramma degli Use Cases}
+    \label{fig:UseCases}
+\end{figure}
+
+\subsubsection{Manage User Account}
+
+\subsubsection{Create Beach}
+
+\subsubsection{Manage Beach}
+
+\subsubsection{Create Booking}
+
+\section{Progettazione}
 
 \newpage
 
@@ -96,53 +118,50 @@ Il modello Entity-Relationship (\cref{fig:modelloER}) omette la relazione dirett
 
 \begin{figure}[H] 
     \centering
-    \includegraphics[width=1.0\textwidth]{ModelloER.pdf} 
+     \makebox[\textwidth][c]{   
+     \includegraphics[width=1.15\textwidth]{ModelloER.pdf} 
+     }
     \caption{Modello Entity Relationship (Schema Concettuale)}
     \label{fig:modelloER}
 \end{figure}
 
-\vspace{0.5cm}
-
 \subsection{Dizionario dei dati}
-Il dizionario (\cref{fig:diz_entita,fig:diz_relazioni}) presenta per \textit{Spots} e \textit{Bookings} attributi identificativi esterni derivanti dalle relazioni con altre entità, che dovrebbero svolgere il ruolo di chiave primaria per le entità citate. Per semplificare le interrogazioni e la realizzazione del db si è optato per l'utilizzo di una chiave primaria artificiale (\textit{id}), preservando la valenza identificativa di questi attributi tramite vincoli \texttt{UNIQUE} e \texttt{NOT NULL}, come dettagliato nella tabella dei vincoli (\cref{fig:tab_vincoli}).
+Il dizionario (\cref{fig:diz_entita,fig:diz_relazioni}) presenta per \textit{Spots} e \textit{Bookings} attributi identificativi esterni derivanti dalle relazioni con altre entità. Per semplificare le interrogazioni e la realizzazione del database si è optato per l'utilizzo di una chiave primaria artificiale (\textit{id}), preservando la valenza identificativa di questi attributi tramite vincoli \texttt{UNIQUE} e \texttt{NOT NULL}, come dettagliato nella tabella dei vincoli (\cref{fig:tab_vincoli}).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{DataBase/Dizionario/Entità}
+    \includegraphics[width=1\textwidth]{DataBase/Dizionario/Entità}
     \caption{Dizionario delle Entità}
     \label{fig:diz_entita}
 \end{figure}
 
-\vspace{0.5cm}
-
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{DataBase/Dizionario/relazioni}
+    \includegraphics[width=1\textwidth]{DataBase/Dizionario/relazioni}
     \caption{Dizionario delle Relazioni}
     \label{fig:diz_relazioni}
 \end{figure}
 
-\vspace{0.5cm}
-
 \subsection{Tabelle delle Regole}
 Di seguito vengono riportati i vincoli di integrità e le regole di derivazione che governano la logica della persistenza dei dati.
-In merito alla regola di RD1 (\cref{fig:tab_derivazioni}), si è scelta la persistenza dell'attributo \textit{totalPrice} nel database, al fine di ridurre il carico computazionale di consultazione dei dati.
+In merito alla regola RD1 (\cref{fig:tab_derivazioni}), si è scelta la persistenza dell'attributo \textit{totalPrice} nel database al fine di ridurre il carico computazionale di consultazione.
 
 \begin{figure}[H] 
     \centering
-    \includegraphics[width=0.9\textwidth]{DataBase/Tabelle/vincoli}
+    \includegraphics[width=1\textwidth]{DataBase/Tabelle/vincoli}
     \caption{Tabella dei vincoli di integrità (RV)}
     \label{fig:tab_vincoli}
 \end{figure}
 
-\vspace{0.5cm}
-
 \begin{figure}[H] 
     \centering
-    \includegraphics[width=0.9\textwidth]{DataBase/Tabelle/derivazioni} 
+    \includegraphics[width=1\textwidth]{DataBase/Tabelle/derivazioni} 
     \caption{Tabella delle regole di derivazione (RD)}
     \label{fig:tab_derivazioni}
 \end{figure}
 
+\section{Mockup}
+
+\section{Testing}
 
 \end{document}
