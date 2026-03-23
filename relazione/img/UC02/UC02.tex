@@ -1,0 +1,83 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+% Custom command adapted for standalone (removed table environment and fixed width)
+\newcommand{\usecasetable}[9]{
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{16cm}{|l|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{ID Use Case} & #1 \\ \hline
+        \textbf{Nome Use Case} & #2 \\ \hline
+        \textbf{Attori} & #3 \\ \hline
+        \textbf{Descrizione} & #4 \\ \hline
+        \textbf{Precondizioni} & #5 \\ \hline
+        \textbf{Postcondizioni} & #6 \\ \hline
+        \textbf{Flusso Principale} & #7 \\ \hline
+        \textbf{Flussi alternativi} & #8 \\ \hline
+        \textbf{Business Rules} & #9 \\ \hline
+    \end{tabularx}
+}
+
+\begin{document}
+    \usecasetable
+    {UC-02}
+    {Manage Account}
+    {User (Admin, Customer, Owner)}
+    {Permette all'utente di modificare i suoi dati legati all'account (username, email, numero di telefono, indirizzo ecc.).}
+    {L'utente in questione deve aver fatto login inizialmente all'account.}
+    {I dati modificati vengono aggiornati nel database e viene mostrato all'utente un messaggio di conferma dei cambiamenti.}
+    {
+        \begin{enumerate}[nosep, leftmargin=*]
+            \item[1.] L'utente naviga dentro la pagina "Impostazioni Account/Modifica infornazioni";
+            \item[2.] Il sistema recupera i dati e mostra i dati attuali dell'account (nome, cognome);
+            \item[3.] L'utente modifica i dati che preferisce;
+            \item[4.] L'utente clicca su "Salva modifiche";
+            \item[5.] Il sistema convalida e salva i nuovi dati;
+            \item[6.] Viene mosrato all'utente un messaggio di conferma.
+        \end{enumerate}
+    }
+    {
+        \begin{enumerate}[nosep, leftmargin=25px]
+            \item[\textbf{2a.}] \textbf{L'utente è un Customer:} Il sistema mostra anche l'indirizzo;
+            \item[\textbf{3a.}] \textbf{L'utente è un Customer} L'utente può modificare anche l'indirizzo; 
+            \item[\textbf{1a.}] \textbf{Cambio email (da passo 1):}
+            \begin{enumerate}[nosep, leftmargin=*]
+                \item[i.] L'utente naviga su "Cambia Email"; 
+                \item[ii.] Il sistema mostra una pagina dedicata per il cambio email;
+                \item[iii.] L'utente inserisce la nuova email e la password attuale; 
+                \item[iv.] Il sistema verifica l'unicità della email nel database e aggiorna la nuova email nel database.
+            \end{enumerate}
+            \item[\textbf{1b-e.}] \textbf{Email già usata per un altro account/non valida:} Il sistema segnala l'errore all'utente e invita a ricontrollare.
+            \item[\textbf{1b-e.}] \textbf{Password non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la password.
+            \item[\textbf{1c.}] \textbf{Cambio numero di telefono (L'utente è un Customer, da passo 1):} 
+            \begin{enumerate}[nosep, leftmargin=*]
+                \item[i.] L'utente naviga su "Cambia numero di telefono";
+                \item[ii.] Il sistema mostra una pagina dedicata per il cambio numero di telefono;
+                \item[iii.] L'utente inserisce il nuovo numero di telefono e la password attuale;
+                \item[iv.] Il sistema verifica l'unicità del numero nel database e aggiorna il nuovo numero nel database.
+            \end{enumerate}
+            \item[\textbf{1c-e.}] \textbf{Numero di telefono già usato per un altro account/non valido:} Il sistema segnala l'errore all'utente e invita a ricontrollare.
+            \item[\textbf{1c-e.}] \textbf{Password non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la password.
+            \item[\textbf{1d.}] \textbf{Cambio password (da passo 1):}
+            \begin{enumerate}[nosep, leftmargin=1px]
+                \item[i.] L'utente naviga su "Cambia password"; 
+                \item[ii.] Il sistema mostra una pagina dedicata per il cambio password;
+                \item[iii.] L'utente inserisce la nuova e la vecchia password;
+                \item[iv.] Il sistema verifica la password vecchia;
+                \item[v.] Il sistema aggiorna la password nel database e mostra un messaggio di conferma all'utente.
+            \end{enumerate}
+            \item[\textbf{1d-e.}] \textbf{Password vecchia non valida:} Il sistema segnala l'errore all'utente e invita a reinserire la vecchia password.
+        \end{enumerate}
+    }
+    {
+        \begin{enumerate}[nosep, leftmargin=*]
+            \item[•] Ogni utente deve inserire dati validi. I dati non possono essere nulli.
+            \item[•] Solo Customer possiede indirizzo e numero di telefono;
+            \item[•] Username, nome, cognome (per i Customers: indirizzo) possono essere cambiati allo stesso momento. Email, Password (per i Customers: numero di telefono) invece devono essere cambiati singolarmente attraversando dei check di sicurezza.
+        \end{enumerate}
+    }
+\end{document}

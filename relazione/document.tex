@@ -15,6 +15,8 @@
 \usepackage{xcolor}      
 \usepackage{tabularray}  
 \usepackage[italian]{cleveref}
+\usepackage{lmodern}       % Font pulito (Latin Modern)
+\usepackage{microtype}     % Fondamentale: aggiusta gli spazi tra le lettere per evitare che il testo esca dai bordi
 \usepackage{parskip} % Risolve il problema dell'indentazione mista (vedi spiegazione sotto)
 
 \graphicspath{{img/}}
@@ -85,10 +87,8 @@ Il programma coinvolge tre attori principali: Customer, Owner e Admin. Ciascuno 
 Il programma si pone l'obiettivo di implementare un'applicazione a scopi commerciali, di conseguenza l'azione di eliminare prenotazioni, spiagge, utenti ed altre informazioni di natura fiscale risulterebbe un comportamento superficiale da parte dei programmatori. Per questo motivo, il sistema non prevede l'eliminazione fisica di record sensibili, ma utilizza un meccanismo di disattivazione logica.
 
 Di seguito (\cref{fig:UseCases}) è riportato il diagramma degli Use Cases del progetto, nelle sezioni successive verranno analizzati nel dettaglio i flussi più rilevanti.
-
 \begin{figure}[H] 
     \centering
-    % Se il PDF è davvero vettoriale, con 1.15\textwidth si vedrà benissimo
     \makebox[\textwidth][c]{
         \includegraphics[width=1.15\textwidth]{DiagrammaUseCases.pdf} 
     }
@@ -98,11 +98,58 @@ Di seguito (\cref{fig:UseCases}) è riportato il diagramma degli Use Cases del p
 
 \subsubsection{Manage User Account}
 
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=0.85\linewidth]{UC02/UC02.pdf}
+    }
+    \caption{UC: Manage Account}
+    \label{fig:UC02}
+\end{figure}
+
+\subsubsection{Create Booking}
+
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=0.85\textwidth]{UC05/UC05.pdf}
+    }
+    \caption{UC: Create Booking}
+    \label{fig:UC05}
+\end{figure}
+
+\subsubsection{Manage Reviews}
+
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=0.85\textwidth]{UC07/UC07.pdf}
+    }
+    \caption{UC: Manage Reviews}
+    \label{fig:UC07}
+\end{figure}
+
 \subsubsection{Create Beach}
+
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=0.85\textwidth]{UC10/UC10.pdf}
+    }
+    \caption{UC: Create Beach}
+    \label{fig:UC10}
+\end{figure}
 
 \subsubsection{Manage Beach}
 
-\subsubsection{Create Booking}
+\begin{figure}[H]
+    \centering
+    \makebox[\textwidth][c]{
+        \includegraphics[width=0.85\textwidth]{UC11/UC11.pdf}
+    }
+    \caption{UC: Manage Beach}
+    \label{fig:UC11}
+\end{figure}
 
 \section{Progettazione}
 

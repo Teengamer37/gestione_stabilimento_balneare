@@ -1,0 +1,61 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+\newcommand{\usecasetable}[9]{
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{16cm}{|l|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{ID Use Case} & #1 \\ \hline
+        \textbf{Nome Use Case} & #2 \\ \hline
+        \textbf{Attori} & #3 \\ \hline
+        \textbf{Descrizione} & #4 \\ \hline
+        \textbf{Precondizioni} & #5 \\ \hline
+        \textbf{Postcondizioni} & #6 \\ \hline
+        \textbf{Flusso Principale} & #7 \\ \hline
+        \textbf{Flussi alternativi} & #8 \\ \hline
+        \textbf{Business Rules} & #9 \\ \hline
+    \end{tabularx}
+}
+
+\begin{document}
+	\usecasetable
+	{UC-10}
+	{Create Beach}
+	{Owner}
+	{Permette a un Owner appena registrato (o senza strutture associate) di inserire nel sistema la propria spiaggia, configurandone dati anagrafici, inventario, servizi, parcheggi, stagioni e zone.}
+	{L'utente deve aver effettuato il login come Owner. Nel database NON deve esistere alcuna spiaggia già associata a questo account.}
+	{Viene creato un nuovo record "Spiaggia" nel database, associato all'Owner. Lo stato sarà ATTIVO se configurata completamente e confermata, altrimenti INATTIVO (bozza).}
+	{
+		\begin{enumerate}[nosep, leftmargin=15px]
+			\item L'Owner accede al sistema; il sistema rileva l'assenza di strutture e mostra il pulsante "Crea Spiaggia";
+			\item L'Owner clicca sul pulsante e accede al modulo di creazione;
+			\item L'Owner inserisce i Dati Obbligatori: Nome, Descrizione, Numero di Telefono, Indirizzo e Informazioni Extra;
+			\item L'Owner (opzionalmente) compila l'Inventario: quantità di ombrelloni, tende, sdraio, lettini, sedie, camerini;
+			\item L'Owner (opzionalmente) seleziona i Servizi: bagni, docce, piscina, bar, ristorante, Wi-Fi, campo da pallavolo;
+			\item L'Owner (opzionalmente) configura il Parcheggio: numero posti auto, moto, bici, veicoli elettrici e presenza telecamere di videosorveglianza;
+			\item L'Owner (opzionalmente) crea le Stagioni (prezzi base e tariffe sulle varie zone) e le Zone (layout ombrelloni/tende);
+			\item L'Owner clicca su "Salva Spiaggia";
+			\item Il sistema convalida i dati obbligatori;
+			\item Il sistema verifica la completezza della configurazione (presenza sia dei dati obbligatori che di quelli opzionali/operativi);
+			\item Avendo inserito tutti i dati, il sistema mostra un prompt: "Vuoi attivare la spiaggia e renderla visibile ora?";
+			\item L'Owner accetta (o rifiuta);
+			\item Il sistema salva definitivamente la spiaggia nel database (in stato ATTIVO se l'Owner ha accettato, altrimenti INATTIVO).
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{9a-e.}] \textbf{Campi Obbligatori Mancanti:} Se Nome, Indirizzo o altri campi base sono vuoti, il sistema evidenzia gli errori e impedisce il salvataggio.
+			\item[\textbf{10a.}] \textbf{Salvataggio Parziale (Bozza):} Se l'Owner ha inserito i dati obbligatori ma ha saltato configurazioni chiave (es. Stagioni e Zone), il sistema non mostra il prompt di attivazione. Salva direttamente la spiaggia in stato INATTIVO. L'Owner dovrà usare "Manage Beach" (UC-11) in futuro per completarla e attivarla.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Relazione 1:1 rigida: un Owner può possedere e gestire al massimo una spiaggia nel sistema.
+			\item[•] Per poter passare allo stato ATTIVO, la spiaggia deve possedere almeno i requisiti minimi operativi (Inventario, Servizi e Parcheggi definiti; almeno una Stagione e una Zona configurate, come definito dalle regole di business generali).
+		\end{enumerate}
+	}
+\end{document}

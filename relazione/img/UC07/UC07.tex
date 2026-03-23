@@ -1,0 +1,65 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+\newcommand{\usecasetable}[9]{
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{16cm}{|l|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{ID Use Case} & #1 \\ \hline
+        \textbf{Nome Use Case} & #2 \\ \hline
+        \textbf{Attori} & #3 \\ \hline
+        \textbf{Descrizione} & #4 \\ \hline
+        \textbf{Precondizioni} & #5 \\ \hline
+        \textbf{Postcondizioni} & #6 \\ \hline
+        \textbf{Flusso Principale} & #7 \\ \hline
+        \textbf{Flussi alternativi} & #8 \\ \hline
+        \textbf{Business Rules} & #9 \\ \hline
+    \end{tabularx}
+}
+
+\begin{document}
+	\usecasetable
+	{UC-07}
+	{Manage Reviews}
+	{Customer}
+	{Permette ad un Customer di valutare e commentare la propria esperienza presso una spiaggia in cui ha effettivamente soggiornato, oppure di eliminare una propria recensione precedentemente pubblicata.}
+	{L'utente è loggato. La spiaggia è in stato ATTIVO. L'utente non ha un Ban per quella spiaggia. Deve esistere almeno una prenotazione per quella spiaggia con data nel passato (rispetto a quando viene applicato lo Use Case) e in stato CONFIRMED.}
+	{La recensione viene salvata o rimossa dal database, associata alla spiaggia e all'utente.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'utente naviga nella sezione "Le mie prenotazioni" o sulla pagina della spiaggia;
+			\item L'utente clicca sul pulsante "Lascia una recensione" per la spiaggia selezionata;
+			\item Il sistema verifica che tutti i requisiti siano soddisfatti (prenotazione passata e CONFIRMED, assenza di ban, spiaggia attiva);
+			\item Il sistema mostra il modulo della recensione;
+			\item L'utente seleziona una valutazione (da 1 a 5 stelle) e inserisce un commento testuale;
+			\item L'utente clicca su "Pubblica";
+			\item Il sistema salva la recensione nel database e mostra un messaggio di conferma.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{2a.}] \textbf{Eliminazione Recensione:} 
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'utente seleziona una recensione che ha già pubblicato in passato e clicca su "Elimina";
+				\item[ii.] Il sistema chiede conferma dell'operazione ("Sei sicuro di voler eliminare questa recensione?");
+				\item[iii.] L'utente conferma;
+				\item[iv.] Il sistema rimuove il record dal database e mostra un messaggio di successo.
+			\end{enumerate}
+			\item[\textbf{3a-e.}] \textbf{Mancanza Requisiti:} Se l'utente tenta di accedere all'URL della recensione senza averne diritto (es. prenotazione futura, prenotazione CANCELLED/REJECTED o mai stato in quella spiaggia), il sistema blocca l'azione mostrando: "Devi aver completato un soggiorno in questa struttura per poter lasciare una recensione.".
+			\item[\textbf{3b-e.}] \textbf{Spiaggia Disattivata/Ban:} Se la spiaggia non è più attiva o l'utente è stato bannato da quella struttura dopo il soggiorno, il sistema inibisce la funzione di recensione.
+			\item[\textbf{6a-e.}] \textbf{Recensione non completata:} Se l'utente non compila entrambi i campi, il sistema evidenzia i campi da compilare obbligatoriamente.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] La valutazione è obbligatoria ed è un valore intero tra 1 e 5.
+			\item[•] Il commento testuale è anch'esso obbligatorio.
+			\item[•] Il sistema accetta recensioni solo per prenotazioni la cui data è strettamente minore della data odierna (es. prenotazione il 19 luglio, recensibile dal 20 luglio).
+			\item[•] L'App Ban è già gestito a monte dal Login (UC-01).
+		\end{enumerate}
+	}
+\end{document}

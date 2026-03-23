@@ -1,0 +1,68 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+\newcommand{\usecasetable}[9]{
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{16cm}{|l|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{ID Use Case} & #1 \\ \hline
+        \textbf{Nome Use Case} & #2 \\ \hline
+        \textbf{Attori} & #3 \\ \hline
+        \textbf{Descrizione} & #4 \\ \hline
+        \textbf{Precondizioni} & #5 \\ \hline
+        \textbf{Postcondizioni} & #6 \\ \hline
+        \textbf{Flusso Principale} & #7 \\ \hline
+        \textbf{Flussi alternativi} & #8 \\ \hline
+        \textbf{Business Rules} & #9 \\ \hline
+    \end{tabularx}
+}
+
+\begin{document}
+	\usecasetable
+	{UC-05}
+	{Create Booking}
+	{Customer, Owner}
+	{Permette ad un Customer di prenotare posti, servizi extra e parcheggi presso una spiaggia in una certa data. Permette inoltre ad un Owner di registrare manualmente una prenotazione per un cliente telefonico.}
+	{L'utente deve aver effettuato il login. Se l'utente è un Customer, non deve essere bannato dalla spiaggia selezionata. Se l'utente è un Owner, deve possedere una spiaggia attiva. La spiaggia selezionata (o posseduta dall'Owner) deve essere nello stato ATTIVO.}
+	{Viene creato un nuovo record di prenotazione nel database con un prezzo totale calcolato e uno stato iniziale (PENDING per i Customer, CONFIRMED per gli Owner).}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item Il Customer seleziona una spiaggia (partendo da UC-04) e sceglie una data;
+			\item Il sistema verifica che il Customer non sia bannato da quella spiaggia;
+			\item Il sistema mostra la mappa o la lista delle disponibilità per la data scelta;
+			\item Il Customer seleziona i posti spiaggia desiderati (es. ombrelloni, lettini);
+			\item Il Customer seleziona eventuali extra (lettini, sdraio, sedie);
+			\item Il Customer inserisce il numero di parcheggi desiderati;
+			\item Il sistema calcola e mostra il prezzo totale riepilogativo;
+			\item Il Customer conferma la prenotazione;
+			\item Il sistema salva la prenotazione e le assegna lo stato "PENDING", mostrando un messaggio di successo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=33px]
+			\item[\textbf{1a.}] \textbf{Flusso Owner (Prenotazione Telefonica):}
+			\begin{enumerate}[nosep, leftmargin=*]
+				\item[i.] L'Owner accede al pannello gestionale della propria spiaggia e avvia una nuova prenotazione;
+				\item[ii.] L'Owner seleziona la data, i posti, gli extra e i parcheggi (come nei passi 3-6 del Main Flow);
+				\item[iii.] L'Owner inserisce obbligatoriamente il Nome e il Numero di Telefono del cliente chiamante;
+				\item[iv.] Il sistema calcola e mostra il totale;
+				\item[v.] L'Owner conferma la prenotazione;
+				\item[vi.] Il sistema salva la prenotazione assegnandole automaticamente lo stato "CONFIRMED".
+			\end{enumerate}
+			\item[\textbf{2a-e.}] \textbf{Utente Bannato:} Il sistema rileva che il Customer è nella blacklist della spiaggia e blocca l'operazione mostrando il messaggio: "Non sei autorizzato a prenotare in questa struttura.".
+			\item[\textbf{4/6a-e.}] \textbf{Disponibilità Esaurita:} Se durante la selezione i posti o i parcheggi scelti vengono esauriti (es. prenotati da un altro utente nello stesso istante), il sistema avvisa l'utente e lo invita a modificare la scelta.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Le prenotazioni dei Customer partono sempre dallo stato PENDING e richiedono un passaggio a CONFIRMED da parte dell'Owner.
+			\item[•] Le prenotazioni create dall'Owner sono considerate già confermate (CONFIRMED). 
+			\item[•] L'Owner non può selezionare la spiaggia: il sistema forza la prenotazione solo sullo stabilimento di sua proprietà.
+			\item[•] Il calcolo del totale si basa sul tariffario (Season/Zone) impostato per quella data.
+		\end{enumerate}
+	}
+\end{document}

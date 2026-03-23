@@ -1,0 +1,57 @@
+\documentclass[border=10pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{array}
+
+\newcommand{\usecasetable}[9]{
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabularx}{16cm}{|l|>{\raggedright\arraybackslash}X|}
+        \hline
+        \textbf{ID Use Case} & #1 \\ \hline
+        \textbf{Nome Use Case} & #2 \\ \hline
+        \textbf{Attori} & #3 \\ \hline
+        \textbf{Descrizione} & #4 \\ \hline
+        \textbf{Precondizioni} & #5 \\ \hline
+        \textbf{Postcondizioni} & #6 \\ \hline
+        \textbf{Flusso Principale} & #7 \\ \hline
+        \textbf{Flussi alternativi} & #8 \\ \hline
+        \textbf{Business Rules} & #9 \\ \hline
+    \end{tabularx}
+}
+
+\begin{document}
+	\usecasetable
+	{UC-11}
+	{Manage Beach}
+	{Owner}
+	{Permette all'Owner di aggiornare i dati generali, l'inventario, i servizi, i parcheggi e di gestire la struttura delle Stagioni e delle Zone, nel rigoroso rispetto dello stato di attività della spiaggia.}
+	{L'Owner ha effettuato il login, possiede una spiaggia associata e l'account/spiaggia non sono soggetti a Ban (già verificato al login).}
+	{Il database viene aggiornato con le nuove informazioni della spiaggia, dell'inventario, dei servizi e/o dei parcheggi.}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item L'Owner accede alla dashboard di Gestione Spiaggia;
+			\item Il sistema recupera i dati attuali e verifica lo stato della spiaggia (ATTIVO o INATTIVO);
+			\item Il sistema "blocca" (sola lettura) o abilita i campi di modifica in base allo stato attuale;
+			\item L'Owner naviga tra le sezioni e applica le modifiche desiderate (Anagrafica, Inventario, Servizi, Parcheggi);
+			\item L'Owner clicca su "Salva Modifiche";
+			\item Il sistema esegue i controlli di integrità (es. validazione dell'inventario contro le esigenze delle stagioni future e capienza parcheggi per le prenotazioni attive);
+			\item Il sistema salva i dati aggiornati nel database e mostra un messaggio di successo.
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=25px]
+			\item[\textbf{3a.}] \textbf{Spiaggia in stato ATTIVO (Restrizioni):} Il sistema rende in sola lettura: Nome, Descrizione, Numero di Telefono, Indirizzo, Inventario, Servizi e Parcheggio. Non è permessa alcuna alterazione strutturale finché la spiaggia riceve prenotazioni.
+			\item[\textbf{3b.}] \textbf{Spiaggia in stato INATTIVO (Permessi Estesi):} Il sistema sblocca la modifica dei dati base, Inventario, Servizi e Parcheggio.
+			\item[\textbf{6a-e.}] \textbf{Conflitto Inventario:} Se la spiaggia è INATTIVA e l'Owner riduce la quantità di inventario (ombrelloni, tende), il sistema verifica le stagioni attuali e future. Se la nuova capacità è inferiore a quella utilizzata nelle Stagioni, il sistema blocca il salvataggio mostrando: "Inventario insufficiente: capacità ridotta sotto la soglia richiesta dalle stagioni programmate."
+			\item[\textbf{6b-e.}] \textbf{Conflitto Parcheggi:} Se l'Owner riduce il numero di parcheggi, il sistema somma i posti auto richiesti da tutte le prenotazioni PENDING e CONFIRMED per ogni singola data (odierna e futura). Se il nuovo limite inserito è inferiore al totale già prenotato in una qualsiasi di queste date, il sistema blocca l'operazione mostrando: "Capacità parcheggio insufficiente per coprire le prenotazioni già attive o in attesa."
+		\end{enumerate}
+	}
+	{
+		\begin{enumerate}[nosep, leftmargin=*]
+			\item[•] Dati anagrafici, Inventario, Servizi e Parcheggio sono modificabili esclusivamente in stato INATTIVO.
+			\item[•] I controlli di capienza (Inventario e Parcheggi) devono garantire la retrocompatibilità sia con le Stagioni in corso e quelle in futuro che con le prenotazioni già accettate o in approvazione (CONFIRMED/PENDING).
+		\end{enumerate}
+	}
+\end{document}
